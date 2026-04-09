@@ -1,0 +1,1 @@
+# Conexão com SQLite, funções de cache
