@@ -4,15 +4,16 @@ import { ATRIBUTOS, getMockSpecs } from '../data/mockData'
 import { useHistorico } from '../context/HistoricoContext'
 import ResultadoIndividual from './ResultadoIndividual'
 
-export default function PesquisaIndividual() {
+export default function PesquisaIndividual({ itemHistorico }) {
   const { adicionarPesquisa } = useHistorico()
-  const [marca, setMarca] = useState('')
-  const [modelo, setModelo] = useState('')
-  const [versao, setVersao] = useState('')
+  const [marca, setMarca] = useState(itemHistorico?.marca || '')
+  const [modelo, setModelo] = useState(itemHistorico?.modelo || '')
+  const [versao, setVersao] = useState(itemHistorico?.versao || '')
   const [atributosSelecionados, setAtributosSelecionados] = useState(
+    itemHistorico ? Object.keys(itemHistorico.specs) :
     ['Motor', 'Torque', 'Câmbio', 'Tração', 'Freios', 'Rodas e Pneus', 'Faróis', 'Preço']
   )
-  const [resultado, setResultado] = useState(null)
+  const [resultado, setResultado] = useState(itemHistorico || null)
   const [loading, setLoading] = useState(false)
 
   function toggleAtributo(atributo) {

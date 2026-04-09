@@ -16,12 +16,16 @@ export function HistoricoProvider({ children }) {
     ])
   }
 
+  function removerPesquisa(id) {
+    setHistorico(prev => prev.filter(item => item.id !== id))
+  }
+
   function limparHistorico() {
     setHistorico([])
   }
 
   return (
-    <HistoricoContext.Provider value={{ historico, adicionarPesquisa, limparHistorico }}>
+    <HistoricoContext.Provider value={{ historico, adicionarPesquisa, removerPesquisa, limparHistorico }}>
       {children}
     </HistoricoContext.Provider>
   )

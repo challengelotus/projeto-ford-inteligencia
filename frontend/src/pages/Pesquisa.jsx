@@ -1,15 +1,20 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import PesquisaIndividual from '../components/PesquisaIndividual'
 import CompararVeiculos from '../components/CompararVeiculos'
 
 export default function Pesquisa() {
-  const [aba, setAba] = useState('individual')
+  const location = useLocation()
+  const itemHistorico = location.state?.itemHistorico || null
+
+  const abaInicial = itemHistorico?.tipo === 'comparacao' ? 'comparar' : 'individual'
+  const [aba, setAba] = useState(abaInicial)
 
   return (
     <div className="min-h-screen bg-[#0a1628]">
       <Navbar />
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
 
         <div className="flex justify-center mb-6">
           <div className="flex bg-[#1a2f5e] border border-[#2a4070] rounded-xl p-1">
@@ -31,7 +36,10 @@ export default function Pesquisa() {
         </div>
 
         <div className="max-w-3xl mx-auto">
-          {aba === 'individual' ? <PesquisaIndividual /> : <CompararVeiculos />}
+          {aba === 'individual'
+            ? <PesquisaIndividual itemHistorico={itemHistorico?.tipo === 'individual' ? itemHistorico : null} />
+            : <CompararVeiculos itemHistorico={itemHistorico?.tipo === 'comparacao' ? itemHistorico : null} />
+          }
         </div>
 
       </div>
