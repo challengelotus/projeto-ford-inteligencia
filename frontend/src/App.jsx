@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { HistoricoProvider } from './context/HistoricoContext'
 import Login from './pages/Login'
 import Pesquisa from './pages/Pesquisa'
 import Historico from './pages/Historico'
@@ -27,9 +28,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <HistoricoProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </HistoricoProvider>
     </AuthProvider>
   )
 }
