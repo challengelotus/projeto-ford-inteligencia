@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import { ATRIBUTOS_TECNICOS, ATRIBUTOS_SENSACOES, getMockSpecs } from '../data/mockData'
+import { getMockSpecs } from '../data/mockData'
+import { useAtributos } from '../context/AtributosContext'
 import { useHistorico } from '../context/HistoricoContext'
 import { useTranslation } from 'react-i18next'
 import ResultadoIndividual from './ResultadoIndividual'
@@ -18,6 +19,7 @@ export default function PesquisaIndividual({ itemHistorico }) {
   const [resultado, setResultado] = useState(itemHistorico || null)
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
+  const { atributosTecnicos, atributosSensacoes } = useAtributos()
 
   function toggleAtributo(atributo) {
     setAtributosSelecionados(prev =>
@@ -28,7 +30,7 @@ export default function PesquisaIndividual({ itemHistorico }) {
   }
 
   function selecionarTodos() {
-    const todos = [...ATRIBUTOS_TECNICOS, ...ATRIBUTOS_SENSACOES]
+    const todos = [...atributosTecnicos, ...atributosSensacoes]
     setAtributosSelecionados(todos)
   }
 
@@ -124,14 +126,14 @@ export default function PesquisaIndividual({ itemHistorico }) {
             <p className="text-white text-sm font-semibold">{t('pesquisa.especificacoes_tecnicas')}</p>
           </div>
           <button
-            onClick={() => selecionarGrupo(ATRIBUTOS_TECNICOS)}
+            onClick={() => selecionarGrupo(atributosTecnicos)}
             className="text-xs text-slate-400 hover:text-[#4a9eff] transition"
           >
-            {ATRIBUTOS_TECNICOS.every(a => atributosSelecionados.includes(a)) ? 'Desmarcar grupo' : 'Selecionar grupo'}
+            {atributosTecnicos.every(a => atributosSelecionados.includes(a)) ? 'Desmarcar grupo' : 'Selecionar grupo'}
           </button>
         </div>
         <div className="flex flex-wrap gap-2">
-          {ATRIBUTOS_TECNICOS.map(atributo => {
+          {atributosTecnicos.map(atributo => {
             const selecionado = atributosSelecionados.includes(atributo)
             return (
               <button
@@ -163,14 +165,14 @@ export default function PesquisaIndividual({ itemHistorico }) {
             <span className="text-xs text-slate-500 ml-1">{t('pesquisa.experiencia_sub')}</span>
           </div>
           <button
-            onClick={() => selecionarGrupo(ATRIBUTOS_SENSACOES)}
+            onClick={() => selecionarGrupo(atributosSensacoes)}
             className="text-xs text-slate-400 hover:text-purple-400 transition"
           >
-            {ATRIBUTOS_SENSACOES.every(a => atributosSelecionados.includes(a)) ? 'Desmarcar grupo' : 'Selecionar grupo'}
+            {atributosSensacoes.every(a => atributosSelecionados.includes(a)) ? 'Desmarcar grupo' : 'Selecionar grupo'}
           </button>
         </div>
         <div className="flex flex-wrap gap-2">
-          {ATRIBUTOS_SENSACOES.map(atributo => {
+          {atributosSensacoes.map(atributo => {
             const selecionado = atributosSelecionados.includes(atributo)
             return (
               <button
