@@ -1,14 +1,19 @@
 import { ArrowLeft, Download } from 'lucide-react'
+import { ATRIBUTOS_TECNICOS, ATRIBUTOS_SENSACOES } from '../data/mockData'
 
 export default function ResultadoIndividual({ resultado, onNovaPesquisa }) {
   const { marca, modelo, versao, specs } = resultado
 
-  return (
-    <div>
-      <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4 mb-5 text-base font-semibold text-white">
-        {marca} · {modelo} · <span className="text-[#4a9eff]">{versao}</span>
-      </div>
+  const specsTecnicos = Object.entries(specs).filter(([atributo]) =>
+    ATRIBUTOS_TECNICOS.includes(atributo)
+  )
 
+  const specsSensacoes = Object.entries(specs).filter(([atributo]) =>
+    ATRIBUTOS_SENSACOES.includes(atributo)
+  )
+
+  function TabelaSpecs({ dados }) {
+    return (
       <div className="rounded-xl overflow-hidden border border-[#2a4070]">
         <table className="w-full border-collapse">
           <thead>
@@ -19,13 +24,13 @@ export default function ResultadoIndividual({ resultado, onNovaPesquisa }) {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(specs).map(([atributo, valor]) => {
+            {dados.map(([atributo, valor]) => {
               const encontrado = valor !== 'Não disponível'
               return (
                 <tr key={atributo} className="border-t border-[#1e3358]">
-                  <td className="px-5 py-4 text-white font-semibold text-sm">{atributo}</td>
+                  <td className="px-5 py-4 text-white font-semibold text-sm w-40">{atributo}</td>
                   <td className="px-5 py-4 text-slate-300 text-sm">{valor}</td>
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-4 w-32">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold
                       ${encontrado ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
                       {encontrado ? 'Encontrado' : 'Indisponível'}
@@ -37,7 +42,40 @@ export default function ResultadoIndividual({ resultado, onNovaPesquisa }) {
           </tbody>
         </table>
       </div>
+    )
+  }
 
+  return (
+    <div>
+      {/* Header */}
+      <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4 mb-5 text-base font-semibold text-white">
+        {marca} · {modelo} · <span className="text-[#4a9eff]">{versao}</span>
+      </div>
+
+      {/* Técnicos */}
+      {specsTecnicos.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
+            <p className="text-white text-sm font-semibold">Especificações Técnicas</p>
+          </div>
+          <TabelaSpecs dados={specsTecnicos} />
+        </div>
+      )}
+
+      {/* Sensações */}
+      {specsSensacoes.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+            <p className="text-white text-sm font-semibold">Experiência e Sensações</p>
+            <span className="text-xs text-slate-500 ml-1">— baseado em reviews e opiniões</span>
+          </div>
+          <TabelaSpecs dados={specsSensacoes} />
+        </div>
+      )}
+
+      {/* Botões */}
       <div className="flex gap-3 mt-5">
         <button
           onClick={onNovaPesquisa}

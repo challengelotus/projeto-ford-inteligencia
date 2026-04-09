@@ -1,28 +1,19 @@
 import { ArrowLeft, Download } from 'lucide-react'
+import { ATRIBUTOS_TECNICOS, ATRIBUTOS_SENSACOES } from '../data/mockData'
 
 export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
   const { veiculo1, veiculo2, atributos } = resultado
+
+  const atributosTecnicos = atributos.filter(a => ATRIBUTOS_TECNICOS.includes(a))
+  const atributosSensacoes = atributos.filter(a => ATRIBUTOS_SENSACOES.includes(a))
 
   const vantagens = atributos.filter(a =>
     veiculo1.specs[a] !== 'Não disponível' &&
     veiculo2.specs[a] === 'Não disponível'
   )
 
-  return (
-    <div>
-      {/* Header veículos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-        {[veiculo1, veiculo2].map((v, i) => (
-          <div key={i} className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4">
-            <small className="text-slate-400 text-xs">Veículo {i + 1}</small>
-            <p className="text-white font-semibold mt-1">
-              {v.marca} {v.modelo} <span className="text-[#4a9eff]">{v.versao}</span>
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Tabela */}
+  function TabelaComparacao({ dados }) {
+    return (
       <div className="rounded-xl overflow-hidden border border-[#2a4070]">
         <table className="w-full border-collapse">
           <thead>
@@ -33,7 +24,7 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
             </tr>
           </thead>
           <tbody>
-            {atributos.map(atributo => {
+            {dados.map(atributo => {
               const val1 = veiculo1.specs[atributo]
               const val2 = veiculo2.specs[atributo]
               const v1vantagem = val1 !== 'Não disponível' && val2 === 'Não disponível'
@@ -41,7 +32,7 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
 
               return (
                 <tr key={atributo} className="border-t border-[#1e3358]">
-                  <td className="px-5 py-4 text-white font-semibold text-sm">{atributo}</td>
+                  <td className="px-5 py-4 text-white font-semibold text-sm w-40">{atributo}</td>
                   <td className={`px-5 py-4 text-sm ${v1vantagem ? 'bg-green-900/20 text-green-300' : 'text-slate-300'}`}>
                     {val1 === 'Não disponível'
                       ? <span className="flex items-center gap-2 text-slate-500">
@@ -64,10 +55,49 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
           </tbody>
         </table>
       </div>
+    )
+  }
+
+  return (
+    <div>
+      {/* Header veículos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+        {[veiculo1, veiculo2].map((v, i) => (
+          <div key={i} className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4">
+            <small className="text-slate-400 text-xs">Veículo {i + 1}</small>
+            <p className="text-white font-semibold mt-1">
+              {v.marca} {v.modelo} <span className="text-[#4a9eff]">{v.versao}</span>
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Técnicos */}
+      {atributosTecnicos.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
+            <p className="text-white text-sm font-semibold">Especificações Técnicas</p>
+          </div>
+          <TabelaComparacao dados={atributosTecnicos} />
+        </div>
+      )}
+
+      {/* Sensações */}
+      {atributosSensacoes.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+            <p className="text-white text-sm font-semibold">Experiência e Sensações</p>
+            <span className="text-xs text-slate-500 ml-1">— baseado em reviews e opiniões</span>
+          </div>
+          <TabelaComparacao dados={atributosSensacoes} />
+        </div>
+      )}
 
       {/* Card resumo vantagens */}
       {vantagens.length > 0 && (
-        <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl p-5 mt-5">
+        <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl p-5 mt-2 mb-5">
           <h3 className="text-white font-semibold mb-3">
             🏆 {veiculo1.marca} {veiculo1.modelo} se destaca em {vantagens.length} atributos
           </h3>
@@ -82,7 +112,7 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
       )}
 
       {/* Botões */}
-      <div className="flex gap-3 mt-5">
+      <div className="flex gap-3">
         <button
           onClick={onNovaComparacao}
           className="flex-1 flex items-center justify-center gap-2 border border-[#2a4070] hover:border-[#4a9eff] text-white py-3 rounded-lg transition text-sm"
