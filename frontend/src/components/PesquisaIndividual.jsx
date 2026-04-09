@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import { ATRIBUTOS, getMockSpecs } from '../data/mockData'
+import { ATRIBUTOS_TECNICOS, ATRIBUTOS_SENSACOES, getMockSpecs } from '../data/mockData'
 import { useHistorico } from '../context/HistoricoContext'
 import ResultadoIndividual from './ResultadoIndividual'
 
@@ -33,6 +33,11 @@ export default function PesquisaIndividual({ itemHistorico }) {
       return
     }
 
+    if (atributosSelecionados.length === 0) {
+      setErro('Selecione pelo menos um atributo.')
+      return
+    }
+
     setLoading(true)
     await new Promise(r => setTimeout(r, 1200))
     const specs = getMockSpecs(marca, modelo, versao)
@@ -52,7 +57,9 @@ export default function PesquisaIndividual({ itemHistorico }) {
 
   return (
     <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-6">
-      <div className="flex gap-4 mb-6">
+
+      {/* Campos */}
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         {[
           { label: 'Marca', value: marca, set: setMarca, placeholder: 'ex: Toyota' },
           { label: 'Modelo', value: modelo, set: setModelo, placeholder: 'ex: Hilux' },
@@ -70,36 +77,74 @@ export default function PesquisaIndividual({ itemHistorico }) {
         ))}
       </div>
 
-      <p className="text-slate-400 text-sm mb-3">Atributos Técnicos</p>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {ATRIBUTOS.map(atributo => {
-          const selecionado = atributosSelecionados.includes(atributo)
-          return (
-            <button
-              key={atributo}
-              onClick={() => toggleAtributo(atributo)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition
-                ${selecionado
-                  ? 'border-[#4a9eff] bg-[#1a3a6e] text-white'
-                  : 'border-[#2a4070] bg-[#0f1f3d] text-slate-400 hover:border-slate-500'
-                }`}
-            >
-              <span className={`w-4 h-4 rounded flex items-center justify-center text-xs
-                ${selecionado ? 'bg-[#4a9eff]' : 'border border-[#2a4070]'}`}>
-                {selecionado && '✓'}
-              </span>
-              {atributo}
-            </button>
-          )
-        })}
+      {/* Atributos técnicos */}
+      <div className="mb-5">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
+          <p className="text-white text-sm font-semibold">Especificações Técnicas</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {ATRIBUTOS_TECNICOS.map(atributo => {
+            const selecionado = atributosSelecionados.includes(atributo)
+            return (
+              <button
+                key={atributo}
+                onClick={() => toggleAtributo(atributo)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition
+                  ${selecionado
+                    ? 'border-[#4a9eff] bg-[#1a3a6e] text-white'
+                    : 'border-[#2a4070] bg-[#0f1f3d] text-slate-400 hover:border-slate-500'
+                  }`}
+              >
+                <span className={`w-4 h-4 rounded flex items-center justify-center text-xs
+                  ${selecionado ? 'bg-[#4a9eff]' : 'border border-[#2a4070]'}`}>
+                  {selecionado && '✓'}
+                </span>
+                {atributo}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
+      {/* Atributos sensações */}
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+          <p className="text-white text-sm font-semibold">Experiência e Sensações</p>
+          <span className="text-xs text-slate-500 ml-1">— baseado em reviews e opiniões</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {ATRIBUTOS_SENSACOES.map(atributo => {
+            const selecionado = atributosSelecionados.includes(atributo)
+            return (
+              <button
+                key={atributo}
+                onClick={() => toggleAtributo(atributo)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition
+                  ${selecionado
+                    ? 'border-purple-400 bg-purple-900/30 text-white'
+                    : 'border-[#2a4070] bg-[#0f1f3d] text-slate-400 hover:border-slate-500'
+                  }`}
+              >
+                <span className={`w-4 h-4 rounded flex items-center justify-center text-xs
+                  ${selecionado ? 'bg-purple-400' : 'border border-[#2a4070]'}`}>
+                  {selecionado && '✓'}
+                </span>
+                {atributo}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Erro */}
       {erro && (
         <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 mb-4">
           <span className="text-red-400 text-lg">⚠</span>
           <p className="text-red-400 text-sm">{erro}</p>
         </div>
-)}
+      )}
 
       <button
         onClick={handleBuscar}

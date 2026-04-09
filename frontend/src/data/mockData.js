@@ -1,7 +1,20 @@
-export const ATRIBUTOS = [
+export const ATRIBUTOS_TECNICOS = [
   'Motor', 'Potência', 'Torque', 'Câmbio',
   'Tração', 'Suspensão', 'Freios', 'Rodas e Pneus',
   'Faróis', 'Modos de condução', 'Preço'
+]
+
+export const ATRIBUTOS_SENSACOES = [
+  'Conforto dos bancos',
+  'Conforto para passageiros traseiros',
+  'Nível de ruído interno',
+  'Facilidade de uso da central multimídia',
+  'Espaço do porta-malas',
+  'Visibilidade ao dirigir',
+  'Consumo percebido no dia a dia',
+  'Qualidade dos acabamentos internos',
+  'Estabilidade em estrada',
+  'Desempenho off-road percebido',
 ]
 
 export const MOCK_VEICULOS = {
@@ -17,6 +30,16 @@ export const MOCK_VEICULOS = {
     'Faróis': 'Não disponível',
     'Modos de condução': 'Não disponível',
     'Preço': 'Não disponível',
+    'Conforto dos bancos': 'Não disponível',
+    'Conforto para passageiros traseiros': 'Não disponível',
+    'Nível de ruído interno': 'Não disponível',
+    'Facilidade de uso da central multimídia': 'Não disponível',
+    'Espaço do porta-malas': 'Não disponível',
+    'Visibilidade ao dirigir': 'Não disponível',
+    'Consumo percebido no dia a dia': 'Não disponível',
+    'Qualidade dos acabamentos internos': 'Não disponível',
+    'Estabilidade em estrada': 'Não disponível',
+    'Desempenho off-road percebido': 'Não disponível',
   },
   'ford-ranger-raptor-2025': {
     'Motor': '3.0L V6 Bi-Turbo Diesel',
@@ -30,6 +53,16 @@ export const MOCK_VEICULOS = {
     'Faróis': 'Full LED com assinatura luminosa em LED',
     'Modos de condução': 'Normal, Esporte, Escorregadio, Lama, Areia, Pedra, Baja',
     'Preço': 'R$ 499.000',
+    'Conforto dos bancos': 'Bancos esportivos com excelente suporte lateral, revestimento em couro e alcântara. Muito elogiados em reviews.',
+    'Conforto para passageiros traseiros': 'Espaço razoável para adultos, banco traseiro um pouco firme em percursos longos.',
+    'Nível de ruído interno': 'Isolamento acústico surpreendente para uma picape off-road. Motor pouco audível em velocidade de cruzeiro.',
+    'Facilidade de uso da central multimídia': 'Sistema SYNC 4 bem avaliado, tela responsiva e integração com Apple CarPlay e Android Auto sem fio.',
+    'Espaço do porta-malas': 'Caçamba grande com 1.270mm de comprimento, ideal para uso profissional e aventura.',
+    'Visibilidade ao dirigir': 'Boa visibilidade frontal, câmera 360° facilita manobras com o tamanho da caminhonete.',
+    'Consumo percebido no dia a dia': 'Cerca de 8-10 km/l na cidade e 11-13 km/l na estrada. Considerado alto consumo para o segmento.',
+    'Qualidade dos acabamentos internos': 'Interior premium com materiais de alta qualidade, plásticos macios e costuras caprichadas.',
+    'Estabilidade em estrada': 'Excelente estabilidade em alta velocidade, suspensão bem calibrada para asfalto e off-road.',
+    'Desempenho off-road percebido': 'Considerado o melhor off-road do segmento de picapes médias no Brasil. Modos Baja e Rock Crawl muito elogiados.',
   },
   'toyota-hilux-sr-2025': {
     'Motor': '2.8L Turbodiesel 4 cilindros em linha',
@@ -43,6 +76,16 @@ export const MOCK_VEICULOS = {
     'Faróis': 'Halógenos com DRL em LED',
     'Modos de condução': 'Não disponível',
     'Preço': 'R$ 264.990 (tabela FIPE estimada)',
+    'Conforto dos bancos': 'Bancos em tecido com boa ergonomia, confortáveis para viagens longas mas sem o refinamento das versões superiores.',
+    'Conforto para passageiros traseiros': 'Espaço adequado para adultos de estatura média. Banco traseiro um pouco alto.',
+    'Nível de ruído interno': 'Ruído de motor e vento perceptível em velocidades acima de 100 km/h. Típico do segmento na versão SR.',
+    'Facilidade de uso da central multimídia': 'Central multimídia simples com tela de 8", funcional mas sem recursos avançados da versão GR-S.',
+    'Espaço do porta-malas': 'Caçamba com 1.085mm de comprimento, boa para uso cotidiano.',
+    'Visibilidade ao dirigir': 'Boa visibilidade frontal e lateral. Câmera de ré presente mas sem câmera 360°.',
+    'Consumo percebido no dia a dia': 'Cerca de 9-11 km/l na cidade e 12-14 km/l na estrada. Bom consumo para o segmento.',
+    'Qualidade dos acabamentos internos': 'Acabamento funcional e robusto, sem grandes pretensões de luxo na versão SR.',
+    'Estabilidade em estrada': 'Boa estabilidade, suspensão traseira de feixe de molas pode ser um pouco saltitante sem carga.',
+    'Desempenho off-road percebido': 'Competente no off-road convencional. Reconhecido pela durabilidade e confiabilidade em terrenos difíceis.',
   },
   'toyota-hilux-grs-2025': {
     'Motor': '2.8L Turbodiesel 4 cilindros em linha',
@@ -56,6 +99,16 @@ export const MOCK_VEICULOS = {
     'Faróis': 'LED com DRL em LED',
     'Modos de condução': 'Não disponível',
     'Preço': 'R$ 339.990 (tabela FIPE estimada)',
+    'Conforto dos bancos': 'Bancos em couro com ajuste elétrico e ventilação. Muito confortáveis para viagens longas.',
+    'Conforto para passageiros traseiros': 'Espaço generoso com banco reclinável e saídas de ar-condicionado traseiras.',
+    'Nível de ruído interno': 'Melhor isolamento acústico da linha Hilux, confortável em viagens longas.',
+    'Facilidade de uso da central multimídia': 'Sistema Toyota Multimedia com tela de 9", Apple CarPlay e Android Auto sem fio. Bem avaliado.',
+    'Espaço do porta-malas': 'Caçamba com 1.085mm de comprimento com tampa elétrica opcional.',
+    'Visibilidade ao dirigir': 'Câmera 360° de série, facilita muito as manobras urbanas.',
+    'Consumo percebido no dia a dia': 'Cerca de 8-10 km/l na cidade e 11-13 km/l na estrada.',
+    'Qualidade dos acabamentos internos': 'Interior premium com materiais nobres, painel soft-touch e iluminação ambiente.',
+    'Estabilidade em estrada': 'Excelente estabilidade com controle de estabilidade e assistente de descida.',
+    'Desempenho off-road percebido': 'Muito competente no off-road com modos de tração dedicados e boa altura em relação ao solo.',
   },
 }
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { GitCompare } from 'lucide-react'
-import { ATRIBUTOS, getMockSpecs } from '../data/mockData'
+import { ATRIBUTOS_TECNICOS, ATRIBUTOS_SENSACOES, getMockSpecs } from '../data/mockData'
 import { useHistorico } from '../context/HistoricoContext'
 import ResultadoComparacao from './ResultadoComparacao'
 
@@ -115,30 +115,68 @@ export default function CompararVeiculos({ itemHistorico }) {
         ))}
       </div>
 
-      {/* Atributos */}
+      {/* Card atributos */}
       <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-5">
-        <p className="text-slate-400 text-sm mb-3">Atributos Técnicos</p>
-        <div className="flex flex-wrap gap-2 mb-5">
-          {ATRIBUTOS.map(atributo => {
-            const selecionado = atributosSelecionados.includes(atributo)
-            return (
-              <button
-                key={atributo}
-                onClick={() => toggleAtributo(atributo)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition
-                  ${selecionado
-                    ? 'border-[#4a9eff] bg-[#1a3a6e] text-white'
-                    : 'border-[#2a4070] bg-[#0f1f3d] text-slate-400 hover:border-slate-500'
-                  }`}
-              >
-                <span className={`w-4 h-4 rounded flex items-center justify-center text-xs
-                  ${selecionado ? 'bg-[#4a9eff]' : 'border border-[#2a4070]'}`}>
-                  {selecionado && '✓'}
-                </span>
-                {atributo}
-              </button>
-            )
-          })}
+
+        {/* Técnicos */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
+            <p className="text-white text-sm font-semibold">Especificações Técnicas</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {ATRIBUTOS_TECNICOS.map(atributo => {
+              const selecionado = atributosSelecionados.includes(atributo)
+              return (
+                <button
+                  key={atributo}
+                  onClick={() => toggleAtributo(atributo)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition
+                    ${selecionado
+                      ? 'border-[#4a9eff] bg-[#1a3a6e] text-white'
+                      : 'border-[#2a4070] bg-[#0f1f3d] text-slate-400 hover:border-slate-500'
+                    }`}
+                >
+                  <span className={`w-4 h-4 rounded flex items-center justify-center text-xs
+                    ${selecionado ? 'bg-[#4a9eff]' : 'border border-[#2a4070]'}`}>
+                    {selecionado && '✓'}
+                  </span>
+                  {atributo}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Sensações */}
+        <div className="mb-5">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+            <p className="text-white text-sm font-semibold">Experiência e Sensações</p>
+            <span className="text-xs text-slate-500 ml-1">— baseado em reviews e opiniões</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {ATRIBUTOS_SENSACOES.map(atributo => {
+              const selecionado = atributosSelecionados.includes(atributo)
+              return (
+                <button
+                  key={atributo}
+                  onClick={() => toggleAtributo(atributo)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition
+                    ${selecionado
+                      ? 'border-purple-400 bg-purple-900/30 text-white'
+                      : 'border-[#2a4070] bg-[#0f1f3d] text-slate-400 hover:border-slate-500'
+                    }`}
+                >
+                  <span className={`w-4 h-4 rounded flex items-center justify-center text-xs
+                    ${selecionado ? 'bg-purple-400' : 'border border-[#2a4070]'}`}>
+                    {selecionado && '✓'}
+                  </span>
+                  {atributo}
+                </button>
+              )
+            })}
+          </div>
         </div>
 
         {/* Erro */}
@@ -156,6 +194,7 @@ export default function CompararVeiculos({ itemHistorico }) {
         >
           {loading ? 'Comparando...' : <><GitCompare size={18} /> Comparar</>}
         </button>
+
       </div>
     </div>
   )
