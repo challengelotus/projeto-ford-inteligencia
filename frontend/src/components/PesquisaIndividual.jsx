@@ -27,6 +27,24 @@ export default function PesquisaIndividual({ itemHistorico }) {
     )
   }
 
+  function selecionarTodos() {
+    const todos = [...ATRIBUTOS_TECNICOS, ...ATRIBUTOS_SENSACOES]
+    setAtributosSelecionados(todos)
+  }
+
+  function limparTodos() {
+    setAtributosSelecionados([])
+  }
+
+  function selecionarGrupo(grupo) {
+    const jaTemTodos = grupo.every(a => atributosSelecionados.includes(a))
+    if (jaTemTodos) {
+      setAtributosSelecionados(prev => prev.filter(a => !grupo.includes(a)))
+    } else {
+      setAtributosSelecionados(prev => [...new Set([...prev, ...grupo])])
+    }
+  }
+
   async function handleBuscar() {
     setErro('')
 
@@ -60,6 +78,7 @@ export default function PesquisaIndividual({ itemHistorico }) {
   return (
     <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-6">
 
+      {/* Campos */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         {[
           { label: t('pesquisa.marca'), value: marca, set: setMarca, placeholder: t('pesquisa.placeholder_marca') },
@@ -78,11 +97,38 @@ export default function PesquisaIndividual({ itemHistorico }) {
         ))}
       </div>
 
+      {/* Botões globais */}
+      <div className="flex items-center justify-between mb-5">
+        <p className="text-slate-400 text-sm">Atributos</p>
+        <div className="flex gap-2">
+          <button
+            onClick={selecionarTodos}
+            className="text-xs text-[#4a9eff] hover:text-white border border-[#2a4070] hover:border-[#4a9eff] px-3 py-1 rounded-lg transition"
+          >
+            Selecionar tudo
+          </button>
+          <button
+            onClick={limparTodos}
+            className="text-xs text-slate-400 hover:text-white border border-[#2a4070] hover:border-slate-500 px-3 py-1 rounded-lg transition"
+          >
+            Limpar tudo
+          </button>
+        </div>
+      </div>
+
       {/* Técnicos */}
       <div className="mb-5">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
-          <p className="text-white text-sm font-semibold">{t('pesquisa.especificacoes_tecnicas')}</p>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
+            <p className="text-white text-sm font-semibold">{t('pesquisa.especificacoes_tecnicas')}</p>
+          </div>
+          <button
+            onClick={() => selecionarGrupo(ATRIBUTOS_TECNICOS)}
+            className="text-xs text-slate-400 hover:text-[#4a9eff] transition"
+          >
+            {ATRIBUTOS_TECNICOS.every(a => atributosSelecionados.includes(a)) ? 'Desmarcar grupo' : 'Selecionar grupo'}
+          </button>
         </div>
         <div className="flex flex-wrap gap-2">
           {ATRIBUTOS_TECNICOS.map(atributo => {
@@ -110,10 +156,18 @@ export default function PesquisaIndividual({ itemHistorico }) {
 
       {/* Sensações */}
       <div className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-          <p className="text-white text-sm font-semibold">{t('pesquisa.experiencia')}</p>
-          <span className="text-xs text-slate-500 ml-1">{t('pesquisa.experiencia_sub')}</span>
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+            <p className="text-white text-sm font-semibold">{t('pesquisa.experiencia')}</p>
+            <span className="text-xs text-slate-500 ml-1">{t('pesquisa.experiencia_sub')}</span>
+          </div>
+          <button
+            onClick={() => selecionarGrupo(ATRIBUTOS_SENSACOES)}
+            className="text-xs text-slate-400 hover:text-purple-400 transition"
+          >
+            {ATRIBUTOS_SENSACOES.every(a => atributosSelecionados.includes(a)) ? 'Desmarcar grupo' : 'Selecionar grupo'}
+          </button>
         </div>
         <div className="flex flex-wrap gap-2">
           {ATRIBUTOS_SENSACOES.map(atributo => {
