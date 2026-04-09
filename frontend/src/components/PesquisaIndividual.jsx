@@ -15,6 +15,7 @@ export default function PesquisaIndividual({ itemHistorico }) {
   )
   const [resultado, setResultado] = useState(itemHistorico || null)
   const [loading, setLoading] = useState(false)
+  const [erro, setErro] = useState('')
 
   function toggleAtributo(atributo) {
     setAtributosSelecionados(prev =>
@@ -25,7 +26,13 @@ export default function PesquisaIndividual({ itemHistorico }) {
   }
 
   async function handleBuscar() {
-    if (!marca || !modelo || !versao) return
+    setErro('')
+
+    if (!marca || !modelo || !versao) {
+      setErro('Preencha todos os campos antes de buscar.')
+      return
+    }
+
     setLoading(true)
     await new Promise(r => setTimeout(r, 1200))
     const specs = getMockSpecs(marca, modelo, versao)
@@ -86,6 +93,13 @@ export default function PesquisaIndividual({ itemHistorico }) {
           )
         })}
       </div>
+
+      {erro && (
+        <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 mb-4">
+          <span className="text-red-400 text-lg">⚠</span>
+          <p className="text-red-400 text-sm">{erro}</p>
+        </div>
+)}
 
       <button
         onClick={handleBuscar}

@@ -10,7 +10,8 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
 
   return (
     <div>
-      <div className="grid grid-cols-2 gap-4 mb-5">
+      {/* Header veículos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
         {[veiculo1, veiculo2].map((v, i) => (
           <div key={i} className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4">
             <small className="text-slate-400 text-xs">Veículo {i + 1}</small>
@@ -21,6 +22,7 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
         ))}
       </div>
 
+      {/* Tabela */}
       <div className="rounded-xl overflow-hidden border border-[#2a4070]">
         <table className="w-full border-collapse">
           <thead>
@@ -43,14 +45,16 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
                   <td className={`px-5 py-4 text-sm ${v1vantagem ? 'bg-green-900/20 text-green-300' : 'text-slate-300'}`}>
                     {val1 === 'Não disponível'
                       ? <span className="flex items-center gap-2 text-slate-500">
-                          Não disponível <span className="px-2 py-0.5 bg-red-900/50 text-red-400 rounded-full text-xs">Indisponível</span>
+                          Não disponível
+                          <span className="px-2 py-0.5 bg-red-900/50 text-red-400 rounded-full text-xs">Indisponível</span>
                         </span>
                       : val1}
                   </td>
                   <td className={`px-5 py-4 text-sm ${v2vantagem ? 'bg-green-900/20 text-green-300' : 'text-slate-300'}`}>
                     {val2 === 'Não disponível'
                       ? <span className="flex items-center gap-2 text-slate-500">
-                          Não disponível <span className="px-2 py-0.5 bg-red-900/50 text-red-400 rounded-full text-xs">Indisponível</span>
+                          Não disponível
+                          <span className="px-2 py-0.5 bg-red-900/50 text-red-400 rounded-full text-xs">Indisponível</span>
                         </span>
                       : val2}
                   </td>
@@ -61,6 +65,7 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
         </table>
       </div>
 
+      {/* Card resumo vantagens */}
       {vantagens.length > 0 && (
         <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl p-5 mt-5">
           <h3 className="text-white font-semibold mb-3">
@@ -76,6 +81,7 @@ export default function ResultadoComparacao({ resultado, onNovaComparacao }) {
         </div>
       )}
 
+      {/* Botões */}
       <div className="flex gap-3 mt-5">
         <button
           onClick={onNovaComparacao}
