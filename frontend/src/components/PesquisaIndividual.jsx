@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { ATRIBUTOS_TECNICOS, ATRIBUTOS_SENSACOES, getMockSpecs } from '../data/mockData'
 import { useHistorico } from '../context/HistoricoContext'
+import { useTranslation } from 'react-i18next'
 import ResultadoIndividual from './ResultadoIndividual'
 
 export default function PesquisaIndividual({ itemHistorico }) {
   const { adicionarPesquisa } = useHistorico()
+  const { t } = useTranslation()
   const [marca, setMarca] = useState(itemHistorico?.marca || '')
   const [modelo, setModelo] = useState(itemHistorico?.modelo || '')
   const [versao, setVersao] = useState(itemHistorico?.versao || '')
@@ -29,12 +31,12 @@ export default function PesquisaIndividual({ itemHistorico }) {
     setErro('')
 
     if (!marca || !modelo || !versao) {
-      setErro('Preencha todos os campos antes de buscar.')
+      setErro(t('pesquisa.erro_campos'))
       return
     }
 
     if (atributosSelecionados.length === 0) {
-      setErro('Selecione pelo menos um atributo.')
+      setErro(t('pesquisa.erro_atributos'))
       return
     }
 
@@ -58,12 +60,11 @@ export default function PesquisaIndividual({ itemHistorico }) {
   return (
     <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-6">
 
-      {/* Campos */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         {[
-          { label: 'Marca', value: marca, set: setMarca, placeholder: 'ex: Toyota' },
-          { label: 'Modelo', value: modelo, set: setModelo, placeholder: 'ex: Hilux' },
-          { label: 'Versão', value: versao, set: setVersao, placeholder: 'ex: SR 2025' },
+          { label: t('pesquisa.marca'), value: marca, set: setMarca, placeholder: t('pesquisa.placeholder_marca') },
+          { label: t('pesquisa.modelo'), value: modelo, set: setModelo, placeholder: t('pesquisa.placeholder_modelo') },
+          { label: t('pesquisa.versao'), value: versao, set: setVersao, placeholder: t('pesquisa.placeholder_versao') },
         ].map(({ label, value, set, placeholder }) => (
           <div key={label} className="flex flex-col gap-2 flex-1">
             <label className="text-slate-400 text-sm">{label}</label>
@@ -77,11 +78,11 @@ export default function PesquisaIndividual({ itemHistorico }) {
         ))}
       </div>
 
-      {/* Atributos técnicos */}
+      {/* Técnicos */}
       <div className="mb-5">
         <div className="flex items-center gap-2 mb-3">
           <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
-          <p className="text-white text-sm font-semibold">Especificações Técnicas</p>
+          <p className="text-white text-sm font-semibold">{t('pesquisa.especificacoes_tecnicas')}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           {ATRIBUTOS_TECNICOS.map(atributo => {
@@ -107,12 +108,12 @@ export default function PesquisaIndividual({ itemHistorico }) {
         </div>
       </div>
 
-      {/* Atributos sensações */}
+      {/* Sensações */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-          <p className="text-white text-sm font-semibold">Experiência e Sensações</p>
-          <span className="text-xs text-slate-500 ml-1">— baseado em reviews e opiniões</span>
+          <p className="text-white text-sm font-semibold">{t('pesquisa.experiencia')}</p>
+          <span className="text-xs text-slate-500 ml-1">{t('pesquisa.experiencia_sub')}</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {ATRIBUTOS_SENSACOES.map(atributo => {
@@ -138,7 +139,6 @@ export default function PesquisaIndividual({ itemHistorico }) {
         </div>
       </div>
 
-      {/* Erro */}
       {erro && (
         <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 mb-4">
           <span className="text-red-400 text-lg">⚠</span>
@@ -151,7 +151,7 @@ export default function PesquisaIndividual({ itemHistorico }) {
         disabled={loading}
         className="w-full bg-[#003478] hover:bg-[#004499] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-60"
       >
-        {loading ? 'Buscando...' : <><Search size={18} /> Buscar Especificações</>}
+        {loading ? t('pesquisa.buscando') : <><Search size={18} /> {t('pesquisa.btn_buscar')}</>}
       </button>
     </div>
   )

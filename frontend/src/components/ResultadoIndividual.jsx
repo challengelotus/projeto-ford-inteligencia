@@ -1,8 +1,10 @@
 import { ArrowLeft, Download } from 'lucide-react'
 import { ATRIBUTOS_TECNICOS, ATRIBUTOS_SENSACOES } from '../data/mockData'
+import { useTranslation } from 'react-i18next'
 
 export default function ResultadoIndividual({ resultado, onNovaPesquisa }) {
   const { marca, modelo, versao, specs } = resultado
+  const { t } = useTranslation()
 
   const specsTecnicos = Object.entries(specs).filter(([atributo]) =>
     ATRIBUTOS_TECNICOS.includes(atributo)
@@ -18,9 +20,9 @@ export default function ResultadoIndividual({ resultado, onNovaPesquisa }) {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-[#0f1f3d]">
-              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">Atributo</th>
-              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">Especificação</th>
-              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">Status</th>
+              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">{t('resultado.atributo')}</th>
+              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">{t('resultado.especificacao')}</th>
+              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">{t('resultado.status')}</th>
             </tr>
           </thead>
           <tbody>
@@ -33,7 +35,7 @@ export default function ResultadoIndividual({ resultado, onNovaPesquisa }) {
                   <td className="px-5 py-4 w-32">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold
                       ${encontrado ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
-                      {encontrado ? 'Encontrado' : 'Indisponível'}
+                      {encontrado ? t('resultado.encontrado') : t('resultado.indisponivel')}
                     </span>
                   </td>
                 </tr>
@@ -47,44 +49,40 @@ export default function ResultadoIndividual({ resultado, onNovaPesquisa }) {
 
   return (
     <div>
-      {/* Header */}
       <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4 mb-5 text-base font-semibold text-white">
         {marca} · {modelo} · <span className="text-[#4a9eff]">{versao}</span>
       </div>
 
-      {/* Técnicos */}
       {specsTecnicos.length > 0 && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
-            <p className="text-white text-sm font-semibold">Especificações Técnicas</p>
+            <p className="text-white text-sm font-semibold">{t('pesquisa.especificacoes_tecnicas')}</p>
           </div>
           <TabelaSpecs dados={specsTecnicos} />
         </div>
       )}
 
-      {/* Sensações */}
       {specsSensacoes.length > 0 && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-            <p className="text-white text-sm font-semibold">Experiência e Sensações</p>
-            <span className="text-xs text-slate-500 ml-1">— baseado em reviews e opiniões</span>
+            <p className="text-white text-sm font-semibold">{t('pesquisa.experiencia')}</p>
+            <span className="text-xs text-slate-500 ml-1">{t('pesquisa.experiencia_sub')}</span>
           </div>
           <TabelaSpecs dados={specsSensacoes} />
         </div>
       )}
 
-      {/* Botões */}
       <div className="flex gap-3 mt-5">
         <button
           onClick={onNovaPesquisa}
           className="flex-1 flex items-center justify-center gap-2 border border-[#2a4070] hover:border-[#4a9eff] text-white py-3 rounded-lg transition text-sm"
         >
-          <ArrowLeft size={16} /> Nova Pesquisa
+          <ArrowLeft size={16} /> {t('resultado.nova_pesquisa')}
         </button>
         <button className="flex-1 flex items-center justify-center gap-2 bg-[#003478] hover:bg-[#004499] text-white py-3 rounded-lg transition text-sm">
-          <Download size={16} /> Exportar CSV
+          <Download size={16} /> {t('resultado.exportar')}
         </button>
       </div>
     </div>

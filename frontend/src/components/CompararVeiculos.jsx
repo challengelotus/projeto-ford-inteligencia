@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { GitCompare } from 'lucide-react'
 import { ATRIBUTOS_TECNICOS, ATRIBUTOS_SENSACOES, getMockSpecs } from '../data/mockData'
 import { useHistorico } from '../context/HistoricoContext'
+import { useTranslation } from 'react-i18next'
 import ResultadoComparacao from './ResultadoComparacao'
 
 export default function CompararVeiculos({ itemHistorico }) {
   const { adicionarPesquisa } = useHistorico()
+  const { t } = useTranslation()
   const [veiculo1, setVeiculo1] = useState({
     marca: itemHistorico?.veiculo1?.marca || '',
     modelo: itemHistorico?.veiculo1?.modelo || '',
@@ -36,12 +38,12 @@ export default function CompararVeiculos({ itemHistorico }) {
     setErro('')
 
     if (!veiculo1.marca || !veiculo1.modelo || !veiculo1.versao) {
-      setErro('Preencha todos os campos do Veículo 1.')
+      setErro(t('pesquisa.erro_veiculo1'))
       return
     }
 
     if (!veiculo2.marca || !veiculo2.modelo || !veiculo2.versao) {
-      setErro('Preencha todos os campos do Veículo 2.')
+      setErro(t('pesquisa.erro_veiculo2'))
       return
     }
 
@@ -50,12 +52,12 @@ export default function CompararVeiculos({ itemHistorico }) {
       veiculo1.modelo.trim().toLowerCase() === veiculo2.modelo.trim().toLowerCase() &&
       veiculo1.versao.trim().toLowerCase() === veiculo2.versao.trim().toLowerCase()
     ) {
-      setErro('Os dois veículos não podem ser iguais.')
+      setErro(t('pesquisa.erro_iguais'))
       return
     }
 
     if (atributosSelecionados.length === 0) {
-      setErro('Selecione pelo menos um atributo.')
+      setErro(t('pesquisa.erro_atributos'))
       return
     }
 
@@ -88,18 +90,17 @@ export default function CompararVeiculos({ itemHistorico }) {
 
   return (
     <div>
-      {/* Cards dos veículos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         {[
-          { label: 'Veículo 1', state: veiculo1, setState: setVeiculo1 },
-          { label: 'Veículo 2', state: veiculo2, setState: setVeiculo2 },
+          { label: t('pesquisa.veiculo1'), state: veiculo1, setState: setVeiculo1 },
+          { label: t('pesquisa.veiculo2'), state: veiculo2, setState: setVeiculo2 },
         ].map(({ label, state, setState }) => (
           <div key={label} className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-5">
             <p className="text-white font-semibold mb-4">{label}</p>
             {[
-              { field: 'marca', label: 'Marca', placeholder: 'ex: Ford' },
-              { field: 'modelo', label: 'Modelo', placeholder: 'ex: Ranger' },
-              { field: 'versao', label: 'Versão', placeholder: 'ex: Raptor 2025' },
+              { field: 'marca', label: t('pesquisa.marca'), placeholder: t('pesquisa.placeholder_marca') },
+              { field: 'modelo', label: t('pesquisa.modelo'), placeholder: t('pesquisa.placeholder_modelo') },
+              { field: 'versao', label: t('pesquisa.versao'), placeholder: t('pesquisa.placeholder_versao') },
             ].map(({ field, label, placeholder }) => (
               <div key={field} className="flex flex-col gap-2 mb-3">
                 <label className="text-slate-400 text-sm">{label}</label>
@@ -115,14 +116,12 @@ export default function CompararVeiculos({ itemHistorico }) {
         ))}
       </div>
 
-      {/* Card atributos */}
       <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-5">
 
-        {/* Técnicos */}
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2 h-2 rounded-full bg-[#4a9eff]"></span>
-            <p className="text-white text-sm font-semibold">Especificações Técnicas</p>
+            <p className="text-white text-sm font-semibold">{t('pesquisa.especificacoes_tecnicas')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {ATRIBUTOS_TECNICOS.map(atributo => {
@@ -148,12 +147,11 @@ export default function CompararVeiculos({ itemHistorico }) {
           </div>
         </div>
 
-        {/* Sensações */}
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-3">
             <span className="w-2 h-2 rounded-full bg-purple-400"></span>
-            <p className="text-white text-sm font-semibold">Experiência e Sensações</p>
-            <span className="text-xs text-slate-500 ml-1">— baseado em reviews e opiniões</span>
+            <p className="text-white text-sm font-semibold">{t('pesquisa.experiencia')}</p>
+            <span className="text-xs text-slate-500 ml-1">{t('pesquisa.experiencia_sub')}</span>
           </div>
           <div className="flex flex-wrap gap-2">
             {ATRIBUTOS_SENSACOES.map(atributo => {
@@ -179,7 +177,6 @@ export default function CompararVeiculos({ itemHistorico }) {
           </div>
         </div>
 
-        {/* Erro */}
         {erro && (
           <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 mb-4">
             <span className="text-red-400 text-lg">⚠</span>
@@ -192,9 +189,8 @@ export default function CompararVeiculos({ itemHistorico }) {
           disabled={loading}
           className="w-full bg-[#003478] hover:bg-[#004499] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-60"
         >
-          {loading ? 'Comparando...' : <><GitCompare size={18} /> Comparar</>}
+          {loading ? t('pesquisa.comparando') : <><GitCompare size={18} /> {t('pesquisa.btn_comparar')}</>}
         </button>
-
       </div>
     </div>
   )
