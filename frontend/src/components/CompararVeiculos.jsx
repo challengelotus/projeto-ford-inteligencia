@@ -57,20 +57,32 @@ export default function CompararVeiculos({ itemHistorico }) {
   async function handleComparar() {
     setErro('')
 
-    if (!veiculo1.marca || !veiculo1.modelo || !veiculo1.versao) {
+    const v1 = {
+      marca: veiculo1.marca.trim(),
+      modelo: veiculo1.modelo.trim(),
+      versao: veiculo1.versao.trim(),
+    }
+
+    const v2 = {
+      marca: veiculo2.marca.trim(),
+      modelo: veiculo2.modelo.trim(),
+      versao: veiculo2.versao.trim(),
+    }
+
+    if (!v1.marca || !v1.modelo || !v1.versao) {
       setErro(t('pesquisa.erro_veiculo1'))
       return
     }
 
-    if (!veiculo2.marca || !veiculo2.modelo || !veiculo2.versao) {
+    if (!v2.marca || !v2.modelo || !v2.versao) {
       setErro(t('pesquisa.erro_veiculo2'))
       return
     }
 
     if (
-      veiculo1.marca.trim().toLowerCase() === veiculo2.marca.trim().toLowerCase() &&
-      veiculo1.modelo.trim().toLowerCase() === veiculo2.modelo.trim().toLowerCase() &&
-      veiculo1.versao.trim().toLowerCase() === veiculo2.versao.trim().toLowerCase()
+      v1.marca.toLowerCase() === v2.marca.toLowerCase() &&
+      v1.modelo.toLowerCase() === v2.modelo.toLowerCase() &&
+      v1.versao.toLowerCase() === v2.versao.toLowerCase()
     ) {
       setErro(t('pesquisa.erro_iguais'))
       return
@@ -84,8 +96,8 @@ export default function CompararVeiculos({ itemHistorico }) {
     setLoading(true)
     await new Promise(r => setTimeout(r, 1200))
 
-    const specs1 = getMockSpecs(veiculo1.marca, veiculo1.modelo, veiculo1.versao)
-    const specs2 = getMockSpecs(veiculo2.marca, veiculo2.modelo, veiculo2.versao)
+    const specs1 = getMockSpecs(v1.marca, v1.modelo, v1.versao)
+    const specs2 = getMockSpecs(v2.marca, v2.modelo, v2.versao)
     const filtrado1 = {}
     const filtrado2 = {}
     atributosSelecionados.forEach(a => {
@@ -95,8 +107,8 @@ export default function CompararVeiculos({ itemHistorico }) {
 
     const pesquisa = {
       tipo: 'comparacao',
-      veiculo1: { ...veiculo1, specs: filtrado1 },
-      veiculo2: { ...veiculo2, specs: filtrado2 },
+      veiculo1: { ...v1, specs: filtrado1 },
+      veiculo2: { ...v2, specs: filtrado2 },
       atributos: atributosSelecionados,
     }
     adicionarPesquisa(pesquisa)

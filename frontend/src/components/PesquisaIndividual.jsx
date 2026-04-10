@@ -50,24 +50,28 @@ export default function PesquisaIndividual({ itemHistorico }) {
   async function handleBuscar() {
     setErro('')
 
+    const marcaLimpa = marca.trim()
+    const modeloLimpo = modelo.trim()
+    const versaoLimpa = versao.trim()
+
     if (!marca || !modelo || !versao) {
       setErro(t('pesquisa.erro_campos'))
       return
     }
 
-    if (atributosSelecionados.length === 0) {
-      setErro(t('pesquisa.erro_atributos'))
+    if (!marcaLimpa || !modeloLimpo || !versaoLimpa) {
+      setErro(t('pesquisa.erro_campos'))
       return
     }
 
     setLoading(true)
     await new Promise(r => setTimeout(r, 1200))
-    const specs = getMockSpecs(marca, modelo, versao)
+    const specs = getMockSpecs(marcaLimpa, modeloLimpo, versaoLimpa)
     const filtrado = {}
     atributosSelecionados.forEach(a => {
       filtrado[a] = specs[a] || 'Não disponível'
     })
-    const pesquisa = { tipo: 'individual', marca, modelo, versao, specs: filtrado }
+    const pesquisa = { tipo: 'individual', marca: marcaLimpa, modelo: modeloLimpo, versao: versaoLimpa, specs: filtrado }
     adicionarPesquisa(pesquisa)
     setResultado(pesquisa)
     setLoading(false)
