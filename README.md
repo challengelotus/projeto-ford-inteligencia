@@ -2,7 +2,8 @@
 API para extração automática de specs de veículos concorrentes usando web scraping + LLM local. FastAPI + React + SQLite + Ollama. Desafio Ford FIAP 2026.
 
 🔧 Ford Commercial Intelligence
-"""text
+
+```text
 projeto-ford/
 ├── backend/
 │   ├── app/
@@ -24,4 +25,4 @@ projeto-ford/
 │   └── tailwind.config.js
 ├── README.md                       # Documentação do projeto (inclui contrato da API)
 └── .gitignore
-"""
+```
