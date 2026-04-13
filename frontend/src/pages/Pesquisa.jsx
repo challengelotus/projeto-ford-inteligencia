@@ -6,14 +6,13 @@ import PesquisaIndividual from '../components/PesquisaIndividual'
 import CompararVeiculos from '../components/CompararVeiculos'
 
 export default function Pesquisa() {
-  const location = useLocation()
   const { t } = useTranslation()
+  const location = useLocation()
+
   const itemHistorico = location.state?.itemHistorico || null
+  const [aba, setAba] = useState(itemHistorico?.tipo === 'comparacao' ? 'comparar' : 'individual')
 
-  const abaInicial = itemHistorico?.tipo === 'comparacao' ? 'comparar' : 'individual'
-  const [aba, setAba] = useState(abaInicial)
-
-return (
+  return (
     <div className="min-h-screen bg-[#0a1628]">
       <Navbar />
       <div className="max-w-6xl mx-auto px-6 py-8">

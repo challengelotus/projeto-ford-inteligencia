@@ -5,9 +5,8 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
 
-  function login(email, password) {
-    // mock — depois conecta com o backend
-    if (email === 'ford@ci.com' && password === 'ford123') {
+  function login(email, senha) {
+    if (email === 'ford@ci.com' && senha === 'ford123') {
       setUser({ email })
       return true
     }

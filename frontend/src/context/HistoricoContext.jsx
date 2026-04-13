@@ -1,44 +1,38 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState } from 'react'
 
 const HistoricoContext = createContext(null)
-
-const CHAVE_STORAGE = 'ford-ci-historico'
+const STORAGE_KEY = 'ford-ci-historico'
 
 export function HistoricoProvider({ children }) {
   const [historico, setHistorico] = useState(() => {
     try {
-      const salvo = localStorage.getItem(CHAVE_STORAGE)
+      const salvo = localStorage.getItem(STORAGE_KEY)
       return salvo ? JSON.parse(salvo) : []
     } catch {
       return []
     }
   })
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(CHAVE_STORAGE, JSON.stringify(historico))
-    } catch {
-      console.log('Erro ao salvar histórico')
-    }
-  }, [historico])
+  function salvar(novoHistorico) {
+    setHistorico(novoHistorico)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(novoHistorico))
+  }
 
   function adicionarPesquisa(pesquisa) {
-    setHistorico(prev => [
-      {
-        ...pesquisa,
-        id: Date.now(),
-        data: new Date().toLocaleString('pt-BR'),
-      },
-      ...prev,
-    ])
+    const nova = {
+      ...pesquisa,
+      id: Date.now(),
+      data: new Date().toLocaleString('pt-BR'),
+    }
+    salvar([nova, ...historico])
   }
 
   function removerPesquisa(id) {
-    setHistorico(prev => prev.filter(item => item.id !== id))
+    salvar(historico.filter(item => item.id !== id))
   }
 
   function limparHistorico() {
-    setHistorico([])
+    salvar([])
   }
 
   return (

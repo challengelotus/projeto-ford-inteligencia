@@ -1,15 +1,15 @@
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useHistorico } from '../context/HistoricoContext'
 import Navbar from '../components/Navbar'
-import { useTranslation } from 'react-i18next'
 import { Search, GitCompare, Trash2, Clock, X } from 'lucide-react'
 
 export default function Historico() {
+  const { t } = useTranslation()
   const { historico, limparHistorico, removerPesquisa } = useHistorico()
   const navigate = useNavigate()
-  const { t } = useTranslation()
 
-  function handleAbrirPesquisa(item) {
+  function abrirPesquisa(item) {
     navigate('/', { state: { itemHistorico: item } })
   }
 
@@ -37,9 +37,9 @@ export default function Historico() {
         </div>
 
         {historico.length === 0 && (
-          <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-12 flex flex-col items-center justify-center gap-4">
+          <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-12 flex flex-col items-center gap-4">
             <Clock size={40} className="text-slate-600" />
-            <p className="text-slate-400 text-center">{t('historico.vazio')}</p>
+            <p className="text-slate-400">{t('historico.vazio')}</p>
             <button
               onClick={() => navigate('/')}
               className="bg-[#003478] hover:bg-[#004499] text-white px-6 py-2 rounded-lg text-sm transition"
@@ -53,7 +53,7 @@ export default function Historico() {
           {historico.map(item => (
             <div
               key={item.id}
-              onClick={() => handleAbrirPesquisa(item)}
+              onClick={() => abrirPesquisa(item)}
               className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-5 cursor-pointer hover:border-[#4a9eff] transition relative"
             >
               <button
@@ -65,10 +65,7 @@ export default function Historico() {
 
               <div className="flex items-center justify-between mb-4">
                 <span className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold
-                  ${item.tipo === 'individual'
-                    ? 'bg-blue-900/50 text-blue-400'
-                    : 'bg-purple-900/50 text-purple-400'
-                  }`}>
+                  ${item.tipo === 'individual' ? 'bg-blue-900/50 text-blue-400' : 'bg-purple-900/50 text-purple-400'}`}>
                   {item.tipo === 'individual'
                     ? <><Search size={12} /> {t('historico.pesquisa_individual')}</>
                     : <><GitCompare size={12} /> {t('historico.comparacao')}</>
@@ -99,19 +96,15 @@ export default function Historico() {
 
               {item.tipo === 'comparacao' && (
                 <div className="flex items-center gap-4">
-                  <div className="flex-1 bg-[#0f1f3d] border border-[#2a4070] rounded-xl px-4 py-3">
-                    <p className="text-xs text-slate-500 mb-1">{t('pesquisa.veiculo1')}</p>
-                    <p className="text-white text-sm font-semibold">
-                      {item.veiculo1.marca} {item.veiculo1.modelo} <span className="text-[#4a9eff]">{item.veiculo1.versao}</span>
-                    </p>
-                  </div>
+                  {[item.veiculo1, item.veiculo2].map((v, i) => (
+                    <div key={i} className="flex-1 bg-[#0f1f3d] border border-[#2a4070] rounded-xl px-4 py-3">
+                      <p className="text-xs text-slate-500 mb-1">{t(`pesquisa.veiculo${i + 1}`)}</p>
+                      <p className="text-white text-sm font-semibold">
+                        {v.marca} {v.modelo} <span className="text-[#4a9eff]">{v.versao}</span>
+                      </p>
+                    </div>
+                  ))}
                   <span className="text-slate-500 font-bold">VS</span>
-                  <div className="flex-1 bg-[#0f1f3d] border border-[#2a4070] rounded-xl px-4 py-3">
-                    <p className="text-xs text-slate-500 mb-1">{t('pesquisa.veiculo2')}</p>
-                    <p className="text-white text-sm font-semibold">
-                      {item.veiculo2.marca} {item.veiculo2.modelo} <span className="text-[#4a9eff]">{item.veiculo2.versao}</span>
-                    </p>
-                  </div>
                 </div>
               )}
             </div>

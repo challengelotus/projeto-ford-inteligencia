@@ -8,19 +8,16 @@ import Historico from './pages/Historico'
 
 function RotaProtegida({ children }) {
   const { user } = useAuth()
-  return user ? children : <Navigate to="/login" />
+  if (!user) return <Navigate to="/login" />
+  return children
 }
 
-function AppRoutes() {
+function Rotas() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={
-        <RotaProtegida><Pesquisa /></RotaProtegida>
-      } />
-      <Route path="/historico" element={
-        <RotaProtegida><Historico /></RotaProtegida>
-      } />
+      <Route path="/" element={<RotaProtegida><Pesquisa /></RotaProtegida>} />
+      <Route path="/historico" element={<RotaProtegida><Historico /></RotaProtegida>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )
@@ -32,7 +29,7 @@ export default function App() {
       <HistoricoProvider>
         <AtributosProvider>
           <BrowserRouter>
-            <AppRoutes />
+            <Rotas />
           </BrowserRouter>
         </AtributosProvider>
       </HistoricoProvider>

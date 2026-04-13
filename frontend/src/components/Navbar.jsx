@@ -1,24 +1,38 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Search, History, LogOut } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Search, History, LogOut } from 'lucide-react'
+
+const IDIOMAS = [
+  { code: 'pt', label: 'PT' },
+  { code: 'en', label: 'EN' },
+  { code: 'es', label: 'ES' },
+]
 
 export default function Navbar() {
   const { user, logout } = useAuth()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { t, i18n } = useTranslation()
-
-  const idiomas = [
-    { code: 'pt', label: 'PT' },
-    { code: 'en', label: 'EN' },
-    { code: 'es', label: 'ES' },
-  ]
 
   function handleLogout() {
     logout()
     navigate('/login')
   }
+
+  const navBtn = (path, icon, label) => (
+    <button
+      onClick={() => navigate(path)}
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition
+        ${location.pathname === path
+          ? 'bg-[#003478] text-white'
+          : 'text-slate-400 hover:text-white hover:bg-[#0f1f3d]'
+        }`}
+    >
+      {icon}
+      {label}
+    </button>
+  )
 
   return (
     <nav className="bg-[#1a2f5e] border-b border-[#2a4070] px-6 py-4">
@@ -28,49 +42,24 @@ export default function Navbar() {
           Ford <span className="text-[#4a9eff]">CI</span>
         </h1>
 
-        {/* Navegação */}
-        <div className="flex items-center gap-2 ml-45">
-          <button
-            onClick={() => navigate('/')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition
-              ${location.pathname === '/'
-                ? 'bg-[#003478] text-white'
-                : 'text-slate-400 hover:text-white hover:bg-[#0f1f3d]'
-              }`}
-          >
-            <Search size={16} />
-            {t('nav.pesquisa')}
-          </button>
-
-          <button
-            onClick={() => navigate('/historico')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition
-              ${location.pathname === '/historico'
-                ? 'bg-[#003478] text-white'
-                : 'text-slate-400 hover:text-white hover:bg-[#0f1f3d]'
-              }`}
-          >
-            <History size={16} />
-            {t('nav.historico')}
-          </button>
+        <div className="flex items-center gap-2 ml-16">
+          {navBtn('/', <Search size={16} />, t('nav.pesquisa'))}
+          {navBtn('/historico', <History size={16} />, t('nav.historico'))}
         </div>
 
-        {/* Direita — idioma + usuário + sair */}
         <div className="flex items-center gap-3">
-
-          {/* Seletor de idioma */}
           <div className="flex items-center gap-1 border border-[#2a4070] rounded-lg p-1">
-            {idiomas.map(idioma => (
+            {IDIOMAS.map(({ code, label }) => (
               <button
-                key={idioma.code}
-                onClick={() => i18n.changeLanguage(idioma.code)}
+                key={code}
+                onClick={() => i18n.changeLanguage(code)}
                 className={`px-2 py-1 rounded text-xs font-semibold transition
-                  ${i18n.language === idioma.code
+                  ${i18n.language === code
                     ? 'bg-[#003478] text-white'
                     : 'text-slate-400 hover:text-white'
                   }`}
               >
-                {idioma.label}
+                {label}
               </button>
             ))}
           </div>
@@ -84,7 +73,6 @@ export default function Navbar() {
             <LogOut size={16} />
             {t('nav.sair')}
           </button>
-
         </div>
 
       </div>
