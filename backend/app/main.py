@@ -1,36 +1,25 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 
+from .routers import auth
+from .routers import user
+    
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",
+]
 
-class Item(BaseModel):
-    name: str
-    price: float
-    is_offer: bool | None = None
-    
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-items_db = []
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int):
-    item = items_db[item_id]  
-    return {"item_id": item_id, "name": item.name}
+memory_db = {"users": []}
 
 
-@app.put("/items/{item_id}")
-def update_item(item_id: int):
-    item = items_db[item_id]
-    return {"item_name": item.name, "item_id": item_id}
-
-
-@app.post("/items/")
-def create_item(item: Item):
-    items_db.append(item)
-    return item
+app.include_router(user.router)
+app.include_router(auth.router, prefix="/auth")

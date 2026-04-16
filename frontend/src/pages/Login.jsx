@@ -4,17 +4,19 @@ import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
 import { LogIn } from 'lucide-react'
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 export default function Login() {
   const { login } = useAuth()
-  const navigate = useNavigate()
   const { t } = useTranslation()
+  const navigate = useNavigate()
 
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
 
-  async function handleLogin(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     setErro('')
 
@@ -26,19 +28,17 @@ export default function Login() {
       return
     }
 
-    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLimpo)
-    if (!emailValido) {
+    if (!EMAIL_REGEX.test(emailLimpo)) {
       setErro(t('login.erro_email'))
       return
     }
 
     setLoading(true)
     await new Promise(r => setTimeout(r, 800))
-
-    const sucesso = login(emailLimpo, senhaLimpa)
+    const ok = login(emailLimpo, senhaLimpa)
     setLoading(false)
 
-    if (sucesso) {
+    if (ok) {
       navigate('/')
     } else {
       setErro(t('login.erro_credenciais'))
@@ -59,8 +59,7 @@ export default function Login() {
         <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-8">
           <h2 className="text-white text-xl font-semibold mb-6">{t('login.titulo')}</h2>
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-4" noValidate>
-
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
             <div className="flex flex-col gap-2">
               <label className="text-slate-400 text-sm">{t('login.email')}</label>
               <input
@@ -85,7 +84,7 @@ export default function Login() {
 
             {erro && (
               <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3">
-                <span className="text-red-400 text-lg">⚠</span>
+                <span className="text-red-400">⚠</span>
                 <p className="text-red-400 text-sm">{erro}</p>
               </div>
             )}
@@ -97,14 +96,10 @@ export default function Login() {
             >
               {loading ? t('login.entrando') : <><LogIn size={18} /> {t('login.btn_entrar')}</>}
             </button>
-
           </form>
         </div>
 
-        <p className="text-center text-slate-600 text-xs mt-6">
-          {t('login.demo')}
-        </p>
-
+        <p className="text-center text-slate-600 text-xs mt-6">{t('login.demo')}</p>
       </div>
     </div>
   )
