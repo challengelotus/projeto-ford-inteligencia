@@ -34,14 +34,21 @@ export default function Login() {
     }
 
     setLoading(true)
-    await new Promise(r => setTimeout(r, 800))
-    const ok = login(emailLimpo, senhaLimpa)
-    setLoading(false)
+    try {
+      await new Promise(r => setTimeout(r, 800))
 
-    if (ok) {
-      navigate('/')
-    } else {
+      const ok = await login(emailLimpo, senhaLimpa)
+      console.log(ok)
+
+      if (ok) {
+        navigate('/')
+      } else {
+        setErro(t('login.erro_credenciais'))
+      }
+    } catch (error) {
       setErro(t('login.erro_credenciais'))
+    } finally {
+      setLoading(false)
     }
   }
 

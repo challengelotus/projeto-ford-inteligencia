@@ -25,14 +25,14 @@ function Rotas() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <HistoricoProvider>
-        <AtributosProvider>
-          <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
+        <HistoricoProvider>
+          <AtributosProvider>
             <Rotas />
-          </BrowserRouter>
-        </AtributosProvider>
-      </HistoricoProvider>
-    </AuthProvider>
+          </AtributosProvider>
+        </HistoricoProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
