@@ -1,1 +1,5 @@
-fastapi[standard]
+fastapi[stantard]
+passlib[argo2]
+pydantic
+PyJWT
+SQLAlchemy

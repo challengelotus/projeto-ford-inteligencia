@@ -7,16 +7,14 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: str | None = None
+    email: str | None = None
 
 
 class UserCreate(BaseModel):
-    username: str
     email: str
     password: str
 
 class UserResponse(BaseModel):
-    username: str
     email: str | None = None
 
 class UserInDB(UserResponse):
