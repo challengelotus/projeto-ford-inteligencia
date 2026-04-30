@@ -6,7 +6,6 @@ from ollama import ChatResponse
 
 # Nome do modelo baixado no Ollama
 model_name = 'gemma4:e2b'
-especificacoes = ['motor', 'potência', 'câmbio', 'tração']
 
 # Exemplo de chamada ao modelo para extrair a especificação de um veículo
 def extrair_especificacao(texto_cru: str, especificacoes: List[str]) -> Dict[str, str]:
@@ -44,4 +43,7 @@ def extrair_especificacao(texto_cru: str, especificacoes: List[str]) -> Dict[str
 
 # Exemplo de uso
 texto_teste = "O carro tem um motor V6, potência de 300 cavalos, câmbio automático e tração nas quatro rodas."
-print(extrair_especificacao(texto_teste, especificacoes))
+especificacoes_teste = ['motor', 'potência', 'câmbio', 'tração']
+print("Extraindo especificações...")
+resultado = extrair_especificacao(texto_teste, especificacoes_teste)
+print(json.dumps(resultado, indent=2, ensure_ascii=False))
