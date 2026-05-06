@@ -1,12 +1,16 @@
-# Modelos Pydantic (schemas)
-from sqlalchemy import Column, Integer, String, Identity
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from sqlalchemy import Column, Integer, Text, TIMESTAMP
+from sqlalchemy.sql import func
+from app.database import Base  # Base centralizada no database.py
 
 class User(Base):
-    __tablename__ = "users"
-    id = Column(Integer, Identity(start=1), primary_key=True)
-    email = Column(String(255), unique=True, nullable=False)
-    hashed_password = Column(String(255), nullable=False)
-    is_active = Column(Integer, default=1)
+    __tablename__ = "usuario"
+
+    id         = Column(Integer, primary_key=True, autoincrement=True)
+    nome       = Column(Text, nullable=False)
+    email      = Column(Text, nullable=False, unique=True, index=True)
+    senha_hash = Column(Text, nullable=False)               # argon2 — nunca texto puro
+    role       = Column(Text, nullable=False, default="user")  # 'admin' | 'user'
+    criado_em  = Column(TIMESTAMP, server_default=func.now())
+
+    def __repr__(self):
+        return f"<User id={self.id} email={self.email} role={self.role}>"
