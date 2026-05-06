@@ -1,5 +1,5 @@
-fastapi[stantard]
-passlib[argo2]
+fastapi[standard]
+passlib[argon2]
 pydantic
 PyJWT
 SQLAlchemy
