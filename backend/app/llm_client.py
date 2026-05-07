@@ -2,35 +2,47 @@ import json
 from typing import List, Dict
 from ollama import chat, ChatResponse
 
-# Configurações globais
+# ================== CONFIGURAÇÕES ==================
 MODEL_NAME = 'gemma4:e2b'
-ESPECIFICACOES = ['motor', 'potência', 'câmbio', 'tração']
+TEMPERATURE = 0.1
+TIMEOUT = 30
 
 
-def extrair_especificacao(texto_cru: str, atributos: List[str]) -> Dict[str, str]:
+def extrair_especificacao(texto_cru: str, atributos: Dict[str, str], marca: str, modelo: str, versao: str) -> Dict[str, str]:
     """
     Chama o modelo de IA para extrair dados técnicos em formato JSON.
     """
     prompt = f"""
         Você é um especialista em fichas técnicas de veículos automotivos.
-        Extraia do texto abaixo os seguintes atributos: {', '.join(atributos)}.
+        Retorne SOMENTE um JSON válido, sem markdown, sem explicações, sem texto adicional.
 
-        Instruções:
-        - Retorne APENAS um objeto JSON válido, sem texto adicional ou explicações.
-        - Use exatamente as chaves solicitadas: {', '.join(atributos)}.
-        - Se um atributo não for encontrado, use o valor "não disponível".
-        - Não invente informações. Seja objetivo e preciso.
+        Formato OBRIGATÓRIO (as chaves devem ser exatamente estas):
+        {{
+            {', '.join(f'"{k}": "{v}"' for k, v in atributos.items())}
+        }}
 
-        Texto: {texto_cru}
+        Regras:
+        - Preencha com dados reais do veículo extraídos do texto.
+        - Se um atributo não for encontrado, use "não disponível".
+        - NUNCA adicione campos extras.
+        - NUNCA use markdown.
+
+        Veículo: {marca} {modelo} {versao}
+
+        Texto para extração: {texto_cru}
     """
 
     try:
         response: ChatResponse = chat(
             model=MODEL_NAME,
-            messages=[{'role': 'user', 'content': prompt}]
+            messages=[{'role': 'user', 'content': prompt}],
+            options={
+                'temperature': TEMPERATURE,
+                'timeout': TIMEOUT
+            }
         )
         
-        conteudo = response['message']['content']
+        conteudo = response['message']['content'].strip()
         
         try:
             return json.loads(conteudo)
@@ -43,25 +55,25 @@ def extrair_especificacao(texto_cru: str, atributos: List[str]) -> Dict[str, str
         return {}
 
 
-def processar_artigos(artigos: List[Dict[str, str]], atributos: List[str]) -> List[Dict[str, str]]:
+def processar_artigos(artigos: List[Dict[str, str]], atributos: Dict[str, str], marca: str, modelo: str, versao: str) -> List[Dict[str, str]]:
     """
     Itera sobre uma lista de artigos e extrai as especificações de cada um.
     """
     resultados = []
     for artigo in artigos:
-        print(f"Processando artigo: {artigo['titulo']}")
-        resultado = extrair_especificacao(artigo['conteudo'], atributos)
+        texto = f"{artigo['titulo']}\n{artigo['conteudo']}"
+        print(f"\nProcessando artigo: {artigo['url']}")
+        resultado = extrair_especificacao(texto, atributos, marca, modelo, versao)
         resultados.append(resultado)
     return resultados
 
 
-def combinar_por_votacao(resultados: List[Dict[str, str]], atributos: List[str]) -> Dict[str, str]:
+def combinar_por_votacao(resultados: List[Dict[str, str]], atributos: Dict[str, str]) -> Dict[str, str]:
     """
     Consolida múltiplos resultados escolhendo o valor mais frequente para cada campo.
     """
     resultado_final = {}
-    
-    for atributo in atributos:
+    for atributo in atributos.keys():
         votos = {}
         for res in resultados:
             valor = res.get(atributo, "não disponível")
@@ -69,18 +81,37 @@ def combinar_por_votacao(resultados: List[Dict[str, str]], atributos: List[str])
                 votos[valor] = votos.get(valor, 0) + 1
         
         if votos:
-            # Seleciona o valor com maior contagem
             valor_mais_votado = max(votos, key=votos.get)
             resultado_final[atributo] = valor_mais_votado
         else:
             resultado_final[atributo] = "não disponível"
-            
     return resultado_final
 
 
-# --- Execução do Script ---
-
+# ================== EXECUÇÃO DE TESTE ==================
 if __name__ == "__main__":
+    # Atributos desejados (baseados no esquema do banco)
+    ESPECIFICACOES = {
+        "marca": "",
+        "modelo": "",
+        "versao": "",
+        "motor": "",
+        "potencia": "",
+        "torque": "",
+        "cambio": "",
+        "tracao": "",
+        "comprimento": "",
+        "largura": "",
+        "altura": "",
+        "capacidade_tanque": "",
+        "peso": ""
+    }
+
+    # Dados do veículo (para auxiliar o prompt)
+    MARCA = "Ford"
+    MODELO = "Ranger"
+    VERSAO = "Raptor 2025"
+
     artigos_simulados = [
         {
             "url": "https://exemplo.com/artigo1",
@@ -100,7 +131,7 @@ if __name__ == "__main__":
     ]
 
     print("\n=== Processando artigos um por um ===")
-    extracoes = processar_artigos(artigos_simulados, ESPECIFICACOES)
+    extracoes = processar_artigos(artigos_simulados, ESPECIFICACOES, MARCA, MODELO, VERSAO)
 
     print("\n=== Extrações individuais ===")
     for i, extr in enumerate(extracoes):
