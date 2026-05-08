@@ -81,7 +81,7 @@ def combinar_por_votacao(resultados: List[Dict[str, str]], atributos: Dict[str, 
                 votos[valor] = votos.get(valor, 0) + 1
         
         if votos:
-            valor_mais_votado = max(votos, key=votos.get)
+            valor_mais_votado = max(votos, key=lambda k: votos[k])
             resultado_final[atributo] = valor_mais_votado
         else:
             resultado_final[atributo] = "não disponível"
