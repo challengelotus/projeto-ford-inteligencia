@@ -1,59 +1,46 @@
+const API_BASE = '/api'
+
 export const ATRIBUTOS = [
   'Motor',
   'Potência',
   'Torque',
   'Câmbio',
   'Tração',
-  'Suspensão',
-  'Freios',
-  'Rodas e Pneus',
-  'Faróis',
-  'Modos de condução',
-  'Preço'
+  'Comprimento',
+  'Largura',
+  'Altura',
+  'Capacidade do Tanque',
+  'Peso',
+  'Número de Marchas',
+  'Aceleração 0-100 km/h',
+  'Velocidade Máxima',
+  'Consumo Urbano',
+  'Consumo Rodoviário',
 ]
 
-export const VEICULOS = {
-  'ford-ranger-raptor-2025': {
-    'Motor': '3.0L V6 Bi-Turbo Diesel',
-    'Potência': '397 cv a 4.000 rpm',
-    'Torque': '583 Nm a 3.500 rpm',
-    'Câmbio': 'Automático de 10 velocidades',
-    'Tração': '4x4 permanente com diferencial traseiro blocante',
-    'Suspensão': 'Dianteira: Duplo A / Traseira: Multilink com amortecedores Fox',
-    'Freios': 'Discos ventilados nas quatro rodas',
-    'Rodas e Pneus': '17" liga leve com pneus BF Goodrich 285/70 R17 AT',
-    'Faróis': 'Full LED com assinatura luminosa',
-    'Modos de condução': 'Normal, Esporte, Lama, Areia, Pedra, Baja',
-    'Preço': 'R$ 499.000',
-  },
-  'toyota-hilux-sr-2025': {
-    'Motor': '2.8L Turbodiesel 4 cilindros',
-    'Potência': '204 cv a 3.000 rpm',
-    'Torque': '500 Nm a 1.600-2.800 rpm',
-    'Câmbio': 'Automático de 6 velocidades',
-    'Tração': '4x4 com reduzida',
-    'Suspensão': 'Dianteira: Duplo A / Traseira: Feixe de molas',
-    'Freios': 'Dianteiros: Disco ventilado / Traseiros: Tambor',
-    'Rodas e Pneus': '17" aço com pneus 265/65 R17',
-    'Faróis': 'Halógenos com DRL em LED',
-    'Modos de condução': 'Não disponível',
-    'Preço': 'R$ 264.990',
-  },
-}
+export async function buscarEspecificacoes(marca, modelo, versao, atributos) {
+  try {
+    const response = await fetch(`${API_BASE}/especificacoes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ marca, modelo, versao, atributos }),
+    })
 
-export function buscarEspecificacoes(marca, modelo, versao, atributos) {
-  const chave = `${marca}-${modelo}-${versao}`
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`)
 
-  const veiculo = VEICULOS[chave] || {}
+    const data = await response.json()
 
-  const resultado = {}
-  atributos.forEach(a => {
-    resultado[a] = veiculo[a] || 'Não disponível'
-  })
-  return resultado
+    const resultado = {}
+    for (const atributo of atributos) {
+      const chave = Object.keys(data).find(
+        k => k.toLowerCase() === atributo.toLowerCase()
+      )
+      resultado[atributo] = chave && data[chave] ? String(data[chave]) : 'Não disponível'
+    }
+
+    return resultado
+  } catch (error) {
+    console.error('Erro ao buscar especificações:', error)
+    return Object.fromEntries(atributos.map(a => [a, 'Não disponível']))
+  }
 }

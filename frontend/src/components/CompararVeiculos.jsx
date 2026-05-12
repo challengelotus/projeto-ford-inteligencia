@@ -65,8 +65,10 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
     setLoading(true)
     await new Promise(r => setTimeout(r, 1000))
 
-    const specs1 = buscarEspecificacoes(veiculo1.marca, veiculo1.modelo, veiculo1.versao, selecionados)
-    const specs2 = buscarEspecificacoes(veiculo2.marca, veiculo2.modelo, veiculo2.versao, selecionados)
+    const [specs1, specs2] = await Promise.all([
+      buscarEspecificacoes(veiculo1.marca, veiculo1.modelo, veiculo1.versao, selecionados),
+      buscarEspecificacoes(veiculo2.marca, veiculo2.modelo, veiculo2.versao, selecionados),
+    ])
 
     const pesquisa = {
       tipo: 'comparacao',

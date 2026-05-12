@@ -50,7 +50,7 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
     setLoading(true)
     await new Promise(r => setTimeout(r, 1000))
 
-    const specs = buscarEspecificacoes(m, mo, v, selecionados)
+    const specs = await buscarEspecificacoes(m, mo, v, selecionados)
     const pesquisa = { tipo: 'individual', marca: m, modelo: mo, versao: v, specs }
 
     aoSalvar(pesquisa)
