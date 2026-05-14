@@ -6,9 +6,9 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
-from ..database import get_db
-from ..schemas import TokenData
-from ..models import User
+from ..models.database import get_db
+from ..models.schemas import TokenData
+from ..models.orm_models import User
 from .security import verify_password
 
 SECRET_KEY = "82343e932ff3ea944a89925c4e1bb49925f51336a691b978ed54544c07687637"

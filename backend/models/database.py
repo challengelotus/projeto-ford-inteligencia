@@ -19,8 +19,8 @@ class Base(DeclarativeBase):
 
 def init_db():
     # Importado aqui para evitar circular import
-    from app.models import User
-    from app.auth.security import get_password_hash
+    from backend.models.orm_models import User
+    from backend.auth.security import get_password_hash
 
     Base.metadata.create_all(bind=engine)
 

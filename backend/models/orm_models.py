@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Text, TIMESTAMP
 from sqlalchemy.sql import func
-from app.database import Base  # Base centralizada no database.py
+from backend.models.database import Base  # Base centralizada no database.py
 
 class User(Base):
     __tablename__ = "usuario"
