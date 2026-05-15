@@ -100,25 +100,32 @@ class LLMService:
             f'"{k}": "{v}"' for k, v in atributos.items())
 
         return f"""
-Você é um especialista em fichas técnicas de veículos automotivos.
-Retorne SOMENTE um JSON válido, sem markdown, sem explicações, sem texto adicional.
+            Você é um especialista em fichas técnicas de veículos automotivos.
+            Retorne SOMENTE um JSON válido, sem markdown, sem explicações, sem texto adicional.
 
-Formato OBRIGATÓRIO (as chaves devem ser exatamente estas):
-{{
-    {exemplo_chaves}
-}}
+            Formato OBRIGATÓRIO (as chaves devem ser exatamente estas):
+            {{
+                {exemplo_chaves}
+            }}
 
-Regras:
-- Preencha com dados reais do veículo extraídos do texto.
-- Se um atributo não for encontrado, use "não disponível".
-- NUNCA adicione campos extras.
-- NUNCA use markdown.
+            Regras:
+            - Preencha com dados reais do veículo extraídos do texto.
+            - Se um atributo não for encontrado, use "não disponível".
+            - NUNCA adicione campos extras.
+            - NUNCA use markdown.
+            - Use APENAS unidades do sistema métrico internacional (kg, metros, cv, Nm ou kgfm).
+            - Para torque: prefira Nm (newton-metro) ou kgfm (1 kgfm = 9,80665 Nm).
+            - Para peso: use quilogramas (kg). Se o texto informar libras (pounds), converta: 1 lb = 0,4536 kg.
+            - Para comprimentos: use metros (m) ou milímetros (mm).
+            - Para potência: mantenha cv (cavalos) ou kW (converta se necessário).
+            - Nunca retorne unidades como "pound-feet", "pounds", "GVW", "GVWR".
+            - Se um valor estiver em unidades estranhas e você não souber converter, escreva "não disponível".
 
-Veículo: {marca} {modelo} {versao}
+            Veículo: {marca} {modelo} {versao}
 
-Texto para extração:
-\"\"\"{texto_limitado}\"\"\"
-"""
+            Texto para extração:
+            \"\"\"{texto_limitado}\"\"\"
+        """
 
 
 # ================== EXECUÇÃO DE TESTE (opcional) ==================

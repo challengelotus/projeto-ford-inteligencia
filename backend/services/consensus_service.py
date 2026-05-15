@@ -38,7 +38,7 @@ class ConsensusService:
                         valor, 0.0) + peso
             if peso_por_valor:
                 # Escolhe o valor com maior peso acumulado (se empate, o primeiro encontrado)
-                melhor_valor = max(peso_por_valor, key=peso_por_valor.get)
+                melhor_valor = max(peso_por_valor, key=lambda x: peso_por_valor[x])
                 final[attr] = melhor_valor
             else:
                 final[attr] = 'não disponível'

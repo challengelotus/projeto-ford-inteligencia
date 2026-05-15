@@ -1,6 +1,6 @@
 import json
 from services.data_loader_service import DataLoaderService
-from services.llm_service import LLMService
+from services.llm_client import LLMService
 from services.consensus_service import ConsensusService
 
 if __name__ == "__main__":
