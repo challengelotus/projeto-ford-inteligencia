@@ -31,8 +31,8 @@ export default function ResultadoIndividual({ resultado, onNova }) {
         {marca} · {modelo} · <span className="text-[#4a9eff]">{versao}</span>
       </div>
 
-      <div className="rounded-xl overflow-hidden border border-[#2a4070]">
-        <table className="w-full border-collapse">
+      <div className="rounded-xl overflow-x-auto border border-[#2a4070]">
+        <table className="w-full border-collapse min-w-[400px]">
           <thead>
             <tr className="bg-[#0f1f3d]">
               <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">Atributo</th>
@@ -48,7 +48,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
                   <td className="px-5 py-4 text-white font-semibold text-sm">{atributo}</td>
                   <td className="px-5 py-4 text-slate-300 text-sm">{valor}</td>
                   <td className="px-5 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap
                       ${encontrado ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
                       {encontrado ? 'Encontrado' : 'Indisponível'}
                     </span>
@@ -60,7 +60,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
         </table>
       </div>
 
-      <div className="flex gap-3 mt-5">
+      <div className="flex flex-col sm:flex-row gap-3 mt-5">
         <button
           onClick={onNova}
           className="flex-1 flex items-center justify-center gap-2 border border-[#2a4070] hover:border-[#4a9eff] text-white py-3 rounded-lg transition text-sm"

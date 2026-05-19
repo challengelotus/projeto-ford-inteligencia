@@ -111,7 +111,7 @@ export default function Historico() {
               )}
 
               {item.tipo === 'comparacao' && (
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-center gap-3">
                   <div className="flex-1 bg-[#0f1f3d] border border-[#2a4070] rounded-xl px-4 py-3">
                     <p className="text-xs text-slate-500 mb-1">Veículo 1</p>
                     <p className="text-white text-sm font-semibold">
