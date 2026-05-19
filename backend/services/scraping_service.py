@@ -1,5 +1,11 @@
-import json
+import sys
 import os
+
+raiz_projeto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if raiz_projeto not in sys.path:
+    sys.path.append(raiz_projeto)
+
+import json
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
 from web_scraping.spiders.automaistv_spider import AutoMaisTVSpider
@@ -22,11 +28,11 @@ def executar_busca(carro):
       for linha in f:
         resultados.append(json.loads(linha))
     
-    with open('results.json', 'w', encoding='utf-8') as f:
+    with open('data/raw/scraping.json', 'w', encoding='utf-8') as f:
       json.dump(resultados, f, ensure_ascii=False, indent=4)
     
     os.remove('temp_results.jsonl')
-    print(f"Sucesso! {len(resultados)} itens salvos em results.json")
+    print(f"Sucesso! {len(resultados)} itens salvos em scraping.json")
 
 if __name__ == "__main__":
   executar_busca("Ford Ranger 2025")
