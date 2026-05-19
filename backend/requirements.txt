@@ -1,4 +1,6 @@
 fastapi==0.136.1
+google_api_python_client==2.196.0
+google_auth_oauthlib==1.4.0
 itemadapter==0.3.0
 ollama==0.6.2
 passlib==1.7.4
@@ -6,3 +8,4 @@ pydantic==2.13.4
 PyJWT==2.12.1
 Scrapy==2.12.0
 SQLAlchemy==2.0.39
+youtube_transcript_api==1.2.4
