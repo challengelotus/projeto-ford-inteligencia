@@ -2,6 +2,7 @@ import json
 from services.data_loader_service import DataLoaderService
 from services.llm_client import LLMService
 from services.consensus_service import ConsensusService
+from services.storage_service import StorageService
 
 if __name__ == "__main__":
     atributos = {
@@ -37,3 +38,8 @@ if __name__ == "__main__":
 
     print("\n=== Resultado final ===")
     print(json.dumps(final, indent=2, ensure_ascii=False))
+
+    # 4. Salvando o resultado JSON na pasta de dados
+    storage = StorageService()
+    storage.salvar_resultado(final, marca, modelo, versao, "2025")
+
