@@ -6,13 +6,22 @@ from services.storage_service import StorageService
 
 if __name__ == "__main__":
     atributos = {
-        "marca": "", "modelo": "", "versao": "",
-        "motor": "", "potencia": "", "torque": "",
-        "cambio": "", "tracao": "",
-        "comprimento": "", "largura": "", "altura": "",
-        "capacidade_tanque": "", "peso": ""
+        "marca": "", 
+        "modelo": "", 
+        "versao": "",
+        "ano": "",
+        "motor": "", 
+        "potencia": "", 
+        "torque": "",
+        "cambio": "", 
+        "tracao": "",
+        "comprimento": "", 
+        "largura": "", 
+        "altura": "",
+        "capacidade_tanque": "", 
+        "peso": ""
     }
-    marca, modelo, versao = "Ford", "Ranger", "Raptor 2025"
+    marca, modelo, versao, ano = "Ford", "Ranger", "Raptor", 2025
 
     # 1. Carregar artigos da pasta data/raw
     loader = DataLoaderService()
@@ -25,7 +34,7 @@ if __name__ == "__main__":
     # 2. Processar com LLM
     llm = LLMService()
     resultados = llm.processar_artigos(
-        artigos, atributos, marca, modelo, versao)
+        artigos, atributos, marca, modelo, versao, ano)
 
     # 3. Definir pesos por fonte
     pesos = {
@@ -41,5 +50,5 @@ if __name__ == "__main__":
 
     # 4. Salvando o resultado JSON na pasta de dados
     storage = StorageService()
-    storage.salvar_resultado(final, marca, modelo, versao, "2025")
+    storage.salvar_resultado(final, marca, modelo, versao, ano)
 

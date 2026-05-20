@@ -9,10 +9,8 @@ class StorageService:
         self.processed_dir = base_dir / processed_dir
         self.processed_dir.mkdir(parents=True, exist_ok=True)
 
-    def salvar_resultado(self, resultado: Dict[str, str], marca: str, modelo: str, versao: str, ano: str = "") -> Path:
-        nome_base = f"{marca}_{modelo}_{versao}".replace(" ", "_").lower()
-        if ano:
-            nome_base += f"_{ano}"
+    def salvar_resultado(self, resultado: Dict[str, str], marca: str, modelo: str, versao: str, ano: int) -> Path:
+        nome_base = f"{marca}_{modelo}_{versao}_{ano}".replace(" ", "_").lower()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         nome_arquivo = f"{nome_base}_{timestamp}.json"
         caminho = self.processed_dir / nome_arquivo

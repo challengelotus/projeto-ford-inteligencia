@@ -16,7 +16,7 @@ class LLMService:
         self.timeout = timeout
 
     def extrair_especificacao(self, texto_cru: str, atributos: Dict[str, str],
-                              marca: str, modelo: str, versao: str) -> Dict[str, str]:
+                              marca: str, modelo: str, versao: str, ano: int) -> Dict[str, str]:
         """
         Extrai atributos de um único texto (artigo, site, etc.) utilizando o modelo LLM.
 
@@ -28,8 +28,7 @@ class LLMService:
         Returns:
             Dicionário com os atributos extraídos (valores ou "não disponível")
         """
-        prompt = self._construir_prompt(
-            texto_cru, atributos, marca, modelo, versao)
+        prompt = self._construir_prompt(texto_cru, atributos, marca, modelo, versao, ano)
 
         try:
             response: ChatResponse = chat(
@@ -66,7 +65,7 @@ class LLMService:
             return {attr: "não disponível" for attr in atributos}
 
     def processar_artigos(self, artigos: List[Dict[str, str]], atributos: Dict[str, str],
-                          marca: str, modelo: str, versao: str) -> List[Dict[str, str]]:
+                          marca: str, modelo: str, versao: str, ano: int) -> List[Dict[str, str]]:
         """
         Processa uma lista de artigos (cada um com 'titulo', 'conteudo', 'fonte', 'url').
         Retorna uma lista de dicionários com os atributos extraídos + a fonte original.
@@ -85,13 +84,13 @@ class LLMService:
             texto = f"{titulo}\n{conteudo}" if titulo else conteudo
             print(f"Processando: {url} (fonte={fonte})")
             resultado = self.extrair_especificacao(
-                texto, atributos, marca, modelo, versao)
+                texto, atributos, marca, modelo, versao, ano)
             resultado['fonte'] = fonte  # Adiciona a fonte para uso no consenso
             resultados.append(resultado)
         return resultados
 
     def _construir_prompt(self, texto_cru: str, atributos: Dict[str, str],
-                          marca: str, modelo: str, versao: str) -> str:
+                          marca: str, modelo: str, versao: str, ano: int) -> str:
         """
         Constrói o prompt para o modelo com formatação clara e obrigação de JSON.
         """
@@ -121,38 +120,8 @@ class LLMService:
             - Nunca retorne unidades como "pound-feet", "pounds", "GVW", "GVWR".
             - Se um valor estiver em unidades estranhas e você não souber converter, escreva "não disponível".
 
-            Veículo: {marca} {modelo} {versao}
+            Veículo: {marca} {modelo} {versao} {ano}
 
             Texto para extração:
             \"\"\"{texto_limitado}\"\"\"
         """
-
-
-# ================== EXECUÇÃO DE TESTE (opcional) ==================
-if __name__ == "__main__":
-    # Pequeno teste manual (simula artigos)
-    from consensus_service import ConsensusService
-
-    atributos_teste = {
-        "motor": "", "potencia": "", "cambio": "", "tracao": ""
-    }
-    artigos_teste = [
-        {
-            "titulo": "Ranger Raptor",
-            "conteudo": "Motor V6 3.0 biturbo de 397 cv, câmbio automático de 10 marchas, tração 4x4.",
-            "fonte": "results",
-            "url": "teste1"
-        },
-        {
-            "titulo": "Review",
-            "conteudo": "Potência 397 cavalos, motor 3.0 V6, transmissão automática de 10 velocidades.",
-            "fonte": "youtube",
-            "url": "teste2"
-        }
-    ]
-
-    llm = LLMService()
-    resultados = llm.processar_artigos(
-        artigos_teste, atributos_teste, "Ford", "Ranger", "Raptor")
-    final = ConsensusService.combinar_por_votacao(resultados, atributos_teste)
-    print(json.dumps(final, indent=2, ensure_ascii=False))
