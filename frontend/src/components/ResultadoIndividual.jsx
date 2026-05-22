@@ -1,11 +1,11 @@
 import { ArrowLeft, Download } from 'lucide-react'
 
 export default function ResultadoIndividual({ resultado, onNova }) {
-  const { marca, modelo, versao, specs } = resultado
+  const { marca, modelo, versao, ano, specs } = resultado
 
   function exportarCSV() {
     const linhas = [
-      ['Veículo', `${marca} ${modelo} ${versao}`],
+      ['Veículo', `${marca} ${modelo} ${versao} ${ano}`],
       [''],
       ['Atributo', 'Valor', 'Status'],
       ...Object.entries(specs).map(([atributo, valor]) => [
@@ -20,7 +20,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `${marca}-${modelo}-${versao}.csv`.replace(/\s+/g, '-')
+    link.download = `${marca}-${modelo}-${versao}-${ano}.csv`.replace(/\s+/g, '-')
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -28,7 +28,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
   return (
     <div>
       <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4 mb-5 font-semibold text-white">
-        {marca} · {modelo} · <span className="text-[#4a9eff]">{versao}</span>
+        {marca} · {modelo} · <span className="text-[#4a9eff]">{versao}</span> · {ano}
       </div>
 
       <div className="rounded-xl overflow-x-auto border border-[#2a4070]">

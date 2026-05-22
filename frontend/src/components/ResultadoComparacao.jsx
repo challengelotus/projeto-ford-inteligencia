@@ -5,7 +5,7 @@ export default function ResultadoComparacao({ resultado, onNova }) {
 
   function exportarCSV() {
     const linhas = [
-      ['', `${veiculo1.marca} ${veiculo1.modelo} ${veiculo1.versao}`, `${veiculo2.marca} ${veiculo2.modelo} ${veiculo2.versao}`],
+      ['', `${veiculo1.marca} ${veiculo1.modelo} ${veiculo1.versao} ${veiculo1.ano}`, `${veiculo2.marca} ${veiculo2.modelo} ${veiculo2.versao} ${veiculo2.ano}`],
       [''],
       ['Atributo', `${veiculo1.marca} ${veiculo1.modelo}`, `${veiculo2.marca} ${veiculo2.modelo}`],
       ...atributos.map(a => [a, veiculo1.specs[a] || 'Não disponível', veiculo2.specs[a] || 'Não disponível'])
@@ -28,7 +28,7 @@ export default function ResultadoComparacao({ resultado, onNova }) {
           <div key={i} className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4">
             <small className="text-slate-400 text-xs">Veículo {i + 1}</small>
             <p className="text-white font-semibold mt-1">
-              {v.marca} {v.modelo} <span className="text-[#4a9eff]">{v.versao}</span>
+              {v.marca} {v.modelo} <span className="text-[#4a9eff]">{v.versao}</span> · {v.ano}
             </p>
           </div>
         ))}
