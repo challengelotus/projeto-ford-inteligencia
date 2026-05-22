@@ -1,5 +1,6 @@
 from pathlib import Path
 from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 # backend/app/database.py → .parent = app/ → .parent = backend/
@@ -11,6 +12,13 @@ engine = create_engine(DATABASE_URL ,
                        # obrigatório para SQLite + FastAPI
                        )
 
+# Ativar foreign keys no SQLite
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Base centralizada aqui — models.py importa daqui
@@ -19,7 +27,7 @@ class Base(DeclarativeBase):
 
 def init_db():
     # Importado aqui para evitar circular import
-    from backend.models.orm_models import User
+    from backend.models.orm_models import User, Veiculo, Historico
     from backend.auth.security import get_password_hash
 
     Base.metadata.create_all(bind=engine)
