@@ -7,6 +7,7 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
   const [marca, setMarca] = useState(itemHistorico?.marca || '')
   const [modelo, setModelo] = useState(itemHistorico?.modelo || '')
   const [versao, setVersao] = useState(itemHistorico?.versao || '')
+  const [ano, setAno] = useState(itemHistorico?.ano || '')
   const [selecionados, setSelecionados] = useState(
     itemHistorico ? Object.keys(itemHistorico.specs) : ATRIBUTOS
   )
@@ -22,13 +23,8 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
     )
   }
 
-  function selecionarTodos() {
-    setSelecionados(ATRIBUTOS)
-  }
-
-  function limparTodos() {
-    setSelecionados([])
-  }
+  function selecionarTodos() { setSelecionados(ATRIBUTOS) }
+  function limparTodos() { setSelecionados([]) }
 
   async function handleBuscar() {
     setErro('')
@@ -36,8 +32,9 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
     const m = marca.trim()
     const mo = modelo.trim()
     const v = versao.trim()
+    const a = ano.trim()
 
-    if (!m || !mo || !v) {
+    if (!m || !mo || !v || !a) {
       setErro('Preencha todos os campos antes de buscar.')
       return
     }
@@ -51,7 +48,7 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
     await new Promise(r => setTimeout(r, 1000))
 
     const specs = await buscarEspecificacoes(m, mo, v, selecionados)
-    const pesquisa = { tipo: 'individual', marca: m, modelo: mo, versao: v, specs }
+    const pesquisa = { tipo: 'individual', marca: m, modelo: mo, versao: v, ano: a, specs }
 
     aoSalvar(pesquisa)
     setResultado(pesquisa)
@@ -69,7 +66,8 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
         {[
           { label: 'Marca', value: marca, set: setMarca, placeholder: 'ex: Toyota' },
           { label: 'Modelo', value: modelo, set: setModelo, placeholder: 'ex: Hilux' },
-          { label: 'Versão', value: versao, set: setVersao, placeholder: 'ex: SR 2025' },
+          { label: 'Versão', value: versao, set: setVersao, placeholder: 'ex: SR' },
+          { label: 'Ano', value: ano, set: setAno, placeholder: 'ex: 2025' },
         ].map(({ label, value, set, placeholder }) => (
           <div key={label} className="flex flex-col gap-2 flex-1">
             <label className="text-slate-400 text-sm">{label}</label>

@@ -93,7 +93,7 @@ export default function Historico() {
               {item.tipo === 'individual' && (
                 <div>
                   <p className="text-white font-semibold">
-                    {item.marca} {item.modelo} <span className="text-[#4a9eff]">{item.versao}</span>
+                    {item.marca} {item.modelo} <span className="text-[#4a9eff]">{item.versao}</span> · {item.ano}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {Object.entries(item.specs).slice(0, 5).map(([atributo, valor]) => (
@@ -111,18 +111,18 @@ export default function Historico() {
               )}
 
               {item.tipo === 'comparacao' && (
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-center gap-3">
                   <div className="flex-1 bg-[#0f1f3d] border border-[#2a4070] rounded-xl px-4 py-3">
                     <p className="text-xs text-slate-500 mb-1">Veículo 1</p>
                     <p className="text-white text-sm font-semibold">
-                      {item.veiculo1.marca} {item.veiculo1.modelo} <span className="text-[#4a9eff]">{item.veiculo1.versao}</span>
+                      {item.veiculo1.marca} {item.veiculo1.modelo} <span className="text-[#4a9eff]">{item.veiculo1.versao}</span> · {item.veiculo1.ano}
                     </p>
                   </div>
                   <span className="text-slate-500 font-bold">VS</span>
                   <div className="flex-1 bg-[#0f1f3d] border border-[#2a4070] rounded-xl px-4 py-3">
                     <p className="text-xs text-slate-500 mb-1">Veículo 2</p>
                     <p className="text-white text-sm font-semibold">
-                      {item.veiculo2.marca} {item.veiculo2.modelo} <span className="text-[#4a9eff]">{item.veiculo2.versao}</span>
+                      {item.veiculo2.marca} {item.veiculo2.modelo} <span className="text-[#4a9eff]">{item.veiculo2.versao}</span> · {item.veiculo2.ano}
                     </p>
                   </div>
                 </div>

@@ -8,11 +8,13 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
     marca: itemHistorico?.veiculo1?.marca || '',
     modelo: itemHistorico?.veiculo1?.modelo || '',
     versao: itemHistorico?.veiculo1?.versao || '',
+    ano: itemHistorico?.veiculo1?.ano || '',
   })
   const [v2, setV2] = useState({
     marca: itemHistorico?.veiculo2?.marca || '',
     modelo: itemHistorico?.veiculo2?.modelo || '',
     versao: itemHistorico?.veiculo2?.versao || '',
+    ano: itemHistorico?.veiculo2?.ano || '',
   })
   const [selecionados, setSelecionados] = useState(
     itemHistorico ? itemHistorico.atributos : ATRIBUTOS
@@ -35,15 +37,15 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
   async function handleComparar() {
     setErro('')
 
-    const veiculo1 = { marca: v1.marca.trim(), modelo: v1.modelo.trim(), versao: v1.versao.trim() }
-    const veiculo2 = { marca: v2.marca.trim(), modelo: v2.modelo.trim(), versao: v2.versao.trim() }
+    const veiculo1 = { marca: v1.marca.trim(), modelo: v1.modelo.trim(), versao: v1.versao.trim(), ano: v1.ano.trim() }
+    const veiculo2 = { marca: v2.marca.trim(), modelo: v2.modelo.trim(), versao: v2.versao.trim(), ano: v2.ano.trim() }
 
-    if (!veiculo1.marca || !veiculo1.modelo || !veiculo1.versao) {
+    if (!veiculo1.marca || !veiculo1.modelo || !veiculo1.versao || !veiculo1.ano) {
       setErro('Preencha todos os campos do Veículo 1.')
       return
     }
 
-    if (!veiculo2.marca || !veiculo2.modelo || !veiculo2.versao) {
+    if (!veiculo2.marca || !veiculo2.modelo || !veiculo2.versao || !veiculo2.ano) {
       setErro('Preencha todos os campos do Veículo 2.')
       return
     }
@@ -51,7 +53,8 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
     if (
       veiculo1.marca.toLowerCase() === veiculo2.marca.toLowerCase() &&
       veiculo1.modelo.toLowerCase() === veiculo2.modelo.toLowerCase() &&
-      veiculo1.versao.toLowerCase() === veiculo2.versao.toLowerCase()
+      veiculo1.versao.toLowerCase() === veiculo2.versao.toLowerCase() &&
+      veiculo1.ano === veiculo2.ano
     ) {
       setErro('Os dois veículos não podem ser iguais.')
       return
@@ -98,7 +101,8 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
             {[
               { field: 'marca', placeholder: 'ex: Ford' },
               { field: 'modelo', placeholder: 'ex: Ranger' },
-              { field: 'versao', placeholder: 'ex: Raptor 2025' },
+              { field: 'versao', placeholder: 'ex: Raptor' },
+              { field: 'ano', placeholder: 'ex: 2025' },
             ].map(({ field, placeholder }) => (
               <div key={field} className="flex flex-col gap-2 mb-3">
                 <label className="text-slate-400 text-sm capitalize">

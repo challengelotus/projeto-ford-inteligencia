@@ -1,11 +1,11 @@
 import { ArrowLeft, Download } from 'lucide-react'
 
 export default function ResultadoIndividual({ resultado, onNova }) {
-  const { marca, modelo, versao, specs } = resultado
+  const { marca, modelo, versao, ano, specs } = resultado
 
   function exportarCSV() {
     const linhas = [
-      ['Veículo', `${marca} ${modelo} ${versao}`],
+      ['Veículo', `${marca} ${modelo} ${versao} ${ano}`],
       [''],
       ['Atributo', 'Valor', 'Status'],
       ...Object.entries(specs).map(([atributo, valor]) => [
@@ -20,7 +20,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = `${marca}-${modelo}-${versao}.csv`.replace(/\s+/g, '-')
+    link.download = `${marca}-${modelo}-${versao}-${ano}.csv`.replace(/\s+/g, '-')
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -28,11 +28,11 @@ export default function ResultadoIndividual({ resultado, onNova }) {
   return (
     <div>
       <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4 mb-5 font-semibold text-white">
-        {marca} · {modelo} · <span className="text-[#4a9eff]">{versao}</span>
+        {marca} · {modelo} · <span className="text-[#4a9eff]">{versao}</span> · {ano}
       </div>
 
-      <div className="rounded-xl overflow-hidden border border-[#2a4070]">
-        <table className="w-full border-collapse">
+      <div className="rounded-xl overflow-x-auto border border-[#2a4070]">
+        <table className="w-full border-collapse min-w-[400px]">
           <thead>
             <tr className="bg-[#0f1f3d]">
               <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">Atributo</th>
@@ -48,7 +48,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
                   <td className="px-5 py-4 text-white font-semibold text-sm">{atributo}</td>
                   <td className="px-5 py-4 text-slate-300 text-sm">{valor}</td>
                   <td className="px-5 py-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap
                       ${encontrado ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
                       {encontrado ? 'Encontrado' : 'Indisponível'}
                     </span>
@@ -60,7 +60,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
         </table>
       </div>
 
-      <div className="flex gap-3 mt-5">
+      <div className="flex flex-col sm:flex-row gap-3 mt-5">
         <button
           onClick={onNova}
           className="flex-1 flex items-center justify-center gap-2 border border-[#2a4070] hover:border-[#4a9eff] text-white py-3 rounded-lg transition text-sm"
