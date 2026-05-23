@@ -140,6 +140,8 @@ O componente `RotaProtegida` no `App.jsx` verifica se há um usuário autenticad
 
 ### Passo a passo
 
+ **Atenção:** O frontend consome a API do backend. Para que as pesquisas funcionem corretamente, o backend precisa estar rodando em `http://localhost:8000` antes de usar a aplicação.
+
 ```bash
 # 1. Entre na pasta do frontend
 cd frontend
@@ -173,41 +175,41 @@ Senha:  ford123
 ##  Demonstração Visual
 
 ### Tela de Login
-![Login](./docs/prints/login.png)
+![Login](./frontend/docs/prints/img4.png)
 
 ---
 
 ### Pesquisa Individual — Formulário
-![Pesquisa Individual](./docs/prints/pesquisa-individual.png)
-![Pesquisa Individual - Atributos](./docs/prints/pesquisa-individual-2.png)
+![Pesquisa Individual](./frontend/docs/prints/img6.png)
+![Pesquisa Individual - Atributos](./frontend/docs/prints/img7.png)
 
 ---
 
 ### Navbar Mobile — Menu Hamburguer
-![Navbar Mobile](./docs/prints/navbar-mobile.png)
+![Navbar Mobile](./frontend/docs/prints/img5.png)
 
 ---
 
 ### Resultado da Pesquisa Individual
-![Resultado Individual](./docs/prints/resultado-individual.png)
-![Resultado Individual - continuação](./docs/prints/resultado-individual-2.png)
+![Resultado Individual](./frontend/docs/prints/img11.png)
+![Resultado Individual - continuação](./frontend/docs/prints/img1.png)
 
 ---
 
 ### Comparação de Veículos — Formulário
-![Comparação - Formulário](./docs/prints/comparacao-form.png)
-![Comparação - Formulário 2](./docs/prints/comparacao-form-2.png)
+![Comparação - Formulário](./frontend/docs/prints/img2.png)
+![Comparação - Formulário 2](./frontend/docs/prints/img8.png)
 
 ---
 
 ### Resultado da Comparação
-![Resultado Comparação](./docs/prints/resultado-comparacao.png)
-![Resultado Comparação - continuação](./docs/prints/resultado-comparacao-2.png)
+![Resultado Comparação](./frontend/docs/prints/img9.png)
+![Resultado Comparação - continuação](./frontend/docs/prints/img3.png)
 
 ---
 
 ### Histórico de Pesquisas
-![Histórico](./docs/prints/historico.png)
+![Histórico](./frontend/docs/prints/img10.png)
 
 ---
 
