@@ -140,6 +140,8 @@ O componente `RotaProtegida` no `App.jsx` verifica se há um usuário autenticad
 
 ### Passo a passo
 
+ **Atenção:** O frontend consome a API do backend. Para que as pesquisas funcionem corretamente, o backend precisa estar rodando em `http://localhost:8000` antes de usar a aplicação.
+
 ```bash
 # 1. Entre na pasta do frontend
 cd frontend
