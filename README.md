@@ -173,41 +173,41 @@ Senha:  ford123
 ##  Demonstração Visual
 
 ### Tela de Login
-![Login](./docs/prints/login.png)
+![Login](./frontend/docs/prints/login.png)
 
 ---
 
 ### Pesquisa Individual — Formulário
-![Pesquisa Individual](./docs/prints/pesquisa-individual.png)
-![Pesquisa Individual - Atributos](./docs/prints/pesquisa-individual-2.png)
+![Pesquisa Individual](./frontend/docs/prints/pesquisa-individual.png)
+![Pesquisa Individual - Atributos](./frontend/docs/prints/pesquisa-individual-2.png)
 
 ---
 
 ### Navbar Mobile — Menu Hamburguer
-![Navbar Mobile](./docs/prints/navbar-mobile.png)
+![Navbar Mobile](./frontend/docs/prints/navbar-mobile.png)
 
 ---
 
 ### Resultado da Pesquisa Individual
-![Resultado Individual](./docs/prints/resultado-individual.png)
-![Resultado Individual - continuação](./docs/prints/resultado-individual-2.png)
+![Resultado Individual](./frontend/docs/prints/resultado-individual.png)
+![Resultado Individual - continuação](./frontend/docs/prints/resultado-individual-2.png)
 
 ---
 
 ### Comparação de Veículos — Formulário
-![Comparação - Formulário](./docs/prints/comparacao-form.png)
-![Comparação - Formulário 2](./docs/prints/comparacao-form-2.png)
+![Comparação - Formulário](./frontend/docs/prints/comparacao-form.png)
+![Comparação - Formulário 2](./frontend/docs/prints/comparacao-form-2.png)
 
 ---
 
 ### Resultado da Comparação
-![Resultado Comparação](./docs/prints/resultado-comparacao.png)
-![Resultado Comparação - continuação](./docs/prints/resultado-comparacao-2.png)
+![Resultado Comparação](./frontend/docs/prints/resultado-comparacao.png)
+![Resultado Comparação - continuação](./frontend/docs/prints/resultado-comparacao-2.png)
 
 ---
 
 ### Histórico de Pesquisas
-![Histórico](./docs/prints/historico.png)
+![Histórico](./frontend/docs/prints/historico.png)
 
 ---
 
