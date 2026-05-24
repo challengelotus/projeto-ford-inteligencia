@@ -29,7 +29,7 @@ def authenticate_user(db: Session, email: str, password: str):
     user = get_user(db, email)
     if not user:
         return False
-    if not verify_password(password, user.senha_hash):  # campo atualizado
+    if not verify_password(password, user.senha_hash):
         return False
     return user
 
@@ -73,7 +73,7 @@ async def get_current_user(
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
     return current_user
 
-# 3. Dependência de RBAC para Administradores
+# 3. RBAC
 async def get_current_admin_user(current_user: User = Depends(get_current_active_user)):
     if current_user.role != "admin":
         raise HTTPException(

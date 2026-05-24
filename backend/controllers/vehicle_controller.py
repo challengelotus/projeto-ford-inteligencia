@@ -1,5 +1,6 @@
 import hashlib
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
+from ..utils.helpers import limiter
 from sqlalchemy.orm import Session
 from datetime import datetime
 
@@ -26,7 +27,9 @@ def fazer_scraping_veiculo(marca: str, modelo: str, versao: str, ano: int):
     }
 
 @router.get("/busca", response_model=VeiculoResponse)
+@limiter.limit("20/minute")
 async def buscar_veiculo(
+    request: Request,
     marca: str = Query(..., min_length=2, max_length=50), 
     modelo: str = Query(..., min_length=1, max_length=50), 
     versao: str = Query(..., min_length=1, max_length=100), 
@@ -38,18 +41,15 @@ async def buscar_veiculo(
 ):
     hash_busca = gerar_hash_busca(marca, modelo, versao, ano)
     
-    # 1. Verifica se já existe na base de dados
+    #  Verifica se já existe na base de dados
     veiculo_db = db.query(Veiculo).filter(Veiculo.hash_busca == hash_busca).first()
     
     if veiculo_db and not bypass_cache:
-        # Retorna do cache da base de dados
         return veiculo_db
 
-    # 2. Se não existe ou bypass_cache é True, faz o scraping
     novas_especificacoes = fazer_scraping_veiculo(marca, modelo, versao, ano)
     
     if veiculo_db and bypass_cache:
-        # Atualização forçada
         veiculo_db.especificacoes = novas_especificacoes
         veiculo_db.fonte = fonte
         veiculo_db.criado_em = datetime.utcnow()
@@ -57,7 +57,6 @@ async def buscar_veiculo(
         db.refresh(veiculo_db)
         return veiculo_db
     else:
-        # Novo registo
         novo_veiculo = Veiculo(
             marca=marca, modelo=modelo, versao=versao, ano=ano,
             hash_busca=hash_busca, fonte=fonte, especificacoes=novas_especificacoes

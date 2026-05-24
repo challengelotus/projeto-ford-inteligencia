@@ -1,6 +1,13 @@
 from .controllers import auth_controller as auth
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+
+from .utils.helpers import limiter
+from .controllers import vehicle_controller
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 
@@ -16,11 +23,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Ford Commercial Intelligence", lifespan=lifespan)
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
