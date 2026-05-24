@@ -37,7 +37,7 @@ class Historico(Base):
     __tablename__ = "historico"
 
     id          = Column(Integer, primary_key=True, autoincrement=True)
-    id_usuario  = Column(Integer, ForeignKey("usuario.id", ondelete="CASCADE"), nullable=False)
+    id_usuario  = Column(Integer, ForeignKey("usuario.id", ondelete="CASCADE"), nullable=True)
     tipo        = Column(Text, nullable=False) # 'individual' ou 'comparacao'
     
     id_veiculo  = Column(Integer, ForeignKey("veiculo.id", ondelete="SET NULL"), nullable=True)
@@ -51,7 +51,12 @@ class Historico(Base):
     veiculo1 = relationship("Veiculo", foreign_keys=[id_veiculo1])
     veiculo2 = relationship("Veiculo", foreign_keys=[id_veiculo2])
 
-    # Constraint para validar a regra de negócio do histórico
+    excluido_em = Column(TIMESTAMP, nullable=True) # SOFT DELETE!!!
+
+    def anonimizar(self):
+        self.id_usuario = None
+
+    # Validar a regra de negócio do histórico
     __table_args__ = (
         CheckConstraint(
             "(tipo = 'individual' AND id_veiculo IS NOT NULL AND id_veiculo1 IS NULL AND id_veiculo2 IS NULL) OR "

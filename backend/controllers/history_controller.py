@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 
@@ -55,3 +56,13 @@ async def listar_meu_historico(
         .all()
     
     return historicos
+
+@router.delete("/limpeza-antigos")
+async def limpar_historico_antigo(db: Session = Depends(get_db)):
+    # Remove registros com mais de 90
+    limite = datetime.utcnow() - timedelta(days=90)
+    db.query(Historico)\
+      .filter(Historico.criado_em < limite)\
+      .update({Historico.id_usuario: None}, synchronize_session=False)
+    db.commit()
+    return {"message": "Registros antigos anonimizados com sucesso para uso estatístico."}
