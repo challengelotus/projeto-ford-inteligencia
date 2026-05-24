@@ -11,6 +11,7 @@ from ..models.database import get_db
 from ..models.schemas import TokenData
 from ..models.orm_models import User
 from .security import verify_password
+from ..utils.helpers import logger
 
 # 1. Chave secreta via Variável de Ambiente
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "ALTERAR_NO_PROD")
@@ -28,9 +29,13 @@ def get_user(db: Session, email: str):
 def authenticate_user(db: Session, email: str, password: str):
     user = get_user(db, email)
     if not user:
+        logger.warning("auth_failed", email=email, reason="user_not_found")
         return False
     if not verify_password(password, user.senha_hash):
+        logger.warning("auth_failed", email=email, reason="invalid_password")
         return False
+    
+    logger.info("auth_success", email=email, user_id=user.id, role=user.role)
     return user
 
 

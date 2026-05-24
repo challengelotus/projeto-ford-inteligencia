@@ -1,6 +1,6 @@
 import hashlib
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
-from ..utils.helpers import limiter
+from ..utils.helpers import limiter, logger
 from sqlalchemy.orm import Session
 from datetime import datetime
 
@@ -39,6 +39,14 @@ async def buscar_veiculo(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):
+    if bypass_cache:
+        logger.warning(
+            "cache_bypass_requested", 
+            user_id=current_user.id, 
+            marca=marca, 
+            modelo=modelo
+        )
+        
     hash_busca = gerar_hash_busca(marca, modelo, versao, ano)
     
     #  Verifica se já existe na base de dados
