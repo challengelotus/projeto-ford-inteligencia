@@ -2,9 +2,12 @@ from .controllers import auth_controller as auth
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
 
 from .models.database import init_db
 from .controllers import user_controller, vehicle_controller, history_controller
+
+load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
