@@ -1,5 +1,5 @@
 import hashlib
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from datetime import datetime
 
@@ -27,9 +27,12 @@ def fazer_scraping_veiculo(marca: str, modelo: str, versao: str, ano: int):
 
 @router.get("/busca", response_model=VeiculoResponse)
 async def buscar_veiculo(
-    marca: str, modelo: str, versao: str, ano: int,
-    fonte: str = "padrao",
-    bypass_cache: bool = False, # Permite ignorar o cache
+    marca: str = Query(..., min_length=2, max_length=50), 
+    modelo: str = Query(..., min_length=1, max_length=50), 
+    versao: str = Query(..., min_length=1, max_length=100), 
+    ano: int = Query(..., ge=1886, le=2027),
+    fonte: str = Query("padrao", max_length=50),
+    bypass_cache: bool = False,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user)
 ):

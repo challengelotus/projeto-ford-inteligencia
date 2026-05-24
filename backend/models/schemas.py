@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
 from datetime import datetime
 
@@ -11,9 +11,9 @@ class TokenData(BaseModel):
 
 class UserCreate(BaseModel):
     id: int | None = None
-    nome: str
-    email: str
-    password: str
+    nome: str = Field(..., min_length=2, max_length=100)
+    email: str = Field(..., max_length=100, pattern=r"^\S+@\S+\.\S+$")
+    password: str = Field(..., min_length=8, max_length=128)
 
 class UserResponse(BaseModel):
     nome: str | None = None
@@ -40,11 +40,11 @@ class Especificacoes(BaseModel):
     preco: str
 
 class VeiculoBase(BaseModel):
-    marca: str
-    modelo: str
-    versao: str
-    ano: int
-    fonte: str
+    marca: str = Field(..., min_length=2, max_length=50)
+    modelo: str = Field(..., min_length=2, max_length=50)
+    versao: str = Field(..., min_length=1, max_length=100)
+    ano: int = Field(..., ge=1886, le=2027)
+    fonte: str = Field(..., max_length=50)
     especificacoes: Especificacoes
 
 class VeiculoCreate(VeiculoBase):
