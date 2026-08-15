@@ -1,14 +1,11 @@
-# app/scraping/settings.py
-import os
 import sys
 from pathlib import Path
 
-# Adiciona a raiz do projeto ao sys.path para importar 'app'
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.append(str(BASE_DIR))
 
-BOT_NAME = "app.scraping"  # Nome do módulo
+BOT_NAME = "app.scraping"
 
 SPIDER_MODULES = ["app.scraping.spiders"]
 NEWSPIDER_MODULE = "app.scraping.spiders"
@@ -24,4 +21,5 @@ DEFAULT_REQUEST_HEADERS = {
    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
    "Referer": "https://www.google.com/",
 }
+
 FEED_EXPORT_ENCODING = "utf-8"
