@@ -1,6 +1,8 @@
 # app/schemas/vehicle_schema.py
-from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, Field
+
 
 class Especificacoes(BaseModel):
     motor: str
@@ -15,6 +17,7 @@ class Especificacoes(BaseModel):
     modos_conducao: str
     preco: str
 
+
 class VeiculoBase(BaseModel):
     marca: str = Field(..., min_length=2, max_length=50)
     modelo: str = Field(..., min_length=2, max_length=50)
@@ -23,8 +26,10 @@ class VeiculoBase(BaseModel):
     fonte: str = Field(..., max_length=50)
     especificacoes: Especificacoes
 
+
 class VeiculoCreate(VeiculoBase):
     hash_busca: str
+
 
 class VeiculoResponse(VeiculoBase):
     id: int

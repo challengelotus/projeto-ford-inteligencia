@@ -1,16 +1,17 @@
 # app/main.py
+from contextlib import asynccontextmanager
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-from dotenv import load_dotenv
 
-from app.routes import auth_routes, user_routes, history_routes, vehicle_routes
-from app.core.database import engine, Base
+from app.core.database import Base, SessionLocal, engine
 from app.core.security import get_password_hash
 from app.models.user_model import User
-from app.core.database import SessionLocal
+from app.routes import auth_routes, history_routes, user_routes, vehicle_routes
 
 load_dotenv()
+
 
 # --- Inicialização do BD e Admin (movido para cá ou para um script separado) ---
 def init_db():
@@ -23,7 +24,7 @@ def init_db():
                 nome="Administrador Ford",
                 email="ford@ci.com",
                 senha_hash=get_password_hash("ford123"),
-                role="admin"
+                role="admin",
             )
             db.add(admin)
             db.commit()
@@ -31,10 +32,12 @@ def init_db():
     finally:
         db.close()
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_db()
     yield
+
 
 app = FastAPI(title="Ford Commercial Intelligence", lifespan=lifespan)
 

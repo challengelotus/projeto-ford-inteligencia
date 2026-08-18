@@ -1,11 +1,14 @@
 # app/services/auth_service.py
 from sqlalchemy.orm import Session
-from app.models.user_model import User
+
 from app.core.security import verify_password
+from app.models.user_model import User
 from app.utils.helpers import logger  # mantém seu logger
+
 
 def get_user(db: Session, email: str) -> User | None:
     return db.query(User).filter(User.email == email).first()
+
 
 def authenticate_user(db: Session, email: str, password: str) -> User | bool:
     user = get_user(db, email)

@@ -1,7 +1,9 @@
 # app/models/vehicle_model.py
-from sqlalchemy import Column, Integer, Text, JSON, TIMESTAMP
+from sqlalchemy import JSON, TIMESTAMP, Column, Integer, Text
 from sqlalchemy.sql import func
+
 from app.core.database import Base
+
 
 class Veiculo(Base):
     __tablename__ = "veiculo"

@@ -1,18 +1,22 @@
 # app/routes/vehicle_routes.py
-from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.dependencies.auth_dependencies import get_current_active_user
 from app.models.user_model import User
 from app.schemas.vehicle_schema import VeiculoResponse
-from app.services.vehicle_service import (
-    gerar_hash_busca, get_veiculo_by_hash, create_veiculo, update_veiculo
-)
 from app.services.scraper_service import buscar_dados_completos_veiculo
+from app.services.vehicle_service import (
+    create_veiculo,
+    gerar_hash_busca,
+    get_veiculo_by_hash,
+    update_veiculo,
+)
 from app.utils.helpers import limiter, logger
 
 router = APIRouter(prefix="/veiculos", tags=["Veículos"])
+
 
 @router.get("/busca", response_model=VeiculoResponse)
 @limiter.limit("10/minute")
@@ -25,7 +29,7 @@ async def buscar_veiculo(
     fonte: str = Query("scrapy_integrado", max_length=50),
     bypass_cache: bool = False,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
 ):
     hash_busca = gerar_hash_busca(marca, modelo, versao, ano)
     veiculo_db = get_veiculo_by_hash(db, hash_busca)
@@ -54,7 +58,7 @@ async def buscar_veiculo(
             "rodas_pneus": "Verificar fontes",
             "farois": "Verificar fontes",
             "modos_conducao": "Verificar fontes",
-            "preco": "Consultar tabela FIPE"
+            "preco": "Consultar tabela FIPE",
         }
         # (Aqui você poderia chamar o Groq para extrair os dados estruturados)
 
@@ -69,5 +73,5 @@ async def buscar_veiculo(
         logger.error("scraping_failed", error=str(e), user_id=current_user.id)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Falha ao buscar dados do veículo: {str(e)}"
+            detail=f"Falha ao buscar dados do veículo: {str(e)}",
         )

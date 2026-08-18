@@ -17,9 +17,9 @@ DOWNLOAD_DELAY = 3
 COOKIES_ENABLED = False
 
 DEFAULT_REQUEST_HEADERS = {
-   "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-   "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-   "Referer": "https://www.google.com/",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Referer": "https://www.google.com/",
 }
 
 FEED_EXPORT_ENCODING = "utf-8"
