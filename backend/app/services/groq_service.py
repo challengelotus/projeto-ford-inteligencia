@@ -1,87 +1,184 @@
-# app/services/groq_service.py
+# app/services/groq_service.py (versão atualizada)
+import json
+import re
+from typing import Dict, List
+
 import httpx
 from groq import Groq
 
-# Importa as configurações centralizadas
 from app.core.config import settings
 
-# Validação da chave API
+# Validação da chave
 if not settings.GROQ_API_KEY:
-    raise ValueError(
-        "❌ GROQ_API_KEY não configurada no arquivo .env.\n"
-        "Crie um arquivo .env na raiz do projeto com: GROQ_API_KEY=sua_chave_aqui",
-    )
+    raise ValueError("❌ GROQ_API_KEY não configurada no .env")
 
-# Mantém a correção de SSL caso esteja em rede restrita (laboratório)
 http_client = httpx.Client(verify=False)
-
-# Cria o cliente Groq com a chave do settings e o cliente HTTP customizado
-client = Groq(
-    api_key=settings.GROQ_API_KEY,
-    http_client=http_client,
-)
+client = Groq(api_key=settings.GROQ_API_KEY, http_client=http_client)
 
 
-def gerar_ficha_tecnica(marca, modelo, versao):
+def extrair_especificacoes_do_texto(
+    texto_cru: str,
+    atributos: Dict[str, str],
+    marca: str,
+    modelo: str,
+    versao: str,
+    ano: int,
+) -> Dict[str, str]:
     """
-    Gera uma ficha técnica completa para um veículo usando a IA Groq.
-    Retorna um JSON com as especificações.
+    Extrai atributos de um único texto (artigo) usando Groq.
+    Retorna dicionário com os atributos preenchidos.
     """
-    prompt = f"""Você é um especialista em fichas técnicas automotivas.
-                Retorne SOMENTE um objeto JSON válido, sem markdown, sem código, sem explicações extras.
+    texto_limitado = texto_cru[:4000]
+    exemplo_chaves = ", ".join(f'"{k}": "{v}"' for k, v in atributos.items())
 
-                Schema obrigatório (use exatamente essas chaves):
-                {{
-                "marca": "",
-                "modelo": "",
-                "versao": "",
-                "motor": "",
-                "potencia": "",
-                "torque": "",
-                "cambio": "",
-                "tracao": "",
-                "comprimento": "",
-                "largura": "",
-                "altura": "",
-                "capacidade_tanque": "",
-                "peso": ""
-                }}
+    prompt = f"""
+Você é um especialista em fichas técnicas de veículos automotivos.
+Retorne SOMENTE um JSON válido, sem markdown, sem explicações, sem texto adicional.
 
-                Regras:
-                - Preencha com dados reais do veículo informado
-                - Campos desconhecidos: use exatamente "Não disponível"
-                - NÃO adicione campos extras
-                - NÃO use markdown, blocos de código ou texto antes/depois do JSON
+Formato OBRIGATÓRIO (as chaves devem ser exatamente estas):
+{{
+    {exemplo_chaves}
+}}
 
-                Veículo: {marca} {modelo} {versao}
-            """
+Regras:
+- Preencha com dados reais do veículo extraídos do texto.
+- Se um atributo não for encontrado, use "não disponível".
+- NUNCA adicione campos extras.
+- NUNCA use markdown.
+- Use APENAS unidades do sistema métrico internacional (kg, metros, cv, Nm ou kgfm).
+- Para torque: prefira Nm ou kgfm (1 kgfm = 9,80665 Nm).
+- Para peso: use quilogramas (kg). Se o texto informar libras (pounds), converta: 1 lb = 0,4536 kg.
+- Para comprimentos: use metros (m) ou milímetros (mm).
+- Para potência: mantenha cv (cavalos) ou kW (converta se necessário).
+- Nunca retorne unidades como "pound-feet", "pounds", "GVW", "GVWR".
+- Se um valor estiver em unidades estranhas e você não souber converter, escreva "não disponível".
+
+Veículo: {marca} {modelo} {versao} {ano}
+
+Texto para extração:
+\"\"\"{texto_limitado}\"\"\"
+"""
 
     try:
         chat_completion = client.chat.completions.create(
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
-            ],
+            messages=[{"role": "user", "content": prompt}],
             model="openai/gpt-oss-20b",
-            temperature=0.1,  # Baixa para respostas precisas e estruturadas
+            temperature=0.1,
         )
-        return chat_completion.choices[0].message.content
+        conteudo = chat_completion.choices[0].message.content.strip()
+
+        # Tenta interpretar a resposta como JSON
+        try:
+            resultado = json.loads(conteudo)
+        except json.JSONDecodeError:
+            json_match = re.search(r"\{.*\}", conteudo, re.DOTALL)
+            if json_match:
+                resultado = json.loads(json_match.group())
+            else:
+                print(f"Erro: resposta não contém JSON válido: {conteudo[:200]}")
+                return {attr: "não disponível" for attr in atributos}
+
+        # Garante que todas as chaves existem
+        for attr in atributos:
+            if attr not in resultado:
+                resultado[attr] = "não disponível"
+        return resultado
+
     except Exception as e:
-        # Você pode logar o erro com o logger do projeto
-        return f"Ocorreu um erro: {e}"
+        print(f"Erro ao chamar o modelo: {e}")
+        return {attr: "não disponível" for attr in atributos}
+
+
+def processar_artigos_para_especificacoes(
+    artigos: List[Dict[str, str]],
+    atributos: Dict[str, str],
+    marca: str,
+    modelo: str,
+    versao: str,
+    ano: int,
+) -> List[Dict[str, str]]:
+    """
+    Processa uma lista de artigos (cada um com 'titulo', 'conteudo', 'url', 'fonte').
+    Retorna uma lista de dicionários com os atributos extraídos + a fonte original.
+    """
+    resultados = []
+    for idx, artigo in enumerate(artigos):
+        titulo = artigo.get("titulo", "")
+        conteudo = artigo.get("conteudo", "")
+        fonte = artigo.get("fonte", "desconhecido")
+        url = artigo.get("url", f"artigo_{idx + 1}")
+
+        if not conteudo.strip():
+            print(f"Pular artigo sem conteúdo: {url}")
+            continue
+
+        texto = f"{titulo}\n{conteudo}" if titulo else conteudo
+        print(f"Processando: {url} (fonte={fonte})")
+        resultado = extrair_especificacoes_do_texto(
+            texto,
+            atributos,
+            marca,
+            modelo,
+            versao,
+            ano,
+        )
+        resultado["fonte"] = fonte
+        resultados.append(resultado)
+    return resultados
+
+
+# Função legada (mantida para compatibilidade)
+def gerar_ficha_tecnica(marca, modelo, versao):
+    """Versão simplificada (mantida para não quebrar usos antigos)."""
+    atributos = {
+        "marca": "",
+        "modelo": "",
+        "versao": "",
+        "motor": "",
+        "potencia": "",
+        "torque": "",
+        "cambio": "",
+        "tracao": "",
+        "comprimento": "",
+        "largura": "",
+        "altura": "",
+        "capacidade_tanque": "",
+        "peso": "",
+    }
+    resultado = extrair_especificacoes_do_texto(
+        f"{marca} {modelo} {versao}",
+        atributos,
+        marca,
+        modelo,
+        versao,
+        2025,
+    )
+    return json.dumps(resultado, ensure_ascii=False)
 
 
 if __name__ == "__main__":
     # Teste rápido
-    marca_carro = "Ford"
-    modelo_carro = "Mustang"
-    versao_carro = "GT Performance"
-
-    print(
-        f"Buscando ficha técnica para: {marca_carro} {modelo_carro} {versao_carro}...\n",
+    atributos_exemplo = {
+        "motor": "",
+        "potencia": "",
+        "torque": "",
+        "cambio": "",
+        "tracao": "",
+        "comprimento": "",
+        "largura": "",
+        "altura": "",
+        "capacidade_tanque": "",
+        "peso": "",
+    }
+    texto_teste = (
+        "A Ford Ranger Raptor 2025 tem motor 2.0 biturbo de 250 cv e 38 kgfm de torque."
     )
-    resposta_json = gerar_ficha_tecnica(marca_carro, modelo_carro, versao_carro)
-    print("Resposta recebida:")
-    print(resposta_json)
+    resultado = extrair_especificacoes_do_texto(
+        texto_teste,
+        atributos_exemplo,
+        "Ford",
+        "Ranger",
+        "Raptor",
+        2025,
+    )
+    print(resultado)
