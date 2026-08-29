@@ -1,184 +1,233 @@
-# app/services/groq_service.py (versão atualizada)
 import json
+import os
 import re
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import httpx
+# Import da biblioteca oficial do Groq
 from groq import Groq
 
-from app.core.config import settings
+# Tentativa de carregar a chave de API das configurações globais
+try:
+    from app.core.config import settings
 
-# Validação da chave
-if not settings.GROQ_API_KEY:
-    raise ValueError("❌ GROQ_API_KEY não configurada no .env")
-
-http_client = httpx.Client(verify=False)
-client = Groq(api_key=settings.GROQ_API_KEY, http_client=http_client)
+    GROQ_API_KEY = getattr(settings, "GROQ_API_KEY", os.environ.get("GROQ_API_KEY"))
+except ImportError:
+    GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 
 
-def extrair_especificacoes_do_texto(
-    texto_cru: str,
-    atributos: Dict[str, str],
-    marca: str,
-    modelo: str,
-    versao: str,
-    ano: int,
-) -> Dict[str, str]:
+class GroqService:
     """
-    Extrai atributos de um único texto (artigo) usando Groq.
-    Retorna dicionário com os atributos preenchidos.
+    Serviço para interagir com modelos de linguagem através da API da Groq.
+    Responsável por extrair especificações técnicas de textos brutos, garantindo
+    o retorno em um formato JSON rigoroso.
     """
-    texto_limitado = texto_cru[:4000]
-    exemplo_chaves = ", ".join(f'"{k}": "{v}"' for k, v in atributos.items())
 
-    prompt = f"""
-Você é um especialista em fichas técnicas de veículos automotivos.
-Retorne SOMENTE um JSON válido, sem markdown, sem explicações, sem texto adicional.
+    def __init__(
+        self,
+        model_name: str = "openai/gpt-oss-20b",
+        temperature: float = 0.1,
+        timeout: float = 30.0,
+    ):
+        self.model_name = model_name
+        self.temperature = temperature
+        self.timeout = timeout
 
-Formato OBRIGATÓRIO (as chaves devem ser exatamente estas):
-{{
-    {exemplo_chaves}
-}}
+        if not GROQ_API_KEY or GROQ_API_KEY == "SUA_CHAVE_AQUI":
+            print("⚠️ AVISO: GROQ_API_KEY não configurada. A extração real falhará.")
 
-Regras:
-- Preencha com dados reais do veículo extraídos do texto.
-- Se um atributo não for encontrado, use "não disponível".
-- NUNCA adicione campos extras.
-- NUNCA use markdown.
-- Use APENAS unidades do sistema métrico internacional (kg, metros, cv, Nm ou kgfm).
-- Para torque: prefira Nm ou kgfm (1 kgfm = 9,80665 Nm).
-- Para peso: use quilogramas (kg). Se o texto informar libras (pounds), converta: 1 lb = 0,4536 kg.
-- Para comprimentos: use metros (m) ou milímetros (mm).
-- Para potência: mantenha cv (cavalos) ou kW (converta se necessário).
-- Nunca retorne unidades como "pound-feet", "pounds", "GVW", "GVWR".
-- Se um valor estiver em unidades estranhas e você não souber converter, escreva "não disponível".
-
-Veículo: {marca} {modelo} {versao} {ano}
-
-Texto para extração:
-\"\"\"{texto_limitado}\"\"\"
-"""
-
-    try:
-        chat_completion = client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model="openai/gpt-oss-20b",
-            temperature=0.1,
+        self.client = Groq(
+            api_key=GROQ_API_KEY,
+            timeout=self.timeout,
         )
-        conteudo = chat_completion.choices[0].message.content.strip()
 
-        # Tenta interpretar a resposta como JSON
-        try:
-            resultado = json.loads(conteudo)
-        except json.JSONDecodeError:
-            json_match = re.search(r"\{.*\}", conteudo, re.DOTALL)
-            if json_match:
-                resultado = json.loads(json_match.group())
-            else:
-                print(f"Erro: resposta não contém JSON válido: {conteudo[:200]}")
-                return {attr: "não disponível" for attr in atributos}
-
-        # Garante que todas as chaves existem
-        for attr in atributos:
-            if attr not in resultado:
-                resultado[attr] = "não disponível"
-        return resultado
-
-    except Exception as e:
-        print(f"Erro ao chamar o modelo: {e}")
-        return {attr: "não disponível" for attr in atributos}
-
-
-def processar_artigos_para_especificacoes(
-    artigos: List[Dict[str, str]],
-    atributos: Dict[str, str],
-    marca: str,
-    modelo: str,
-    versao: str,
-    ano: int,
-) -> List[Dict[str, str]]:
-    """
-    Processa uma lista de artigos (cada um com 'titulo', 'conteudo', 'url', 'fonte').
-    Retorna uma lista de dicionários com os atributos extraídos + a fonte original.
-    """
-    resultados = []
-    for idx, artigo in enumerate(artigos):
-        titulo = artigo.get("titulo", "")
-        conteudo = artigo.get("conteudo", "")
-        fonte = artigo.get("fonte", "desconhecido")
-        url = artigo.get("url", f"artigo_{idx + 1}")
-
-        if not conteudo.strip():
-            print(f"Pular artigo sem conteúdo: {url}")
-            continue
-
-        texto = f"{titulo}\n{conteudo}" if titulo else conteudo
-        print(f"Processando: {url} (fonte={fonte})")
-        resultado = extrair_especificacoes_do_texto(
-            texto,
+    def extrair_especificacao(
+        self,
+        texto_cru: str,
+        atributos: Dict[str, str],
+        marca: str,
+        modelo: str,
+        versao: str,
+        ano: int,
+    ) -> Dict[str, str]:
+        """
+        Extrai atributos técnicos de um único texto utilizando a IA.
+        """
+        prompt = self._construir_prompt(
+            texto_cru,
             atributos,
             marca,
             modelo,
             versao,
             ano,
         )
-        resultado["fonte"] = fonte
-        resultados.append(resultado)
-    return resultados
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=self.temperature,
+            )
+
+            conteudo = response.choices[0].message.content.strip()
+
+            # Tenta interpretar a resposta como JSON diretamente
+            try:
+                resultado = json.loads(conteudo)
+            except json.JSONDecodeError:
+                # Fallback: Tenta localizar o bloco JSON usando Regex
+                json_match = re.search(r"\{.*\}", conteudo, re.DOTALL)
+                if json_match:
+                    resultado = json.loads(json_match.group())
+                else:
+                    print(
+                        f"❌ Erro: resposta da IA não contém JSON válido: {conteudo[:200]}",
+                    )
+                    return {attr: "não disponível" for attr in atributos}
+
+            # Validação estrita: garante que todas as chaves solicitadas existam
+            for attr in atributos:
+                if attr not in resultado:
+                    resultado[attr] = "não disponível"
+
+            return resultado
+
+        except Exception as e:
+            print(f"❌ Erro ao chamar a API da Groq: {e}")
+            return {attr: "não disponível" for attr in atributos}
+
+    def processar_artigos(
+        self,
+        artigos: List[Dict[str, str]],
+        atributos: Dict[str, str],
+        marca: str,
+        modelo: str,
+        versao: str,
+        ano: int,
+    ) -> List[Dict[str, str]]:
+        """
+        Processa uma lista de artigos e retorna os atributos extraídos de cada um,
+        preservando a fonte original.
+        """
+        resultados = []
+        for idx, artigo in enumerate(artigos):
+            titulo = artigo.get("titulo", "")
+            conteudo = artigo.get("conteudo", "")
+            fonte = artigo.get("fonte", "desconhecido")
+            url = artigo.get("url", f"artigo_{idx + 1}")
+
+            if not conteudo.strip():
+                print(f"⚠️ Ignorando artigo sem conteúdo: {url}")
+                continue
+
+            texto_completo = f"{titulo}\n{conteudo}" if titulo else conteudo
+            print(f"🧠 Extraindo dados com IA: {url} (fonte={fonte})")
+
+            resultado = self.extrair_especificacao(
+                texto_completo,
+                atributos,
+                marca,
+                modelo,
+                versao,
+                ano,
+            )
+            resultado["fonte"] = fonte
+            resultados.append(resultado)
+
+        return resultados
+
+    def _construir_prompt(
+        self,
+        texto_cru: str,
+        atributos: Dict[str, str],
+        marca: str,
+        modelo: str,
+        versao: str,
+        ano: int,
+    ) -> str:
+        """
+        Constrói o prompt blindado com regras rígidas de formatação e métricas.
+        """
+        texto_limitado = texto_cru[:4000]  # Prevenção contra estouro de contexto
+        exemplo_chaves = ", ".join(f'"{k}": "{v}"' for k, v in atributos.items())
+
+        return f"""
+            Você é um especialista em fichas técnicas de veículos automotivos.
+            Retorne SOMENTE um JSON válido, sem markdown, sem explicações, sem texto adicional.
+
+            Formato OBRIGATÓRIO (as chaves devem ser exatamente estas):
+            {{
+                {exemplo_chaves}
+            }}
+
+            Regras:
+            - Preencha com dados reais do veículo extraídos do texto.
+            - Se um atributo não for encontrado, use "não disponível".
+            - NUNCA adicione campos extras.
+            - NUNCA use markdown ou blocos de código na resposta.
+            - Use APENAS unidades do sistema métrico internacional (kg, metros, cv, Nm ou kgfm).
+            - Para torque: prefira Nm (newton-metro) ou kgfm (1 kgfm = 9,80665 Nm).
+            - Para peso: use quilogramas (kg). Se o texto informar libras (pounds), converta: 1 lb = 0,4536 kg.
+            - Para potência: mantenha cv (cavalos) ou kW (converta se necessário).
+            - Se um valor estiver em unidades estranhas e você não souber converter, escreva "não disponível".
+
+            Veículo alvo da busca: {marca} {modelo} {versao} {ano}
+
+            Texto para extração:
+            \"\"\"{texto_limitado}\"\"\"
+        """
 
 
-# Função legada (mantida para compatibilidade)
-def gerar_ficha_tecnica(marca, modelo, versao):
-    """Versão simplificada (mantida para não quebrar usos antigos)."""
-    atributos = {
-        "marca": "",
-        "modelo": "",
-        "versao": "",
-        "motor": "",
-        "potencia": "",
-        "torque": "",
-        "cambio": "",
-        "tracao": "",
-        "comprimento": "",
-        "largura": "",
-        "altura": "",
-        "capacidade_tanque": "",
-        "peso": "",
-    }
-    resultado = extrair_especificacoes_do_texto(
-        f"{marca} {modelo} {versao}",
-        atributos,
-        marca,
-        modelo,
-        versao,
-        2025,
-    )
-    return json.dumps(resultado, ensure_ascii=False)
+# ==========================================
+# FUNÇÕES DE COMPATIBILIDADE (MOCKS)
+# Mantidas temporariamente para não quebrar a rota
+# /veiculos/busca atual antes da orquestração (Etapa 5).
+# ==========================================
+def extrair_especificacoes_do_texto(texto: str) -> str:
+    return "Extraído via Scrapy (Mock Compatibilidade)"
 
 
+def processar_artigos_para_especificacoes(artigos: list) -> dict:
+    return {"especificacoes": "Extraído via Scrapy (Mock Compatibilidade)"}
+
+
+# ==========================================
+# BLOCO DE VALIDAÇÃO (TESTE LOCAL)
+# ==========================================
 if __name__ == "__main__":
-    # Teste rápido
-    atributos_exemplo = {
+    print("--- Testando GroqService (IA) ---")
+
+    # IMPORTANTE: Coloque sua chave real do Groq no ambiente para esse teste funcionar
+    # export GROQ_API_KEY="gsk_suachaveaqui"
+
+    servico = GroqService()
+
+    texto_teste = (
+        "Por último, a Ford Ranger Raptor tem visual exclusivo. Seu propulsor é 3.0 V6 bi-turbo "
+        "de 397 cv e a transmissão é automática de seis marchas. Esta versão ostenta o título de "
+        "caminhonete mais rápida do Brasil, por ir de 0 a 100 km/h em 5,8 segundos."
+    )
+
+    atributos_esperados = {
         "motor": "",
         "potencia": "",
-        "torque": "",
-        "cambio": "",
+        "transmissao": "",
         "tracao": "",
-        "comprimento": "",
-        "largura": "",
-        "altura": "",
-        "capacidade_tanque": "",
-        "peso": "",
     }
-    texto_teste = (
-        "A Ford Ranger Raptor 2025 tem motor 2.0 biturbo de 250 cv e 38 kgfm de torque."
-    )
-    resultado = extrair_especificacoes_do_texto(
-        texto_teste,
-        atributos_exemplo,
-        "Ford",
-        "Ranger",
-        "Raptor",
-        2025,
-    )
-    print(resultado)
+
+    print("Enviando texto de teste para a API da Groq...")
+    try:
+        resultado = servico.extrair_especificacao(
+            texto_cru=texto_teste,
+            atributos=atributos_esperados,
+            marca="Ford",
+            modelo="Ranger",
+            versao="Raptor",
+            ano=2025,
+        )
+        print("\n✅ Resposta estruturada retornada pela IA:")
+        print(json.dumps(resultado, indent=2, ensure_ascii=False))
+
+    except Exception as e:
+        print(
+            f"\n⚠️ Falha no teste. Verifique sua conexão e sua GROQ_API_KEY. Detalhe: {e}",
+        )
