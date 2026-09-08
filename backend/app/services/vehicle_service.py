@@ -1,12 +1,13 @@
+import hashlib
 from typing import Any, Dict, Optional
 
+from sqlalchemy.orm import Session
+from app.models.vehicle_model import Veiculo
 from app.services.consensus_service import ConsensusService
-
-# Importamos os nossos serviços já validados
 from app.services.data_loader_service import DataLoaderService
 from app.services.groq_service import GroqService
 from app.services.storage_service import StorageService
-
+''
 
 class VehicleService:
     """
@@ -91,6 +92,99 @@ class VehicleService:
     # mantenha-os inalterados. Eles serão atualizados apenas na Etapa 5).
     # ---------------------------------------------------------
 
+def gerar_hash_busca(
+    marca: str,
+    modelo: str,
+    versao: str,
+    ano: int,
+) -> str:
+    """
+    Gera um hash único para identificar um veículo
+    através de marca, modelo, versão e ano.
+    """
+
+    chave = (
+        f"{marca.strip().lower()}|"
+        f"{modelo.strip().lower()}|"
+        f"{versao.strip().lower()}|"
+        f"{ano}"
+    )
+
+    return hashlib.sha256(
+        chave.encode("utf-8")
+    ).hexdigest()
+
+
+def get_veiculo_by_hash(
+    db: Session,
+    hash_busca: str,
+):
+    """
+    Busca um veículo existente pelo hash.
+    """
+
+    return (
+        db.query(Veiculo)
+        .filter(Veiculo.hash_busca == hash_busca)
+        .first()
+    )
+
+
+def create_veiculo(
+    db: Session,
+    marca: str,
+    modelo: str,
+    versao: str,
+    ano: int,
+    fonte: str,
+    especificacoes: dict,
+):
+    """
+    Cria um novo veículo no banco de dados.
+    """
+
+    hash_busca = gerar_hash_busca(
+        marca=marca,
+        modelo=modelo,
+        versao=versao,
+        ano=ano,
+    )
+
+    veiculo = Veiculo(
+        marca=marca,
+        modelo=modelo,
+        versao=versao,
+        ano=ano,
+        fonte=fonte,
+        hash_busca=hash_busca,
+        especificacoes=especificacoes,
+    )
+
+    db.add(veiculo)
+    db.commit()
+    db.refresh(veiculo)
+
+    return veiculo
+
+
+def update_veiculo(
+    db: Session,
+    veiculo: Veiculo,
+    especificacoes: dict,
+    fonte: str,
+):
+    """
+    Atualiza as especificações e a fonte
+    de um veículo existente.
+    """
+
+    veiculo.especificacoes = especificacoes
+    veiculo.fonte = fonte
+
+    db.commit()
+    db.refresh(veiculo)
+
+    return veiculo
 
 # ==========================================
 # BLOCO DE VALIDAÇÃO (TESTE LOCAL)

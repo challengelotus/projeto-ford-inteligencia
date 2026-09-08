@@ -6,7 +6,7 @@ from app.core.database import get_db
 from app.dependencies.auth_dependencies import get_current_active_user
 from app.models.user_model import User
 from app.schemas.vehicle_schema import VeiculoResponse
-from app.services.scraper_service import buscar_dados_completos_veiculo
+from app.services.scraper_service import get_blog_scrapy
 from app.services.vehicle_service import (
     create_veiculo,
     gerar_hash_busca,
@@ -44,7 +44,7 @@ async def buscar_veiculo(
 
     try:
         # 🔥 AQUI RODA O SCRAPING (pode levar alguns segundos)
-        dados_brutos = buscar_dados_completos_veiculo(carro_query)
+        dados_brutos = get_blog_scrapy(carro_query)
         # Exemplo: pega o primeiro artigo como "especificações"
         # Na vida real, você usaria IA (Groq) para extrair os campos estruturados
         especs = {
