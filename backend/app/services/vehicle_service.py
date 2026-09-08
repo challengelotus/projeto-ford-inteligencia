@@ -2,12 +2,15 @@ import hashlib
 from typing import Any, Dict, Optional
 
 from sqlalchemy.orm import Session
+
 from app.models.vehicle_model import Veiculo
 from app.services.consensus_service import ConsensusService
 from app.services.data_loader_service import DataLoaderService
 from app.services.groq_service import GroqService
 from app.services.storage_service import StorageService
-''
+
+""
+
 
 class VehicleService:
     """
@@ -25,11 +28,14 @@ class VehicleService:
             "motor": "",
             "potencia": "",
             "torque": "",
-            "transmissao": "",
+            "cambio": "",
             "tracao": "",
-            "peso": "",
-            "comprimento": "",
-            "capacidade_carga": "",
+            "suspensao": "",
+            "freios": "",
+            "rodas_pneus": "",
+            "farois": "",
+            "modos_conducao": "",
+            "preco": "",
         }
 
     def processar_veiculo_com_ia(
@@ -86,11 +92,6 @@ class VehicleService:
 
         return resultado_final
 
-    # ---------------------------------------------------------
-    # MÉTODOS EXISTENTES (Mantidos para não quebrar a branch)
-    # (Se você já tiver métodos aqui como buscar_veiculo ou criar_veiculo,
-    # mantenha-os inalterados. Eles serão atualizados apenas na Etapa 5).
-    # ---------------------------------------------------------
 
 def gerar_hash_busca(
     marca: str,
@@ -111,7 +112,7 @@ def gerar_hash_busca(
     )
 
     return hashlib.sha256(
-        chave.encode("utf-8")
+        chave.encode("utf-8"),
     ).hexdigest()
 
 
@@ -123,11 +124,7 @@ def get_veiculo_by_hash(
     Busca um veículo existente pelo hash.
     """
 
-    return (
-        db.query(Veiculo)
-        .filter(Veiculo.hash_busca == hash_busca)
-        .first()
-    )
+    return db.query(Veiculo).filter(Veiculo.hash_busca == hash_busca).first()
 
 
 def create_veiculo(
@@ -186,6 +183,7 @@ def update_veiculo(
 
     return veiculo
 
+
 # ==========================================
 # BLOCO DE VALIDAÇÃO (TESTE LOCAL)
 # ==========================================
@@ -193,7 +191,6 @@ if __name__ == "__main__":
     import json
 
     print("--- Testando Orquestração Completa (VehicleService) ---")
-    # Lembrete: a GROQ_API_KEY precisa estar no ambiente
 
     servico = VehicleService()
 

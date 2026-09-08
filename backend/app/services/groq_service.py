@@ -147,7 +147,7 @@ class GroqService:
         """
         Constrói o prompt blindado com regras rígidas de formatação e métricas.
         """
-        texto_limitado = texto_cru[:4000]  # Prevenção contra estouro de contexto
+        texto_limitado = texto_cru[:4000]
         exemplo_chaves = ", ".join(f'"{k}": "{v}"' for k, v in atributos.items())
 
         return f"""
@@ -162,13 +162,12 @@ class GroqService:
             Regras:
             - Preencha com dados reais do veículo extraídos do texto.
             - Se um atributo não for encontrado, use "não disponível".
-            - NUNCA adicione campos extras.
-            - NUNCA use markdown ou blocos de código na resposta.
-            - Use APENAS unidades do sistema métrico internacional (kg, metros, cv, Nm ou kgfm).
-            - Para torque: prefira Nm (newton-metro) ou kgfm (1 kgfm = 9,80665 Nm).
-            - Para peso: use quilogramas (kg). Se o texto informar libras (pounds), converta: 1 lb = 0,4536 kg.
-            - Para potência: mantenha cv (cavalos) ou kW (converta se necessário).
-            - Se um valor estiver em unidades estranhas e você não souber converter, escreva "não disponível".
+            - NUNCA adicione campos extras ou use blocos de código markdown.
+            - Para 'torque': prefira Nm ou kgfm.
+            - Para 'potencia': mantenha cv ou kW.
+            - Para 'cambio': descreva se é manual ou automático e o número de marchas.
+            - Para 'preco': mantenha a moeda e o formato (ex: R$ 350.000).
+            - Se um valor estiver em unidades estrangeiras sem conversão clara, escreva "não disponível".
 
             Veículo alvo da busca: {marca} {modelo} {versao} {ano}
 
@@ -178,47 +177,40 @@ class GroqService:
 
 
 # ==========================================
-# FUNÇÕES DE COMPATIBILIDADE (MOCKS)
-# Mantidas temporariamente para não quebrar a rota
-# /veiculos/busca atual antes da orquestração (Etapa 5).
-# ==========================================
-def extrair_especificacoes_do_texto(texto: str) -> str:
-    return "Extraído via Scrapy (Mock Compatibilidade)"
-
-
-def processar_artigos_para_especificacoes(artigos: list) -> dict:
-    return {"especificacoes": "Extraído via Scrapy (Mock Compatibilidade)"}
-
-
-# ==========================================
 # BLOCO DE VALIDAÇÃO (TESTE LOCAL)
 # ==========================================
 if __name__ == "__main__":
-    print("--- Testando GroqService (IA) ---")
-
-    # IMPORTANTE: Coloque sua chave real do Groq no ambiente para esse teste funcionar
-    # export GROQ_API_KEY="gsk_suachaveaqui"
+    print("--- Testando GroqService (IA) com Atributos do Front ---")
 
     servico = GroqService()
 
     texto_teste = (
-        "Por último, a Ford Ranger Raptor tem visual exclusivo. Seu propulsor é 3.0 V6 bi-turbo "
-        "de 397 cv e a transmissão é automática de seis marchas. Esta versão ostenta o título de "
-        "caminhonete mais rápida do Brasil, por ir de 0 a 100 km/h em 5,8 segundos."
+        "A Ford Ranger Raptor 2025 chega ao mercado com motor 3.0 V6 bi-turbo "
+        "de 397 cv e 59,4 kgfm de torque. A transmissão é automática de 10 marchas com "
+        "tração 4x4. Possui suspensão ativa Fox, freios a disco ventilados, rodas de liga leve aro 17 "
+        "com pneus todo-terreno e faróis full-LED Matrix. O motorista conta com 7 modos de condução. "
+        "Seu preço sugerido é de R$ 469.700."
     )
 
-    atributos_esperados = {
+    atributos_front = {
         "motor": "",
         "potencia": "",
-        "transmissao": "",
+        "torque": "",
+        "cambio": "",
         "tracao": "",
+        "suspensao": "",
+        "freios": "",
+        "rodas_pneus": "",
+        "farois": "",
+        "modos_conducao": "",
+        "preco": "",
     }
 
     print("Enviando texto de teste para a API da Groq...")
     try:
         resultado = servico.extrair_especificacao(
             texto_cru=texto_teste,
-            atributos=atributos_esperados,
+            atributos=atributos_front,
             marca="Ford",
             modelo="Ranger",
             versao="Raptor",
@@ -228,6 +220,4 @@ if __name__ == "__main__":
         print(json.dumps(resultado, indent=2, ensure_ascii=False))
 
     except Exception as e:
-        print(
-            f"\n⚠️ Falha no teste. Verifique sua conexão e sua GROQ_API_KEY. Detalhe: {e}",
-        )
+        print(f"\n⚠️ Falha no teste. Verifique sua GROQ_API_KEY. Detalhe: {e}")

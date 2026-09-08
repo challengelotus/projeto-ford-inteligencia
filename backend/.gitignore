@@ -13,3 +13,7 @@ __pycache__/
 
 # Credenciais
 utils/secret_file.json
+
+# Ignorar backups de JSON gerados pela IA
+data/processed/*.json
+backend/data/processed/*.json
