@@ -1,13 +1,12 @@
+# app/services/storage_service.py
 import json
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional
 
 try:
-    # Tenta usar o diretório base das configurações, se existir
     from app.core.config import settings
 
-    # Presumindo que settings tenha um DATA_PROCESSED_DIR, senão fazemos fallback
     DEFAULT_PROCESSED_DIR = Path(
         getattr(
             settings,
@@ -23,12 +22,11 @@ except ImportError:
 class StorageService:
     """
     Serviço responsável por salvar o resultado final processado pela IA
-    em arquivos JSON para histórico, auditoria e fallback.
+    em arquivos JSON para histórico, auditoria e fallback, filtrando dados inválidos.
     """
 
     def __init__(self, processed_dir: Optional[Path] = None):
         self.processed_dir = processed_dir or DEFAULT_PROCESSED_DIR
-        # Garante que a pasta exista antes de tentar salvar
         self.processed_dir.mkdir(parents=True, exist_ok=True)
 
     def salvar_resultado(
@@ -38,10 +36,36 @@ class StorageService:
         modelo: str,
         versao: str,
         ano: int,
-    ) -> Path:
+        limite_falha_percentual: float = 0.7,
+    ) -> Optional[Path]:
         """
-        Salva o dicionário de especificações em um arquivo JSON com nome padronizado.
+        Salva o dicionário de especificações em um arquivo JSON com nome padronizado,
+        desde que a extração possua qualidade mínima (evita salvar lixo se a IA falhar).
         """
+        if not resultado:
+            print("⚠️ [StorageService] Resultado vazio. Ignorando salvamento.")
+            return None
+
+        total_campos = len(resultado)
+        if total_campos == 0:
+            return None
+
+        # Conta quantos campos vieram vazios, indisponíveis ou genéricos de erro
+        termos_invalidos = ["não disponível", "nao disponivel", "", "verificar fontes"]
+        indisponiveis = sum(
+            1 for v in resultado.values() if str(v).strip().lower() in termos_invalidos
+        )
+
+        taxa_falha = indisponiveis / total_campos
+
+        # Se a taxa de falha for maior ou igual a 70%, aborta a gravação em disco
+        if taxa_falha >= limite_falha_percentual:
+            print(
+                f"⚠️ [StorageService] Descartando salvamento: {taxa_falha * 100:.1f}% "
+                f"dos campos estão indisponíveis para {marca} {modelo} {versao} {ano}.",
+            )
+            return None
+
         nome_base = f"{marca}_{modelo}_{versao}_{ano}".replace(" ", "_").lower()
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         nome_arquivo = f"{nome_base}_{timestamp}.json"
@@ -51,6 +75,7 @@ class StorageService:
         with open(caminho, "w", encoding="utf-8") as f:
             json.dump(resultado, f, indent=2, ensure_ascii=False)
 
+        print(f"✅ [StorageService] Backup válido salvo em: {caminho}")
         return caminho
 
 
@@ -58,30 +83,51 @@ class StorageService:
 # BLOCO DE VALIDAÇÃO (TESTE LOCAL)
 # ==========================================
 if __name__ == "__main__":
-    print("--- Testando StorageService ---")
+    print("--- Testando StorageService com Filtro de Qualidade ---")
     servico = StorageService()
 
-    resultado_mock = {
-        "motor": "3.0 V6 Bi-turbo",
-        "potencia": "397 cv",
-        "transmissao": "Automática de 10 marchas",
+    # 1. Teste com dados ruins (mais de 70% indisponíveis)
+    resultado_lixo = {
+        "motor": "não disponível",
+        "potencia": "não disponível",
+        "torque": "não disponível",
+        "cambio": "não disponível",
+        "tracao": "não disponível",
+        "suspensao": "não disponível",
+        "freios": "não disponível",
+        "rodas_pneus": "não disponível",
+        "farois": "não disponível",
+        "modos_conducao": "não disponível",
+        "preco": "R$ 100.000",
     }
 
-    try:
-        caminho_salvo = servico.salvar_resultado(
-            resultado=resultado_mock,
-            marca="Ford",
-            modelo="Ranger",
-            versao="Raptor",
-            ano=2025,
-        )
-        print(f"✅ Sucesso! Arquivo salvo em: {caminho_salvo}")
+    # 2. Teste com dados bons
+    resultado_bom = {
+        "motor": "3.0 V6 Bi-turbo",
+        "potencia": "397 cv",
+        "torque": "600 Nm",
+        "cambio": "automática de 10 marchas",
+        "tracao": "4x4",
+        "suspensao": "Fox",
+        "freios": "disco ventilado",
+        "rodas_pneus": "aro 17",
+        "farois": "LED",
+        "modos_conducao": "7 modos",
+        "preco": "R$ 469.700",
+    }
 
-        # Lê o arquivo para confirmar se foi salvo corretamente
-        with open(caminho_salvo, "r", encoding="utf-8") as f:
-            dados_salvos = json.load(f)
-            print("Conteúdo salvo:")
-            print(json.dumps(dados_salvos, indent=2, ensure_ascii=False))
+    print("\n[Teste 1] Tentando salvar resultado com alta taxa de falha:")
+    caminho_1 = servico.salvar_resultado(resultado_lixo, "Ford", "Teste", "Ruim", 2026)
+    assert caminho_1 is None, "Deveria ter bloqueado o salvamento do lixo!"
+    print("-> Teste 1 passou com sucesso (bloqueado corretamente).")
 
-    except Exception as e:
-        print(f"❌ Erro ao salvar o arquivo: {e}")
+    print("\n[Teste 2] Tentando salvar resultado com dados consistentes:")
+    caminho_2 = servico.salvar_resultado(
+        resultado_bom,
+        "Ford",
+        "Ranger",
+        "Raptor",
+        2025,
+    )
+    assert caminho_2 is not None, "Deveria ter salvo o arquivo com sucesso!"
+    print(f"-> Teste 2 passou com sucesso. Arquivo em: {caminho_2}")

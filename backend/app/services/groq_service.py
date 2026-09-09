@@ -145,13 +145,16 @@ class GroqService:
         ano: int,
     ) -> str:
         """
-        Constrói o prompt blindado com regras rígidas de formatação e métricas.
+        Constrói o prompt blindado com regras rígidas de formatação,
+        focado em dimensões, performance e consumo.
         """
         texto_limitado = texto_cru[:4000]
-        exemplo_chaves = ", ".join(f'"{k}": "{v}"' for k, v in atributos.items())
+        exemplo_chaves = ",\n                ".join(
+            f'"{k}": "{v}"' for k, v in atributos.items()
+        )
 
         return f"""
-            Você é um especialista em fichas técnicas de veículos automotivos.
+            Você é um especialista em fichas técnicas automotivas.
             Retorne SOMENTE um JSON válido, sem markdown, sem explicações, sem texto adicional.
 
             Formato OBRIGATÓRIO (as chaves devem ser exatamente estas):
@@ -159,19 +162,22 @@ class GroqService:
                 {exemplo_chaves}
             }}
 
-            Regras:
-            - Preencha com dados reais do veículo extraídos do texto.
-            - Se um atributo não for encontrado, use "não disponível".
-            - NUNCA adicione campos extras ou use blocos de código markdown.
-            - Para 'torque': prefira Nm ou kgfm.
-            - Para 'potencia': mantenha cv ou kW.
-            - Para 'cambio': descreva se é manual ou automático e o número de marchas.
-            - Para 'preco': mantenha a moeda e o formato (ex: R$ 350.000).
-            - Se um valor estiver em unidades estrangeiras sem conversão clara, escreva "não disponível".
+            Regras rigorosas de preenchimento:
+            - Se não encontrar a informação exata no texto, use "não disponível".
+            - NUNCA adicione chaves novas ao JSON.
+            - 'cambio': Retorne apenas o tipo (ex: "Automático", "Manual", "CVT").
+            - 'numero_de_marchas': Retorne apenas o número (ex: "6", "10").
+            - 'comprimento', 'largura', 'altura': Prefira milímetros (mm) ou metros (m).
+            - 'capacidade_do_tanque': Use litros (L).
+            - 'aceleracao_0_100': Use segundos (ex: "5,8 s").
+            - 'velocidade_maxima': Use km/h.
+            - 'consumo_urbano' e 'consumo_rodoviario': Use km/l.
+            - 'torque': Use kgfm ou Nm.
+            - 'potencia': Use cv ou hp.
 
-            Veículo alvo da busca: {marca} {modelo} {versao} {ano}
+            Veículo alvo da extração: {marca} {modelo} {versao} {ano}
 
-            Texto para extração:
+            Texto para análise:
             \"\"\"{texto_limitado}\"\"\"
         """
 
@@ -180,16 +186,18 @@ class GroqService:
 # BLOCO DE VALIDAÇÃO (TESTE LOCAL)
 # ==========================================
 if __name__ == "__main__":
-    print("--- Testando GroqService (IA) com Atributos do Front ---")
+    import json
+
+    print("--- Testando GroqService com Contrato de 15 Chaves ---")
 
     servico = GroqService()
 
     texto_teste = (
-        "A Ford Ranger Raptor 2025 chega ao mercado com motor 3.0 V6 bi-turbo "
-        "de 397 cv e 59,4 kgfm de torque. A transmissão é automática de 10 marchas com "
-        "tração 4x4. Possui suspensão ativa Fox, freios a disco ventilados, rodas de liga leve aro 17 "
-        "com pneus todo-terreno e faróis full-LED Matrix. O motorista conta com 7 modos de condução. "
-        "Seu preço sugerido é de R$ 469.700."
+        "A Ford Ranger Raptor 2025 impressiona pelas dimensões: 5360 mm de comprimento, "
+        "2028 mm de largura e 1926 mm de altura, pesando 2415 kg. O tanque de combustível comporta 80 litros. "
+        "Sob o capô, o motor 3.0 V6 bi-turbo entrega 397 cv e 59,4 kgfm de torque, acoplado a um "
+        "câmbio automático de 10 marchas com tração 4x4. Ela atinge 100 km/h em apenas 5,8 segundos, "
+        "com velocidade máxima limitada a 180 km/h. O consumo urbano é de 8,3 km/l e o rodoviário chega a 10,2 km/l."
     )
 
     atributos_front = {
@@ -197,16 +205,20 @@ if __name__ == "__main__":
         "potencia": "",
         "torque": "",
         "cambio": "",
+        "numero_de_marchas": "",
         "tracao": "",
-        "suspensao": "",
-        "freios": "",
-        "rodas_pneus": "",
-        "farois": "",
-        "modos_conducao": "",
-        "preco": "",
+        "comprimento": "",
+        "largura": "",
+        "altura": "",
+        "capacidade_do_tanque": "",
+        "peso": "",
+        "aceleracao_0_100": "",
+        "velocidade_maxima": "",
+        "consumo_urbano": "",
+        "consumo_rodoviario": "",
     }
 
-    print("Enviando texto de teste para a API da Groq...")
+    print("Processando extração na API da Groq...")
     try:
         resultado = servico.extrair_especificacao(
             texto_cru=texto_teste,
@@ -216,8 +228,8 @@ if __name__ == "__main__":
             versao="Raptor",
             ano=2025,
         )
-        print("\n✅ Resposta estruturada retornada pela IA:")
+        print("\n✅ Resposta Estruturada (Contrato do Frontend):")
         print(json.dumps(resultado, indent=2, ensure_ascii=False))
 
     except Exception as e:
-        print(f"\n⚠️ Falha no teste. Verifique sua GROQ_API_KEY. Detalhe: {e}")
+        print(f"\n⚠️ Falha no teste: {e}")

@@ -36,3 +36,10 @@ class VeiculoResponse(VeiculoBase):
     hash_busca: str
     criado_em: datetime
     model_config = ConfigDict(from_attributes=True)
+
+
+class VeiculoCompareResponse(BaseModel):
+    """Schema para retornar a comparação de dois veículos simultaneamente."""
+
+    veiculo_1: VeiculoResponse
+    veiculo_2: VeiculoResponse

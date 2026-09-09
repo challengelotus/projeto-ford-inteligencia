@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.dependencies.auth_dependencies import get_current_active_user
 from app.models.user_model import User
-from app.schemas.vehicle_schema import VeiculoResponse
+from app.schemas.vehicle_schema import VeiculoCompareResponse, VeiculoResponse
 from app.services.scraper_service import get_blog_scrapy
 from app.services.vehicle_service import (
     VehicleService,
@@ -17,8 +17,53 @@ from app.services.vehicle_service import (
 from app.utils.helpers import limiter, logger
 
 router = APIRouter(prefix="/veiculos", tags=["Veículos"])
-
 ai_service = VehicleService()
+
+
+def _obter_ou_processar_veiculo(
+    db: Session,
+    current_user: User,
+    marca: str,
+    modelo: str,
+    versao: str,
+    ano: int,
+    fonte: str,
+    bypass_cache: bool,
+):
+    """Função interna para buscar no cache ou processar via IA."""
+    hash_busca = gerar_hash_busca(marca, modelo, versao, ano)
+    veiculo_db = get_veiculo_by_hash(db, hash_busca)
+
+    if veiculo_db and not bypass_cache:
+        return veiculo_db
+
+    carro_query = f"{marca} {modelo} {versao}"
+    logger.info("scraping_started", user_id=current_user.id, carro=carro_query)
+
+    try:
+        # 1. Scraping
+        get_blog_scrapy(carro_query)
+
+        # 2. IA e Consenso
+        especs = ai_service.processar_veiculo_com_ia(
+            marca=marca,
+            modelo=modelo,
+            versao=versao,
+            ano=ano,
+        )
+
+        # 3. Salvar no Banco
+        if veiculo_db and bypass_cache:
+            return update_veiculo(db, veiculo_db, especs, fonte)
+        else:
+            return create_veiculo(db, marca, modelo, versao, ano, fonte, especs)
+
+    except Exception as e:
+        logger.error("scraping_failed", error=str(e), user_id=current_user.id)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Falha ao processar {marca} {modelo}: {str(e)}",
+        )
 
 
 @router.get("/busca", response_model=VeiculoResponse)
@@ -34,40 +79,59 @@ async def buscar_veiculo(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_active_user),
 ):
-    hash_busca = gerar_hash_busca(marca, modelo, versao, ano)
-    veiculo_db = get_veiculo_by_hash(db, hash_busca)
+    """Busca a ficha técnica de um veículo individual."""
+    return _obter_ou_processar_veiculo(
+        db,
+        current_user,
+        marca,
+        modelo,
+        versao,
+        ano,
+        fonte,
+        bypass_cache,
+    )
 
-    # Caso 1: Cache válido e não quer forçar atualização (Economiza IA e Scrapy)
-    if veiculo_db and not bypass_cache:
-        return veiculo_db
 
-    # Caso 2: Precisa buscar dados novos do zero
-    carro_query = f"{marca} {modelo} {versao}"
-    logger.info("scraping_started", user_id=current_user.id, carro=carro_query)
+@router.get("/comparar", response_model=VeiculoCompareResponse)
+@limiter.limit("5/minute")
+async def comparar_veiculos(
+    request: Request,
+    # Veículo 1
+    marca1: str = Query(..., description="Marca do veículo 1"),
+    modelo1: str = Query(..., description="Modelo do veículo 1"),
+    versao1: str = Query(..., description="Versão do veículo 1"),
+    ano1: int = Query(..., description="Ano do veículo 1"),
+    # Veículo 2
+    marca2: str = Query(..., description="Marca do veículo 2"),
+    modelo2: str = Query(..., description="Modelo do veículo 2"),
+    versao2: str = Query(..., description="Versão do veículo 2"),
+    ano2: int = Query(..., description="Ano do veículo 2"),
+    # Configurações globais
+    fonte: str = Query("scrapy_ia_consenso", max_length=50),
+    bypass_cache: bool = False,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+):
+    """Processa e retorna as fichas técnicas de dois veículos simultaneamente para comparação."""
+    veiculo_1 = _obter_ou_processar_veiculo(
+        db,
+        current_user,
+        marca1,
+        modelo1,
+        versao1,
+        ano1,
+        fonte,
+        bypass_cache,
+    )
+    veiculo_2 = _obter_ou_processar_veiculo(
+        db,
+        current_user,
+        marca2,
+        modelo2,
+        versao2,
+        ano2,
+        fonte,
+        bypass_cache,
+    )
 
-    try:
-        # 🔥 1. Roda o Scraping para vasculhar a internet
-        get_blog_scrapy(carro_query)
-
-        # 🧠 2. Roda a Inteligência Artificial
-        especs = ai_service.processar_veiculo_com_ia(
-            marca=marca,
-            modelo=modelo,
-            versao=versao,
-            ano=ano,
-        )
-
-        # 💾 3. Salva no Banco de Dados (via funções do Rafael)
-        if veiculo_db and bypass_cache:
-            veiculo_atualizado = update_veiculo(db, veiculo_db, especs, fonte)
-            return veiculo_atualizado
-        else:
-            novo_veiculo = create_veiculo(db, marca, modelo, versao, ano, fonte, especs)
-            return novo_veiculo
-
-    except Exception as e:
-        logger.error("scraping_failed", error=str(e), user_id=current_user.id)
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Falha ao buscar e processar dados do veículo com a IA: {str(e)}",
-        )
+    return VeiculoCompareResponse(veiculo_1=veiculo_1, veiculo_2=veiculo_2)

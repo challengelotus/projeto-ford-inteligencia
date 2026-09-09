@@ -23,19 +23,23 @@ class VehicleService:
         self.groq_service = GroqService()
         self.storage_service = StorageService()
 
-        # O dicionário padrão de tudo que queremos que a IA extraia
+        # Dicionário padrão (Contrato rígido de 15 chaves alinhado com o Frontend)
         self.atributos_esperados = {
             "motor": "",
             "potencia": "",
             "torque": "",
             "cambio": "",
+            "numero_de_marchas": "",
             "tracao": "",
-            "suspensao": "",
-            "freios": "",
-            "rodas_pneus": "",
-            "farois": "",
-            "modos_conducao": "",
-            "preco": "",
+            "comprimento": "",
+            "largura": "",
+            "altura": "",
+            "capacidade_do_tanque": "",
+            "peso": "",
+            "aceleracao_0_100": "",
+            "velocidade_maxima": "",
+            "consumo_urbano": "",
+            "consumo_rodoviario": "",
         }
 
     def processar_veiculo_com_ia(
