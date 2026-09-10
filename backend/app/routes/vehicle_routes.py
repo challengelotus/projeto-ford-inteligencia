@@ -41,7 +41,7 @@ def _obter_ou_processar_veiculo(
     logger.info("scraping_started", user_id=current_user.id, carro=carro_query)
 
     try:
-        # 1. Scraping
+        # 1. Scraping (Comente esta linha temporariamente se o erro do Twisted persistir)
         get_blog_scrapy(carro_query)
 
         # 2. IA e Consenso
@@ -52,12 +52,27 @@ def _obter_ou_processar_veiculo(
             ano=ano,
         )
 
-        # 3. Salvar no Banco
+        # 🔥 BARREIRA DE QUALIDADE: Impede salvar lixo no Banco de Dados
+        termos_invalidos = ["não disponível", "nao disponivel", "", "verificar fontes"]
+        indisponiveis = sum(
+            1 for v in especs.values() if str(v).strip().lower() in termos_invalidos
+        )
+        taxa_falha = indisponiveis / len(especs)
+
+        if taxa_falha >= 0.7:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Não foram encontradas informações suficientes para {marca} {modelo}. A extração falhou ou o veículo é muito recente.",
+            )
+
+        # 3. Salvar no Banco (Só chega aqui se a extração for boa)
         if veiculo_db and bypass_cache:
             return update_veiculo(db, veiculo_db, especs, fonte)
         else:
             return create_veiculo(db, marca, modelo, versao, ano, fonte, especs)
 
+    except HTTPException:
+        raise  # Repassa o erro 404 limpo para o front-end
     except Exception as e:
         logger.error("scraping_failed", error=str(e), user_id=current_user.id)
         raise HTTPException(

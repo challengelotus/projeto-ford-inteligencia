@@ -148,7 +148,7 @@ class GroqService:
         Constrói o prompt blindado com regras rígidas de formatação,
         focado em dimensões, performance e consumo.
         """
-        texto_limitado = texto_cru[:4000]
+        texto_limitado = texto_cru[:20000]
         exemplo_chaves = ",\n                ".join(
             f'"{k}": "{v}"' for k, v in atributos.items()
         )
