@@ -41,38 +41,41 @@ def _obter_ou_processar_veiculo(
     logger.info("scraping_started", user_id=current_user.id, carro=carro_query)
 
     try:
-        # 1. Scraping (Comente esta linha temporariamente se o erro do Twisted persistir)
-        get_blog_scrapy(carro_query)
+        # 1. Scraping
+        resultados_scrapy = get_blog_scrapy(carro_query)
+
+        # 🔥 ECONOMIA DE TOKENS: Aborta a requisição se o Scrapy falhar ou vier vazio
+        if not resultados_scrapy:
+            logger.warning(f"Scraping vazio para {carro_query}. Abortando IA.")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Não foi possível coletar dados na internet para {marca} {modelo}. A extração via IA foi cancelada para poupar tokens."
+            )
 
         # 2. IA e Consenso
         especs = ai_service.processar_veiculo_com_ia(
-            marca=marca,
-            modelo=modelo,
-            versao=versao,
-            ano=ano,
+            marca=marca, modelo=modelo, versao=versao, ano=ano
         )
 
         # 🔥 BARREIRA DE QUALIDADE: Impede salvar lixo no Banco de Dados
         termos_invalidos = ["não disponível", "nao disponivel", "", "verificar fontes"]
-        indisponiveis = sum(
-            1 for v in especs.values() if str(v).strip().lower() in termos_invalidos
-        )
+        indisponiveis = sum(1 for v in especs.values() if str(v).strip().lower() in termos_invalidos)
         taxa_falha = indisponiveis / len(especs)
 
         if taxa_falha >= 0.7:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Não foram encontradas informações suficientes para {marca} {modelo}. A extração falhou ou o veículo é muito recente.",
+                detail=f"Não foram encontradas informações suficientes para {marca} {modelo}. A extração falhou ou o veículo é muito recente."
             )
 
-        # 3. Salvar no Banco (Só chega aqui se a extração for boa)
+        # 3. Salvar no Banco
         if veiculo_db and bypass_cache:
             return update_veiculo(db, veiculo_db, especs, fonte)
         else:
             return create_veiculo(db, marca, modelo, versao, ano, fonte, especs)
 
     except HTTPException:
-        raise  # Repassa o erro 404 limpo para o front-end
+        raise
     except Exception as e:
         logger.error("scraping_failed", error=str(e), user_id=current_user.id)
         raise HTTPException(

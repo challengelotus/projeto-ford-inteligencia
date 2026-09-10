@@ -1,3 +1,4 @@
+import httpx
 import json
 import os
 import re
@@ -35,9 +36,12 @@ class GroqService:
         if not GROQ_API_KEY or GROQ_API_KEY == "SUA_CHAVE_AQUI":
             print("⚠️ AVISO: GROQ_API_KEY não configurada. A extração real falhará.")
 
+        http_client_customizado = httpx.Client(verify=False)
+
         self.client = Groq(
             api_key=GROQ_API_KEY,
             timeout=self.timeout,
+            http_client=http_client_customizado,
         )
 
     def extrair_especificacao(

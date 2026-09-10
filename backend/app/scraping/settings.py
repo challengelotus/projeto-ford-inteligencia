@@ -23,3 +23,6 @@ DEFAULT_REQUEST_HEADERS = {
 }
 
 FEED_EXPORT_ENCODING = "utf-8"
+
+# 🔥 IGNORAR ERROS DE CERTIFICADO SSL (Firewall da Faculdade)
+DOWNLOADER_CLIENTCONTEXTFACTORY = "scrapy.core.downloader.contextfactory.ScrapyClientContextFactory"

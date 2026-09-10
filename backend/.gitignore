@@ -14,9 +14,11 @@ __pycache__/
 # Credenciais
 utils/secret_file.json
 
-# Ignorar backups de JSON gerados pela IA
+# Ignorar backups de JSON gerados pela IA e pelo Scrapy
 data/processed/*.json
 backend/data/processed/*.json
+data/raw/*.json
+backend/data/raw/*.json
 
 # Banco de dados SQLite
 *.db
