@@ -9,13 +9,17 @@ class Especificacoes(BaseModel):
     potencia: str
     torque: str
     cambio: str
+    numero_de_marchas: str
     tracao: str
-    suspensao: str
-    freios: str
-    rodas_pneus: str
-    farois: str
-    modos_conducao: str
-    preco: str
+    comprimento: str
+    largura: str
+    altura: str
+    capacidade_do_tanque: str
+    peso: str
+    aceleracao_0_100: str
+    velocidade_maxima: str
+    consumo_urbano: str
+    consumo_rodoviario: str
 
 
 class VeiculoBase(BaseModel):
