@@ -11,7 +11,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
       ...Object.entries(specs).map(([atributo, valor]) => [
         atributo,
         valor,
-        valor !== 'Não disponível' ? 'Encontrado' : 'Indisponível'
+        valor !== 'Não disponível' ? 'Encontrado' : 'Não Encontrado'
       ])
     ]
 

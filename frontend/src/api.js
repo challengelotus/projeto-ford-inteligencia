@@ -78,7 +78,14 @@ const buscarEspecificacoesReais = async (marca, modelo, versao, ano, token, atri
 
     const resultado = {};
     for (const attr of atributosSelecionados) {
-        resultado[attr] = mapaAtributos[attr] || 'Não disponível';
+        let valor = mapaAtributos[attr];
+
+        // Padroniza qualquer variação de indisponibilidade para a string exata que os componentes React esperam
+        if (!valor || valor.trim().toLowerCase() === 'não disponível') {
+            valor = 'Não disponível';
+        }
+
+        resultado[attr] = valor;
     }
 
     return resultado;
