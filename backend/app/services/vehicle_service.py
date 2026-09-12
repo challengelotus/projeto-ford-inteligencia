@@ -7,9 +7,6 @@ from app.models.vehicle_model import Veiculo
 from app.services.consensus_service import ConsensusService
 from app.services.data_loader_service import DataLoaderService
 from app.services.groq_service import GroqService
-from app.services.storage_service import StorageService
-
-""
 
 
 class VehicleService:
@@ -21,7 +18,6 @@ class VehicleService:
     def __init__(self):
         self.data_loader = DataLoaderService()
         self.groq_service = GroqService()
-        self.storage_service = StorageService()
 
         # Dicionário padrão (Contrato rígido de 15 chaves alinhado com o Frontend)
         self.atributos_esperados = {
@@ -51,7 +47,7 @@ class VehicleService:
     ) -> Dict[str, str]:
         """
         Orquestra o pipeline completo:
-        Lê arquivos -> Extrai via Groq -> Aplica Consenso -> Salva Backup.
+        Lê arquivos -> Extrai via Groq -> Aplica Consenso.
         """
         print(
             f"\n🚀 Iniciando orquestração da IA para: {marca} {modelo} {versao} {ano}",
@@ -83,16 +79,6 @@ class VehicleService:
             resultados=resultados_ia,
             atributos=self.atributos_esperados,
         )
-
-        # 4. Salva um backup do JSON consolidado para auditoria/histórico
-        caminho_backup = self.storage_service.salvar_resultado(
-            resultado=resultado_final,
-            marca=marca,
-            modelo=modelo,
-            versao=versao,
-            ano=ano,
-        )
-        print(f"💾 Backup da ficha técnica salvo em: {caminho_backup}")
 
         return resultado_final
 

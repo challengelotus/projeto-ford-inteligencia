@@ -171,7 +171,7 @@ class GroqService:
             - NUNCA adicione chaves novas ao JSON.
             - 'cambio': Retorne apenas o tipo (ex: "Automático", "Manual", "CVT").
             - 'numero_de_marchas': Retorne apenas o número (ex: "6", "10").
-            - 'comprimento', 'largura', 'altura': Prefira milímetros (mm) ou metros (m).
+            - 'comprimento', 'largura', 'altura': Use EXCLUSIVAMENTE milímetros (mm). Não use metros.
             - 'capacidade_do_tanque': Use litros (L).
             - 'aceleracao_0_100': Use segundos (ex: "5,8 s").
             - 'velocidade_maxima': Use km/h.
