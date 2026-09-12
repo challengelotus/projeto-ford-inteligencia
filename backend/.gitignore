@@ -15,8 +15,6 @@ __pycache__/
 utils/secret_file.json
 
 # Ignorar backups de JSON gerados pela IA e pelo Scrapy
-data/processed/*.json
-backend/data/processed/*.json
 data/raw/*.json
 backend/data/raw/*.json
 

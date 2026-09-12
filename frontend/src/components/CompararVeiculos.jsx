@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { GitCompare } from 'lucide-react'
-import { ATRIBUTOS, buscarEspecificacoes } from '../data/mock'
+import { ATRIBUTOS } from '../data/mock'
+import { buscarEspecificacoesReais } from '../api'
+import { useAuth } from '../context/AuthContext'
 import ResultadoComparacao from './ResultadoComparacao'
 
 export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
+  const { token } = useAuth()
   const [v1, setV1] = useState({
     marca: itemHistorico?.veiculo1?.marca || '',
     modelo: itemHistorico?.veiculo1?.modelo || '',
@@ -66,23 +69,29 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
     }
 
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1000))
 
-    const [specs1, specs2] = await Promise.all([
-      buscarEspecificacoes(veiculo1.marca, veiculo1.modelo, veiculo1.versao, selecionados),
-      buscarEspecificacoes(veiculo2.marca, veiculo2.modelo, veiculo2.versao, selecionados),
-    ])
+    try {
+      // 🔥 Dispara o Scrapy e IA simultaneamente para os dois veículos
+      const [specs1, specs2] = await Promise.all([
+        buscarEspecificacoesReais(veiculo1.marca, veiculo1.modelo, veiculo1.versao, veiculo1.ano, token, selecionados),
+        buscarEspecificacoesReais(veiculo2.marca, veiculo2.modelo, veiculo2.versao, veiculo2.ano, token, selecionados),
+      ])
 
-    const pesquisa = {
-      tipo: 'comparacao',
-      veiculo1: { ...veiculo1, specs: specs1 },
-      veiculo2: { ...veiculo2, specs: specs2 },
-      atributos: selecionados,
+      const pesquisa = {
+        tipo: 'comparacao',
+        veiculo1: { ...veiculo1, specs: specs1 },
+        veiculo2: { ...veiculo2, specs: specs2 },
+        atributos: selecionados,
+      }
+
+      aoSalvar(pesquisa)
+      setResultado(pesquisa)
+    } catch (err) {
+       const mensagemErro = err.response?.data?.detail || 'Falha ao realizar a comparação com a IA. Tente novamente.'
+       setErro(mensagemErro)
+    } finally {
+      setLoading(false)
     }
-
-    aoSalvar(pesquisa)
-    setResultado(pesquisa)
-    setLoading(false)
   }
 
   if (resultado) {
@@ -168,7 +177,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
           disabled={loading}
           className="w-full bg-[#003478] hover:bg-[#004499] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-60"
         >
-          {loading ? 'Comparando...' : <><GitCompare size={18} /> Comparar</>}
+          {loading ? 'Processando dados de 2 veículos...' : <><GitCompare size={18} /> Comparar</>}
         </button>
       </div>
     </div>

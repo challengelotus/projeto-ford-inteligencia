@@ -1,9 +1,12 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import { ATRIBUTOS, buscarEspecificacoes } from '../data/mock'
+import { ATRIBUTOS } from '../data/mock'
+import { buscarEspecificacoesReais } from '../api'
+import { useAuth } from '../context/AuthContext'
 import ResultadoIndividual from './ResultadoIndividual'
 
 export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
+  const { token } = useAuth()
   const [marca, setMarca] = useState(itemHistorico?.marca || '')
   const [modelo, setModelo] = useState(itemHistorico?.modelo || '')
   const [versao, setVersao] = useState(itemHistorico?.versao || '')
@@ -45,14 +48,21 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
     }
 
     setLoading(true)
-    await new Promise(r => setTimeout(r, 1000))
 
-    const specs = await buscarEspecificacoes(m, mo, v, selecionados)
-    const pesquisa = { tipo: 'individual', marca: m, modelo: mo, versao: v, ano: a, specs }
+    try {
+      // 🔥 Chamada real ao backend do FastAPI
+      const specs = await buscarEspecificacoesReais(m, mo, v, a, token, selecionados)
+      const pesquisa = { tipo: 'individual', marca: m, modelo: mo, versao: v, ano: a, specs }
 
-    aoSalvar(pesquisa)
-    setResultado(pesquisa)
-    setLoading(false)
+      aoSalvar(pesquisa)
+      setResultado(pesquisa)
+    } catch (err) {
+      // Captura o Erro 404 ou 503 do backend e mostra na tela elegantemente
+      const mensagemErro = err.response?.data?.detail || 'Erro ao conectar com a inteligência artificial. Tente novamente.'
+      setErro(mensagemErro)
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (resultado) {
@@ -61,12 +71,11 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
 
   return (
     <div className="bg-[#1a2f5e] border border-[#2a4070] rounded-2xl p-6">
-
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         {[
           { label: 'Marca', value: marca, set: setMarca, placeholder: 'ex: Toyota' },
           { label: 'Modelo', value: modelo, set: setModelo, placeholder: 'ex: Hilux' },
-          { label: 'Versão', value: versao, set: setVersao, placeholder: 'ex: SR' },
+          { label: 'Versão', value: versao, set: setVersao, placeholder: 'ex: SRX' },
           { label: 'Ano', value: ano, set: setAno, placeholder: 'ex: 2025' },
         ].map(({ label, value, set, placeholder }) => (
           <div key={label} className="flex flex-col gap-2 flex-1">
@@ -128,7 +137,7 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
         disabled={loading}
         className="w-full bg-[#003478] hover:bg-[#004499] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-60"
       >
-        {loading ? 'Buscando...' : <><Search size={18} /> Buscar Especificações</>}
+        {loading ? 'Extraindo dados com IA...' : <><Search size={18} /> Buscar Especificações</>}
       </button>
     </div>
   )
