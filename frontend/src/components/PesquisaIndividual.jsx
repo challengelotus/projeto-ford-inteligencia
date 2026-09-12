@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import { ATRIBUTOS } from '../data/mock'
 import { buscarEspecificacoesReais } from '../api'
@@ -16,7 +16,22 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
   )
   const [resultado, setResultado] = useState(itemHistorico || null)
   const [loading, setLoading] = useState(false)
+  const [loadingStep, setLoadingStep] = useState(0)
   const [erro, setErro] = useState('')
+
+  // Simula etapas visuais de progresso enquanto a IA/Scrapy processam
+  useEffect(() => {
+    let timer
+    if (loading) {
+      setLoadingStep(1) // "Raspando dados da web..."
+      timer = setTimeout(() => {
+        setLoadingStep(2) // "Processando com Inteligência Artificial..."
+      }, 3500)
+    } else {
+      setLoadingStep(0)
+    }
+    return () => clearTimeout(timer)
+  }, [loading])
 
   function toggle(atributo) {
     setSelecionados(prev =>
@@ -50,14 +65,12 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
     setLoading(true)
 
     try {
-      // 🔥 Chamada real ao backend do FastAPI
       const specs = await buscarEspecificacoesReais(m, mo, v, a, token, selecionados)
       const pesquisa = { tipo: 'individual', marca: m, modelo: mo, versao: v, ano: a, specs }
 
       aoSalvar(pesquisa)
       setResultado(pesquisa)
     } catch (err) {
-      // Captura o Erro 404 ou 503 do backend e mostra na tela elegantemente
       const mensagemErro = err.response?.data?.detail || 'Erro ao conectar com a inteligência artificial. Tente novamente.'
       setErro(mensagemErro)
     } finally {
@@ -137,7 +150,14 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
         disabled={loading}
         className="w-full bg-[#003478] hover:bg-[#004499] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-60"
       >
-        {loading ? 'Extraindo dados com IA...' : <><Search size={18} /> Buscar Especificações</>}
+        {loading ? (
+          <span className="flex items-center gap-2 animate-pulse">
+            <Search size={18} className="animate-spin" />
+            {loadingStep === 1 ? 'Raspando dados na web...' : 'Extraindo e consolidando com IA...'}
+          </span>
+        ) : (
+          <><Search size={18} /> Buscar Especificações</>
+        )}
       </button>
     </div>
   )

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { GitCompare } from 'lucide-react'
 import { ATRIBUTOS } from '../data/mock'
 import { buscarEspecificacoesReais } from '../api'
@@ -24,7 +24,21 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
   )
   const [resultado, setResultado] = useState(itemHistorico || null)
   const [loading, setLoading] = useState(false)
+  const [loadingStep, setLoadingStep] = useState(0)
   const [erro, setErro] = useState('')
+
+  useEffect(() => {
+    let timer
+    if (loading) {
+      setLoadingStep(1)
+      timer = setTimeout(() => {
+        setLoadingStep(2)
+      }, 4000)
+    } else {
+      setLoadingStep(0)
+    }
+    return () => clearTimeout(timer)
+  }, [loading])
 
   function toggle(atributo) {
     setSelecionados(prev =>
@@ -71,7 +85,6 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
     setLoading(true)
 
     try {
-      // 🔥 Dispara o Scrapy e IA simultaneamente para os dois veículos
       const [specs1, specs2] = await Promise.all([
         buscarEspecificacoesReais(veiculo1.marca, veiculo1.modelo, veiculo1.versao, veiculo1.ano, token, selecionados),
         buscarEspecificacoesReais(veiculo2.marca, veiculo2.modelo, veiculo2.versao, veiculo2.ano, token, selecionados),
@@ -177,7 +190,14 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
           disabled={loading}
           className="w-full bg-[#003478] hover:bg-[#004499] text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition disabled:opacity-60"
         >
-          {loading ? 'Processando dados de 2 veículos...' : <><GitCompare size={18} /> Comparar</>}
+          {loading ? (
+            <span className="flex items-center gap-2 animate-pulse">
+              <GitCompare size={18} className="animate-spin" />
+              {loadingStep === 1 ? 'Raspando dados simultâneos...' : 'Processando fichas técnicas com IA...'}
+            </span>
+          ) : (
+            <><GitCompare size={18} /> Comparar</>
+          )}
         </button>
       </div>
     </div>
