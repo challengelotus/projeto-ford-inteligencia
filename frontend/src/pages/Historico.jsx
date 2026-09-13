@@ -2,31 +2,28 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/Navbar'
 import { Search, GitCompare, Trash2, Clock, X } from 'lucide-react'
-
-const CHAVE = 'ford-ci-dev-historico'
+import { obterHistorico, removerDoHistorico, limparHistorico } from '../utils/historico'
 
 export default function Historico() {
   const [historico, setHistorico] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {
-    const salvo = localStorage.getItem(CHAVE)
-    if (salvo) setHistorico(JSON.parse(salvo))
+    setHistorico(obterHistorico())
   }, [])
 
   function remover(id) {
-    const novo = historico.filter(item => item.id !== id)
-    setHistorico(novo)
-    localStorage.setItem(CHAVE, JSON.stringify(novo))
+    setHistorico(removerDoHistorico(id))
   }
 
   function limparTudo() {
     setHistorico([])
-    localStorage.removeItem(CHAVE)
+    limparHistorico()
   }
 
   function abrir(item) {
-    navigate('/', { state: { itemHistorico: item } })
+    const destino = item.tipo === 'comparacao' ? '/duelo' : '/'
+    navigate(destino, { state: { itemHistorico: item } })
   }
 
   return (

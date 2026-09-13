@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
-import { Search, History, LogOut, Menu, X } from 'lucide-react'
+import { Search, GitCompare, History, LogOut, Menu, X } from 'lucide-react'
 
 const IDIOMAS = [
   { code: 'pt', label: 'PT' },
@@ -47,6 +47,7 @@ export default function Navbar() {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-2">
           {navBtn('/', <Search size={16} />, t('nav.pesquisa'))}
+          {navBtn('/duelo', <GitCompare size={16} />, t('nav.duelo'))}
           {navBtn('/historico', <History size={16} />, t('nav.historico'))}
         </div>
 
@@ -92,6 +93,7 @@ export default function Navbar() {
       {menuAberto && (
         <div className="md:hidden mt-3 border-t border-[#2a4070] pt-3 flex flex-col gap-2 px-1">
           {navBtn('/', <Search size={16} />, t('nav.pesquisa'))}
+          {navBtn('/duelo', <GitCompare size={16} />, t('nav.duelo'))}
           {navBtn('/historico', <History size={16} />, t('nav.historico'))}
 
           <div className="flex items-center justify-between mt-1 pt-3 border-t border-[#2a4070]">

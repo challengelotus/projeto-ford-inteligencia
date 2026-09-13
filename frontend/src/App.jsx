@@ -4,6 +4,7 @@ import { HistoricoProvider } from './context/HistoricoContext'
 import { AtributosProvider } from './context/AtributosContext'
 import Login from './pages/Login'
 import Pesquisa from './pages/Pesquisa'
+import Duelo from './pages/Duelo'
 import Historico from './pages/Historico'
 
 function RotaProtegida({ children }) {
@@ -17,6 +18,7 @@ function Rotas() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<RotaProtegida><Pesquisa /></RotaProtegida>} />
+      <Route path="/duelo" element={<RotaProtegida><Duelo /></RotaProtegida>} />
       <Route path="/historico" element={<RotaProtegida><Historico /></RotaProtegida>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

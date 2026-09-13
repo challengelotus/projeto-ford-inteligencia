@@ -1,9 +1,6 @@
 export default {
-  nav: {
-    pesquisa: 'Pesquisa',
-    historico: 'Histórico',
-    sair: 'Sair',
-  },
+nav: { pesquisa: 'Pesquisa', duelo: 'Duelo', historico: 'Histórico', sair: 'Sair' },
+
   login: {
     titulo: 'Entrar',
     email: 'E-mail',

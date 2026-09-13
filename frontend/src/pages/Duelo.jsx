@@ -1,11 +1,11 @@
 import { useLocation } from 'react-router-dom'
 import Navbar from '../components/Navbar'
-import PesquisaIndividual from '../components/PesquisaIndividual'
+import CompararVeiculos from '../components/CompararVeiculos'
 import { salvarNoHistorico } from '../utils/historico'
 
-export default function Pesquisa() {
+export default function Duelo() {
   const location = useLocation()
-  const itemHistorico = location.state?.itemHistorico?.tipo === 'individual'
+  const itemHistorico = location.state?.itemHistorico?.tipo === 'comparacao'
     ? location.state.itemHistorico
     : null
 
@@ -13,7 +13,7 @@ export default function Pesquisa() {
     <div className="min-h-screen bg-[#0a1628]">
       <Navbar />
       <div className="max-w-5xl mx-auto px-6 py-8">
-        <PesquisaIndividual aoSalvar={salvarNoHistorico} itemHistorico={itemHistorico} />
+        <CompararVeiculos aoSalvar={salvarNoHistorico} itemHistorico={itemHistorico} />
       </div>
     </div>
   )
