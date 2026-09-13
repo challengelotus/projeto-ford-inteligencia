@@ -1,10 +1,10 @@
-# app/schemas/vehicle_schema.py
 from datetime import datetime
+from typing import List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel
 
 
-class Especificacoes(BaseModel):
+class EspecificacoesSchema(BaseModel):
     motor: str
     potencia: str
     torque: str
@@ -16,7 +16,6 @@ class Especificacoes(BaseModel):
     rodas_e_pneus: str
     farois: str
     modos_de_conducao: str
-    preco: str
     comprimento: str
     largura: str
     altura: str
@@ -26,30 +25,28 @@ class Especificacoes(BaseModel):
     velocidade_maxima: str
     consumo_urbano: str
     consumo_rodoviario: str
+    preco: str
+    tipo_combustivel: str
 
 
 class VeiculoBase(BaseModel):
-    marca: str = Field(..., min_length=2, max_length=50)
-    modelo: str = Field(..., min_length=2, max_length=50)
-    versao: str = Field(..., min_length=1, max_length=100)
-    ano: int = Field(..., ge=1886, le=2027)
-    fonte: str = Field(..., max_length=50)
-    especificacoes: Especificacoes
-
-
-class VeiculoCreate(VeiculoBase):
-    hash_busca: str
+    marca: str
+    modelo: str
+    versao: str
+    ano: int
+    fonte: str
 
 
 class VeiculoResponse(VeiculoBase):
     id: int
     hash_busca: str
     criado_em: datetime
-    model_config = ConfigDict(from_attributes=True)
+    especificacoes: EspecificacoesSchema
+
+    class Config:
+        from_attributes = True
 
 
 class VeiculoCompareResponse(BaseModel):
-    """Schema para retornar a comparação de dois veículos simultaneamente."""
-
-    veiculo_1: VeiculoResponse
-    veiculo_2: VeiculoResponse
+    veiculo1: VeiculoResponse
+    veiculo2: VeiculoResponse

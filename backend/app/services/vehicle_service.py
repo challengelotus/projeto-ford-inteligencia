@@ -42,6 +42,7 @@ class VehicleService:
             "consumo_urbano": "",
             "consumo_rodoviario": "",
             "preco": "",
+            "tipo_combustivel": "",
         }
 
     def processar_veiculo_com_ia(
@@ -86,7 +87,9 @@ class VehicleService:
             atributos=self.atributos_esperados,
         )
 
-        resultado_final = {chave: str(valor) for chave, valor in resultado_bruto.items()}
+        resultado_final = {
+            chave: str(valor) for chave, valor in resultado_bruto.items()
+        }
 
         return resultado_final
 
@@ -135,15 +138,9 @@ def create_veiculo(
     especificacoes: dict,
 ):
     """
-    Cria um novo veículo no banco de dados.
+    Cria um novo veículo espalhando os atributos dinamicamente para as colunas.
     """
-
-    hash_busca = gerar_hash_busca(
-        marca=marca,
-        modelo=modelo,
-        versao=versao,
-        ano=ano,
-    )
+    hash_busca = gerar_hash_busca(marca, modelo, versao, ano)
 
     veiculo = Veiculo(
         marca=marca,
@@ -152,7 +149,7 @@ def create_veiculo(
         ano=ano,
         fonte=fonte,
         hash_busca=hash_busca,
-        especificacoes=especificacoes,
+        **especificacoes,  # Desempacota as 22 chaves diretamente para as 22 colunas
     )
 
     db.add(veiculo)
@@ -169,11 +166,11 @@ def update_veiculo(
     fonte: str,
 ):
     """
-    Atualiza as especificações e a fonte
-    de um veículo existente.
+    Atualiza colunas específicas de um veículo existente.
     """
+    for chave, valor in especificacoes.items():
+        setattr(veiculo, chave, valor)
 
-    veiculo.especificacoes = especificacoes
     veiculo.fonte = fonte
 
     db.commit()
