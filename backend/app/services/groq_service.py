@@ -70,6 +70,7 @@ class GroqService:
             response = self.client.chat.completions.create(
                 model=self.model_name,
                 messages=[{"role": "user", "content": prompt}],
+                max_tokens=4096,
                 temperature=self.temperature,
             )
 
@@ -170,9 +171,10 @@ class GroqService:
             - 'potencia' e 'torque': Inclua as rotações (rpm) se disponíveis (ex: 397 cv a 4.000 rpm).
             - 'preco': Mantenha a moeda e formatação original (ex: R$ 499.000).
             - 'suspensao', 'freios', 'rodas_e_pneus': Detalhe se a informação estiver presente (ex: Traseira Multilink, Discos ventilados, Aro 17).
-            - 'modos_de_conducao': Liste os modos disponíveis encontrados (ex: Normal, Esporte, Baja).
+            - 'modos_de_conducao': Retorne uma ÚNICA STRING com os modos separados por vírgula (ex: "Normal, Esporte, Baja"). NÃO retorne arrays ou listas.
             - 'propulsao': Defina estritamente o princípio de funcionamento do motor. Use APENAS "Combustão", "Híbrido" ou "Elétrico".
             - 'tipo_combustivel': Defina apenas a fonte de energia consumida. Use "Flex", "Gasolina", "Diesel" ou, se for 100% elétrico, "Eletricidade".
+        5. Seja EXTREMAMENTE conciso nos valores. Máximo de 5 a 8 palavras por campo (exceto quando listar os modos de condução).
 
         TEXTO PARA ANÁLISE:
         {texto}

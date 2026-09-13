@@ -1,4 +1,6 @@
+import datetime
 import hashlib
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 from sqlalchemy.orm import Session
@@ -6,7 +8,9 @@ from sqlalchemy.orm import Session
 from app.models.vehicle_model import Veiculo
 from app.services.consensus_service import ConsensusService
 from app.services.data_loader_service import DataLoaderService
+from app.services.fipe_service import FipeService
 from app.services.groq_service import GroqService
+from app.services.youtube_service import get_youtube_transcripts
 
 
 class VehicleService:
@@ -55,13 +59,19 @@ class VehicleService:
     ) -> Dict[str, str]:
         """
         Orquestra o pipeline completo:
-        Lê arquivos -> Extrai via Groq -> Aplica Consenso.
+        Extrai YouTube -> Lê artigos do Scrapy -> Extrai via Groq -> Aplica Consenso.
         """
         print(
             f"\n🚀 Iniciando orquestração da IA para: {marca} {modelo} {versao} {ano}",
         )
 
-        # 1. Carrega os artigos brutos deixados pelo Scrapy
+        print("🎥 Buscando reviews e transcrições no YouTube...")
+        # try:
+        #     get_youtube_transcripts(f"{marca} {modelo} {versao} {ano}", max_results=2)
+        # except Exception as e:
+        #     print(f"⚠️ Aviso: Não foi possível baixar transcrições do YouTube: {e}")
+
+        # 1. Carrega os artigos brutos (agora incluindo o transcript_youtube.json)
         artigos = self.data_loader.carregar_artigos()
         if not artigos:
             print(
@@ -81,16 +91,34 @@ class VehicleService:
             ano=ano,
         )
 
+        # Garante que nenhum valor seja Array/Lista antes de ir para o Consenso.
+        resultados_sanitizados = []
+        for resultado in resultados_ia:
+            sanitizado = {}
+            for k, v in resultado.items():
+                if isinstance(v, list):
+                    sanitizado[k] = ", ".join(str(item) for item in v)
+                else:
+                    sanitizado[k] = str(v)
+            resultados_sanitizados.append(sanitizado)
+
         # 3. Aplica a votação ponderada para resolver conflitos entre as fontes
         print("⚖️ Aplicando consenso por votação ponderada...")
-        resultado_bruto = ConsensusService.combinar_por_votacao(
-            resultados=resultados_ia,
+        resultado_final = ConsensusService.combinar_por_votacao(
+            resultados=resultados_sanitizados,
             atributos=self.atributos_esperados,
         )
 
-        resultado_final = {
-            chave: str(valor) for chave, valor in resultado_bruto.items()
-        }
+        # 4. Consulta a FIPE para atualizar o preço se o ano for menor que o atual
+        ano_atual = datetime.now().year
+        if ano < ano_atual:
+            print(f"📅 Veículo de {ano}. Consultando valor atualizado na FIPE...")
+            preco_fipe = FipeService.buscar_preco_fipe(marca, modelo, versao, ano)
+            if preco_fipe:
+                resultado_final["preco"] = preco_fipe
+                print(f"💰 Preço atualizado pela FIPE: {preco_fipe}")
+            else:
+                print("⚠️ FIPE não encontrou match exato. Mantendo preço extraído pela IA.")
 
         return resultado_final
 
