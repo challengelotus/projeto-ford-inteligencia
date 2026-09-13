@@ -47,7 +47,7 @@ const buscarEspecificacoesReais = async (marca, modelo, versao, ano, token, atri
             versao,
             ano,
             fonte: 'scrapy_ia_consenso',
-            bypass_cache: true // Força o scraping novo durante os testes
+            bypass_cache: true
         },
         headers: {
             Authorization: `Bearer ${token}`,
@@ -57,30 +57,35 @@ const buscarEspecificacoesReais = async (marca, modelo, versao, ano, token, atri
 
     const specs = response.data.especificacoes;
 
-    // De-Para: Traduz o JSON do backend para as labels visuais do React
+    // 🔥 MAPEAMENTO ATUALIZADO: 21 Atributos
     const mapaAtributos = {
         'Motor': specs.motor,
         'Potência': specs.potencia,
         'Torque': specs.torque,
         'Câmbio': specs.cambio,
+        'Número de Marchas': specs.numero_de_marchas,
         'Tração': specs.tracao,
+        'Suspensão': specs.suspensao,
+        'Freios': specs.freios,
+        'Rodas e Pneus': specs.rodas_e_pneus,
+        'Faróis': specs.farois,
+        'Modos de Condução': specs.modos_de_conducao,
         'Comprimento': specs.comprimento,
         'Largura': specs.largura,
         'Altura': specs.altura,
         'Capacidade do Tanque': specs.capacidade_do_tanque,
         'Peso': specs.peso,
-        'Número de Marchas': specs.numero_de_marchas,
         'Aceleração 0-100 km/h': specs.aceleracao_0_100,
         'Velocidade Máxima': specs.velocidade_maxima,
         'Consumo Urbano': specs.consumo_urbano,
         'Consumo Rodoviário': specs.consumo_rodoviario,
+        'Preço': specs.preco,
     };
 
     const resultado = {};
     for (const attr of atributosSelecionados) {
         let valor = mapaAtributos[attr];
 
-        // Padroniza qualquer variação de indisponibilidade para a string exata que os componentes React esperam
         if (!valor || valor.trim().toLowerCase() === 'não disponível') {
             valor = 'Não disponível';
         }

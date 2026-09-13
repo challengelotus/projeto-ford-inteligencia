@@ -11,6 +11,12 @@ class Especificacoes(BaseModel):
     cambio: str
     numero_de_marchas: str
     tracao: str
+    suspensao: str
+    freios: str
+    rodas_e_pneus: str
+    farois: str
+    modos_de_conducao: str
+    preco: str
     comprimento: str
     largura: str
     altura: str

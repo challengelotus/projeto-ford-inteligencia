@@ -19,7 +19,7 @@ class VehicleService:
         self.data_loader = DataLoaderService()
         self.groq_service = GroqService()
 
-        # Dicionário padrão (Contrato rígido de 15 chaves alinhado com o Frontend)
+        # Dicionário padrão (Contrato rígido de 21 chaves alinhado com o Frontend)
         self.atributos_esperados = {
             "motor": "",
             "potencia": "",
@@ -27,6 +27,11 @@ class VehicleService:
             "cambio": "",
             "numero_de_marchas": "",
             "tracao": "",
+            "suspensao": "",
+            "freios": "",
+            "rodas_e_pneus": "",
+            "farois": "",
+            "modos_de_conducao": "",
             "comprimento": "",
             "largura": "",
             "altura": "",
@@ -36,6 +41,7 @@ class VehicleService:
             "velocidade_maxima": "",
             "consumo_urbano": "",
             "consumo_rodoviario": "",
+            "preco": "",
         }
 
     def processar_veiculo_com_ia(

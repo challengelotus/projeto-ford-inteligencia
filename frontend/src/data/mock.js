@@ -1,3 +1,5 @@
+// frontend/src/data/mock.js
+
 const API_BASE = '/api'
 
 export const ATRIBUTOS = [
@@ -5,19 +7,26 @@ export const ATRIBUTOS = [
   'Potência',
   'Torque',
   'Câmbio',
+  'Número de Marchas',
   'Tração',
+  'Suspensão',
+  'Freios',
+  'Rodas e Pneus',
+  'Faróis',
+  'Modos de Condução',
   'Comprimento',
   'Largura',
   'Altura',
   'Capacidade do Tanque',
   'Peso',
-  'Número de Marchas',
   'Aceleração 0-100 km/h',
   'Velocidade Máxima',
   'Consumo Urbano',
   'Consumo Rodoviário',
+  'Preço'
 ]
 
+// A função buscarEspecificacoes permanece igual, embora não seja mais usada no fluxo principal
 export async function buscarEspecificacoes(marca, modelo, versao, atributos) {
   try {
     const response = await fetch(`${API_BASE}/especificacoes`, {

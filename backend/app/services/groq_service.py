@@ -141,48 +141,59 @@ class GroqService:
 
     def _construir_prompt(
         self,
-        texto_cru: str,
-        atributos: Dict[str, str],
+        texto: str,
+        atributos_esperados: dict,
         marca: str,
         modelo: str,
         versao: str,
         ano: int,
     ) -> str:
-        """
-        Constrói o prompt blindado com regras rígidas de formatação,
-        focado em dimensões, performance e consumo.
-        """
-        texto_limitado = texto_cru[:20000]
-        exemplo_chaves = ",\n                ".join(
-            f'"{k}": "{v}"' for k, v in atributos.items()
-        )
+
+        chaves_esperadas = ", ".join(f'"{k}"' for k in atributos_esperados.keys())
 
         return f"""
-            Você é um especialista em fichas técnicas automotivas.
-            Retorne SOMENTE um JSON válido, sem markdown, sem explicações, sem texto adicional.
+        Você é um especialista automotivo focado em extração de dados técnicos.
+        Sua tarefa é analisar o texto fornecido e extrair as especificações técnicas para o veículo {marca} {modelo} {versao} {ano}.
 
-            Formato OBRIGATÓRIO (as chaves devem ser exatamente estas):
-            {{
-                {exemplo_chaves}
-            }}
-
-            Regras rigorosas de preenchimento:
-            - Se não encontrar a informação exata no texto, use "não disponível".
-            - NUNCA adicione chaves novas ao JSON.
-            - 'cambio': Retorne apenas o tipo (ex: "Automático", "Manual", "CVT").
-            - 'numero_de_marchas': Retorne apenas o número (ex: "6", "10").
+        REGRAS RÍGIDAS:
+        1. Retorne APENAS um JSON válido. Sem formatação markdown, sem explicações, sem texto antes ou depois.
+        2. O JSON deve conter EXATAMENTE estas chaves: [{chaves_esperadas}].
+        3. Se uma informação não estiver no texto, preencha o valor com a string exata "não disponível". NÃO invente ou deduza dados.
+        4. Regras de formatação específicas:
             - 'comprimento', 'largura', 'altura': Use EXCLUSIVAMENTE milímetros (mm). Não use metros.
-            - 'capacidade_do_tanque': Use litros (L).
-            - 'aceleracao_0_100': Use segundos (ex: "5,8 s").
-            - 'velocidade_maxima': Use km/h.
-            - 'consumo_urbano' e 'consumo_rodoviario': Use km/l.
-            - 'torque': Use kgfm ou Nm.
-            - 'potencia': Use cv ou hp.
+            - 'peso': Use quilogramas (kg).
+            - 'potencia' e 'torque': Inclua as rotações (rpm) se disponíveis (ex: 397 cv a 4.000 rpm).
+            - 'preco': Mantenha a moeda e formatação original (ex: R$ 499.000).
+            - 'suspensao', 'freios', 'rodas_e_pneus': Detalhe se a informação estiver presente (ex: Traseira Multilink, Discos ventilados, Aro 17).
+            - 'modos_de_conducao': Liste os modos disponíveis encontrados (ex: Normal, Esporte, Baja).
 
-            Veículo alvo da extração: {marca} {modelo} {versao} {ano}
+        TEXTO PARA ANÁLISE:
+        {texto}
 
-            Texto para análise:
-            \"\"\"{texto_limitado}\"\"\"
+        RETORNO ESPERADO (Apenas JSON válido):
+        {{
+            "motor": "...",
+            "potencia": "...",
+            "torque": "...",
+            "cambio": "...",
+            "numero_de_marchas": "...",
+            "tracao": "...",
+            "suspensao": "...",
+            "freios": "...",
+            "rodas_e_pneus": "...",
+            "farois": "...",
+            "modos_de_conducao": "...",
+            "comprimento": "...",
+            "largura": "...",
+            "altura": "...",
+            "capacidade_do_tanque": "...",
+            "peso": "...",
+            "aceleracao_0_100": "...",
+            "velocidade_maxima": "...",
+            "consumo_urbano": "...",
+            "consumo_rodoviario": "...",
+            "preco": "..."
+        }}
         """
 
 
@@ -209,17 +220,19 @@ if __name__ == "__main__":
         "potencia": "",
         "torque": "",
         "cambio": "",
-        "numero_de_marchas": "",
         "tracao": "",
+        "suspensao": "",
+        "freios": "",
+        "rodas_e_pneus": "",
+        "farois": "",
+        "modos_de_conducao": "",
+        "preco": "",
         "comprimento": "",
         "largura": "",
         "altura": "",
         "capacidade_do_tanque": "",
         "peso": "",
         "aceleracao_0_100": "",
-        "velocidade_maxima": "",
-        "consumo_urbano": "",
-        "consumo_rodoviario": "",
     }
 
     print("Processando extração na API da Groq...")
