@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import Navbar from '../components/Navbar'
+import AppLayout from '../components/AppLayout'
 import CompararVeiculos from '../components/CompararVeiculos'
 import { salvarNoHistorico } from '../utils/historico'
 
@@ -10,11 +10,10 @@ export default function Duelo() {
     : null
 
   return (
-    <div className="min-h-screen bg-[#0a1628]">
-      <Navbar />
+    <AppLayout>
       <div className="max-w-5xl mx-auto px-6 py-8">
         <CompararVeiculos aoSalvar={salvarNoHistorico} itemHistorico={itemHistorico} />
       </div>
-    </div>
+    </AppLayout>
   )
 }

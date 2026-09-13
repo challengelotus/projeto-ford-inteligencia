@@ -1,5 +1,11 @@
 export default {
-nav: { pesquisa: 'Búsqueda', duelo: 'Duelo', historico: 'Historial', sair: 'Salir' },
+  nav: {
+    pesquisa: 'Búsqueda',
+    duelo: 'Duelo',
+    historico: 'Historial',
+    sair: 'Salir',
+    groq_ativo: 'API GROQ ACTIVA',
+  },
   login: {
     titulo: 'Iniciar Sesión',
     email: 'Correo electrónico',

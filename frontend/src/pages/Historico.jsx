@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
+import AppLayout from '../components/AppLayout'
 import { Search, GitCompare, Trash2, Clock, X } from 'lucide-react'
 import { obterHistorico, removerDoHistorico, limparHistorico } from '../utils/historico'
 
@@ -27,8 +27,7 @@ export default function Historico() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a1628]">
-      <Navbar />
+    <AppLayout>
       <div className="max-w-5xl mx-auto px-6 py-8">
 
         <div className="flex items-center justify-between mb-6">
@@ -129,6 +128,6 @@ export default function Historico() {
         </div>
 
       </div>
-    </div>
+    </AppLayout>
   )
 }
