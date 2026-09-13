@@ -1,8 +1,9 @@
-import httpx
 import json
 import os
 import re
 from typing import Dict, List, Optional
+
+import httpx
 
 # Import da biblioteca oficial do Groq
 from groq import Groq
@@ -155,7 +156,11 @@ class GroqService:
         Você é um especialista automotivo focado em extração de dados técnicos.
         Sua tarefa é analisar o texto fornecido e extrair as especificações técnicas para o veículo {marca} {modelo} {versao} {ano}.
 
-        REGRAS RÍGIDAS:
+        🔥 REGRAS RÍGIDAS DE FOCO E SÍNTESE (MUITO IMPORTANTE):
+        - O texto pode conter comparações com outras motorizações (ex: versões híbridas vs combustão pura). Extraia ESTRITAMENTE os dados correspondentes à versão '{versao}'. Ignore dados de versões superiores ou inferiores.
+        - Seja conciso na descrição do motor. Evite termos de marketing. Exemplo correto: "2.0 Dynamic Force 16V". Exemplo incorreto: "Incrível motor 2.0 Dynamic Force 16V ciclo Atkinson flex com injeção direta".
+
+        REGRAS GERAIS:
         1. Retorne APENAS um JSON válido. Sem formatação markdown, sem explicações, sem texto antes ou depois.
         2. O JSON deve conter EXATAMENTE estas chaves: [{chaves_esperadas}].
         3. Se uma informação não estiver no texto, preencha o valor com a string exata "não disponível". NÃO invente ou deduza dados.
@@ -166,6 +171,8 @@ class GroqService:
             - 'preco': Mantenha a moeda e formatação original (ex: R$ 499.000).
             - 'suspensao', 'freios', 'rodas_e_pneus': Detalhe se a informação estiver presente (ex: Traseira Multilink, Discos ventilados, Aro 17).
             - 'modos_de_conducao': Liste os modos disponíveis encontrados (ex: Normal, Esporte, Baja).
+            - 'propulsao': Defina estritamente o princípio de funcionamento do motor. Use APENAS "Combustão", "Híbrido" ou "Elétrico".
+            - 'tipo_combustivel': Defina apenas a fonte de energia consumida. Use "Flex", "Gasolina", "Diesel" ou, se for 100% elétrico, "Eletricidade".
 
         TEXTO PARA ANÁLISE:
         {texto}
@@ -192,7 +199,8 @@ class GroqService:
             "velocidade_maxima": "...",
             "consumo_urbano": "...",
             "consumo_rodoviario": "...",
-            "preco": "..."
+            "preco": "...",
+            "tipo_combustivel": "..."
         }}
         """
 

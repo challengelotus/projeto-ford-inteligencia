@@ -27,6 +27,7 @@ class VehicleService:
             "cambio": "",
             "numero_de_marchas": "",
             "tracao": "",
+            "propulsao": "",
             "suspensao": "",
             "freios": "",
             "rodas_e_pneus": "",

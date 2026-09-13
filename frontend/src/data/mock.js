@@ -9,6 +9,7 @@ export const ATRIBUTOS = [
   'Câmbio',
   'Número de Marchas',
   'Tração',
+  'Propulsão',
   'Suspensão',
   'Freios',
   'Rodas e Pneus',
@@ -23,7 +24,8 @@ export const ATRIBUTOS = [
   'Velocidade Máxima',
   'Consumo Urbano',
   'Consumo Rodoviário',
-  'Preço'
+  'Preço',
+  'Tipo de Combustível'
 ]
 
 // A função buscarEspecificacoes permanece igual, embora não seja mais usada no fluxo principal

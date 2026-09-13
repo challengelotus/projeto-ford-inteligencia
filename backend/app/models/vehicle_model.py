@@ -23,6 +23,7 @@ class Veiculo(Base):
     cambio = Column(String, nullable=True)
     numero_de_marchas = Column(String, nullable=True)
     tracao = Column(String, nullable=True)
+    propulsao = Column(String, nullable=True)
     suspensao = Column(String, nullable=True)
     freios = Column(String, nullable=True)
     rodas_e_pneus = Column(String, nullable=True)
@@ -53,6 +54,7 @@ class Veiculo(Base):
             "cambio": self.cambio,
             "numero_de_marchas": self.numero_de_marchas,
             "tracao": self.tracao,
+            "propulsao": self.propulsao,
             "suspensao": self.suspensao,
             "freios": self.freios,
             "rodas_e_pneus": self.rodas_e_pneus,

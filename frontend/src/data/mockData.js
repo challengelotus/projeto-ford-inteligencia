@@ -24,6 +24,7 @@ export const MOCK_VEICULOS = {
     'Torque': 'Não disponível',
     'Câmbio': 'Não disponível',
     'Tração': 'Não disponível',
+    'Propulsão': 'Não disponível',
     'Suspensão': 'Não disponível',
     'Freios': 'Não disponível',
     'Rodas e Pneus': 'Não disponível',

@@ -65,6 +65,7 @@ const buscarEspecificacoesReais = async (marca, modelo, versao, ano, token, atri
         'Câmbio': specs.cambio,
         'Número de Marchas': specs.numero_de_marchas,
         'Tração': specs.tracao,
+        'Propulsão': specs.propulsao,
         'Suspensão': specs.suspensao,
         'Freios': specs.freios,
         'Rodas e Pneus': specs.rodas_e_pneus,
@@ -80,6 +81,7 @@ const buscarEspecificacoesReais = async (marca, modelo, versao, ano, token, atri
         'Consumo Urbano': specs.consumo_urbano,
         'Consumo Rodoviário': specs.consumo_rodoviario,
         'Preço': specs.preco,
+        'Tipo de Combustível': specs.tipo_combustivel,
     };
 
     const resultado = {};
@@ -96,4 +98,5 @@ const buscarEspecificacoesReais = async (marca, modelo, versao, ano, token, atri
     return resultado;
 };
 
-export { loginUser, fetchUserProfile, buscarEspecificacoesReais };
+export { buscarEspecificacoesReais, fetchUserProfile, loginUser };
+

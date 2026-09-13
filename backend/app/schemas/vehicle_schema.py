@@ -11,6 +11,7 @@ class EspecificacoesSchema(BaseModel):
     cambio: str
     numero_de_marchas: str
     tracao: str
+    propulsao: str
     suspensao: str
     freios: str
     rodas_e_pneus: str
