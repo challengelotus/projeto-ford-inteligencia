@@ -81,10 +81,12 @@ class VehicleService:
 
         # 3. Aplica a votação ponderada para resolver conflitos entre as fontes
         print("⚖️ Aplicando consenso por votação ponderada...")
-        resultado_final = ConsensusService.combinar_por_votacao(
+        resultado_bruto = ConsensusService.combinar_por_votacao(
             resultados=resultados_ia,
             atributos=self.atributos_esperados,
         )
+
+        resultado_final = {chave: str(valor) for chave, valor in resultado_bruto.items()}
 
         return resultado_final
 
