@@ -47,7 +47,7 @@ const buscarEspecificacoesReais = async (marca, modelo, versao, ano, token, atri
             versao,
             ano,
             fonte: 'scrapy_ia_consenso',
-            bypass_cache: true
+            bypass_cache: false
         },
         headers: {
             Authorization: `Bearer ${token}`,
@@ -57,7 +57,6 @@ const buscarEspecificacoesReais = async (marca, modelo, versao, ano, token, atri
 
     const specs = response.data.especificacoes;
 
-    // 🔥 MAPEAMENTO ATUALIZADO: 21 Atributos
     const mapaAtributos = {
         'Motor': specs.motor,
         'Potência': specs.potencia,
