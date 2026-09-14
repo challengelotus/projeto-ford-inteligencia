@@ -53,10 +53,16 @@ class GroqService:
         modelo: str,
         versao: str,
         ano: int,
+        limite_caracteres: Optional[int] = None,
     ) -> Dict[str, str]:
         """
         Extrai atributos técnicos de um único texto utilizando a IA.
         """
+        # Trunca o texto se um limite for definido
+        if limite_caracteres and len(texto_cru) > limite_caracteres:
+            print(f"✂️ Texto truncado de {len(texto_cru)} para {limite_caracteres} caracteres.")
+            texto_cru = texto_cru[:limite_caracteres] + "... [TEXTO CORTADO PARA ECONOMIZAR TOKENS]"
+
         prompt = self._construir_prompt(
             texto_cru,
             atributos,
@@ -109,6 +115,7 @@ class GroqService:
         modelo: str,
         versao: str,
         ano: int,
+        limite_caracteres: Optional[int] = None, # 🔥 NOVO: Repassa o limite para a extração
     ) -> List[Dict[str, str]]:
         """
         Processa uma lista de artigos e retorna os atributos extraídos de cada um,
@@ -135,6 +142,7 @@ class GroqService:
                 modelo,
                 versao,
                 ano,
+                limite_caracteres=limite_caracteres, # 🔥 Repassa o valor
             )
             resultado["fonte"] = fonte
             resultados.append(resultado)
