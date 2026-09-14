@@ -21,3 +21,19 @@ export const PRESETS = {
 }
 
 export const PRESET_IDS = ['essencial', 'performance', 'offroad', 'tudo']
+
+// Atributos com comparação numérica possível no Duelo (dá pra calcular vantagem).
+// Os demais (texto/categórico, ex: Motor, Câmbio, Tração) são "qualitativos" — mostrados
+// lado a lado sem vencedor. maiorMelhor: false = o menor valor é que vence (ex: preço, aceleração).
+export const COMPARAVEIS_DUELO = {
+  'Potência': { maiorMelhor: true },
+  'Torque': { maiorMelhor: true },
+  'Número de Marchas': { maiorMelhor: true },
+  'Aceleração 0-100 km/h': { maiorMelhor: false },
+  'Velocidade Máxima': { maiorMelhor: true },
+  'Consumo Urbano': { maiorMelhor: true },
+  'Consumo Rodoviário': { maiorMelhor: true },
+  'Capacidade do Tanque': { maiorMelhor: true },
+  'Peso': { maiorMelhor: false },
+  'Preço': { maiorMelhor: false },
+}

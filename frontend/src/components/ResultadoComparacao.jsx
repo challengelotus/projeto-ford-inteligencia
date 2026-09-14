@@ -1,7 +1,32 @@
-import { ArrowLeft, Download } from 'lucide-react'
+import { COMPARAVEIS_DUELO } from '../data/attributesData'
+
+function extrairNumero(valor) {
+  if (!valor || valor === 'Não disponível') return null
+  const limpo = String(valor).replace(/\./g, '').replace(',', '.')
+  const m = limpo.match(/-?\d+(\.\d+)?/)
+  return m ? parseFloat(m[0]) : null
+}
+
+function calcularVantagem(atributo, valor1, valor2) {
+  const cfg = COMPARAVEIS_DUELO[atributo]
+  if (!cfg) return { comparavel: false }
+  const n1 = extrairNumero(valor1)
+  const n2 = extrairNumero(valor2)
+  if (n1 == null || n2 == null) return { comparavel: false }
+  if (n1 === n2) return { comparavel: true, empate: true, p1: 50, p2: 50 }
+  const vencedor = cfg.maiorMelhor ? (n1 > n2 ? 1 : 2) : (n1 < n2 ? 1 : 2)
+  const base1 = cfg.maiorMelhor ? n1 : 1 / (n1 || 1)
+  const base2 = cfg.maiorMelhor ? n2 : 1 / (n2 || 1)
+  const soma = base1 + base2 || 1
+  const p1 = Math.round((base1 / soma) * 100)
+  return { comparavel: true, empate: false, vencedor, p1, p2: 100 - p1 }
+}
 
 export default function ResultadoComparacao({ resultado, onNova }) {
   const { veiculo1, veiculo2, atributos } = resultado
+
+  const vantagens1 = atributos.filter(a => calcularVantagem(a, veiculo1.specs[a], veiculo2.specs[a]).vencedor === 1).length
+  const vantagens2 = atributos.filter(a => calcularVantagem(a, veiculo1.specs[a], veiculo2.specs[a]).vencedor === 2).length
 
   function exportarCSV() {
     const linhas = [
@@ -23,70 +48,76 @@ export default function ResultadoComparacao({ resultado, onNova }) {
 
   return (
     <div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-        {[veiculo1, veiculo2].map((v, i) => (
-          <div key={i} className="bg-[#1a2f5e] border border-[#2a4070] rounded-xl px-5 py-4">
-            <small className="text-slate-400 text-xs">Veículo {i + 1}</small>
-            <p className="text-white font-semibold mt-1">
-              {v.marca} {v.modelo} <span className="text-[#4a9eff]">{v.versao}</span> · {v.ano}
-            </p>
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onNova}
+          className="bg-transparent border-none text-[#7e90ac] hover:text-white font-mono font-semibold text-[11px] flex items-center gap-2 transition"
+        >
+          <span className="text-base">←</span> Ajustar Duelo
+        </button>
+        <button
+          onClick={exportarCSV}
+          className="border border-[rgba(30,107,255,.4)] bg-[rgba(30,107,255,.16)] hover:bg-[rgba(30,107,255,.3)] hover:text-white rounded-[11px] px-4 py-[11px] text-[#8fb6ff] font-sans font-semibold text-xs transition"
+        >
+          Exportar CSV
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mt-4">
+        {[
+          { v: veiculo1, cor: '#8fb6ff', vantagens: vantagens1 },
+          { v: veiculo2, cor: '#f5a524', vantagens: vantagens2 },
+        ].map(({ v, cor, vantagens }, i) => (
+          <div
+            key={i}
+            className="rounded-2xl p-5"
+            style={{ background: 'linear-gradient(180deg,rgba(16,27,46,.95),rgba(9,16,29,.95))', border: '1px solid rgba(120,160,220,.14)', borderTop: `3px solid ${cor}` }}
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-mono font-extrabold text-[11px] tracking-[.14em]" style={{ color: cor }}>VEÍCULO {i + 1}</span>
+              <span className="font-mono font-bold text-[11px]" style={{ color: cor }}>{vantagens} vantagens</span>
+            </div>
+            <div className="font-sans font-extrabold text-white text-xl mt-2.5">
+              {v.marca} {v.modelo} <span style={{ color: cor }}>{v.versao}</span> · {v.ano}
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl overflow-x-auto border border-[#2a4070]">
-        <table className="w-full border-collapse min-w-[500px]">
-          <thead>
-            <tr className="bg-[#0f1f3d]">
-              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">Atributo</th>
-              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">
-                <span className="block truncate max-w-[150px]">{veiculo1.marca} {veiculo1.modelo}</span>
-              </th>
-              <th className="text-left px-5 py-3 text-xs text-slate-400 uppercase tracking-wider">
-                <span className="block truncate max-w-[150px]">{veiculo2.marca} {veiculo2.modelo}</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {atributos.map(atributo => {
-              const val1 = veiculo1.specs[atributo]
-              const val2 = veiculo2.specs[atributo]
-              const v1destaque = val1 !== 'Não disponível' && val2 === 'Não disponível'
-              const v2destaque = val2 !== 'Não disponível' && val1 === 'Não disponível'
+      <div className="rounded-2xl mt-4 p-2 md:p-4" style={{ background: 'rgba(9,16,29,.9)', border: '1px solid rgba(120,160,220,.14)' }}>
+        {atributos.map(atributo => {
+          const val1 = veiculo1.specs[atributo]
+          const val2 = veiculo2.specs[atributo]
+          const comp = calcularVantagem(atributo, val1, val2)
 
-              return (
-                <tr key={atributo} className="border-t border-[#1e3358]">
-                  <td className="px-5 py-4 text-white font-semibold text-sm">{atributo}</td>
-                  <td className={`px-5 py-4 text-sm ${v1destaque ? 'bg-green-900/20 text-green-300' : 'text-slate-300'}`}>
-                    {val1 === 'Não disponível'
-                      ? <span className="text-slate-500">Não disponível <span className="ml-1 px-2 py-0.5 bg-red-900/50 text-red-400 rounded-full text-xs whitespace-nowrap">Indisponível</span></span>
-                      : val1}
-                  </td>
-                  <td className={`px-5 py-4 text-sm ${v2destaque ? 'bg-green-900/20 text-green-300' : 'text-slate-300'}`}>
-                    {val2 === 'Não disponível'
-                      ? <span className="text-slate-500">Não disponível <span className="ml-1 px-2 py-0.5 bg-red-900/50 text-red-400 rounded-full text-xs whitespace-nowrap">Indisponível</span></span>
-                      : val2}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex flex-col sm:flex-row gap-3 mt-5">
-        <button
-          onClick={onNova}
-          className="flex-1 flex items-center justify-center gap-2 border border-[#2a4070] hover:border-[#4a9eff] text-white py-3 rounded-lg transition text-sm"
-        >
-          <ArrowLeft size={16} /> Nova Comparação
-        </button>
-        <button
-          onClick={exportarCSV}
-          className="flex-1 flex items-center justify-center gap-2 bg-[#003478] hover:bg-[#004499] text-white py-3 rounded-lg transition text-sm"
-        >
-          <Download size={16} /> Exportar CSV
-        </button>
+          return (
+            <div key={atributo} className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 md:gap-4 py-4 px-2 border-b border-[rgba(120,160,220,.1)] last:border-0">
+              <div className="text-right min-w-0">
+                <div className={`font-sans font-bold text-sm md:text-base truncate ${comp.vencedor === 1 ? 'text-[#f5a524]' : val1 === 'Não disponível' ? 'text-[#5d6b82]' : 'text-[#e8eef8]'}`}>
+                  {val1}
+                </div>
+                {comp.comparavel && (
+                  <div className="h-[3px] rounded-full bg-[rgba(120,160,220,.12)] mt-2 overflow-hidden">
+                    <div className="h-full ml-auto rounded-full transition-all" style={{ width: `${comp.p1}%`, background: comp.vencedor === 1 ? '#f5a524' : '#3d4a5e' }} />
+                  </div>
+                )}
+              </div>
+              <div className="font-mono text-[9.5px] md:text-[10px] tracking-[.08em] text-[#6f8099] uppercase text-center px-1 min-w-[90px] md:min-w-[130px]">
+                {atributo}
+              </div>
+              <div className="text-left min-w-0">
+                <div className={`font-sans font-bold text-sm md:text-base truncate ${comp.vencedor === 2 ? 'text-[#f5a524]' : val2 === 'Não disponível' ? 'text-[#5d6b82]' : 'text-[#e8eef8]'}`}>
+                  {val2}
+                </div>
+                {comp.comparavel && (
+                  <div className="h-[3px] rounded-full bg-[rgba(120,160,220,.12)] mt-2 overflow-hidden">
+                    <div className="h-full rounded-full transition-all" style={{ width: `${comp.p2}%`, background: comp.vencedor === 2 ? '#f5a524' : '#3d4a5e' }} />
+                  </div>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
