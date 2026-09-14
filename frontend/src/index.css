@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Archivo", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@keyframes fcd-scan {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(1400%); }
+}
+
+@keyframes fcd-pulse {
+  0%, 100% { opacity: .35; }
+  50% { opacity: .9; }
+}
+
+@keyframes fcd-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
