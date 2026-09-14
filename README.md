@@ -43,11 +43,11 @@ O **Ford Commercial Intelligence (Ford CI)** é uma plataforma centralizada que 
 > A interface foi pensada para ser limpa, responsiva e direta ao ponto.
 
 <div align="center">
-  <img src="./frontend/docs/prints/img6.png" alt="Pesquisa Individual" width="45%"/>
-  <img src="./frontend/docs/prints/img11.png" alt="Resultado Pesquisa" width="45%"/>
+  <img src="./frontend/docs/prints/img1.png" alt="Pesquisa Individual" width="100%"/>
+  <img src="./frontend/docs/prints/img2.png" alt="Resultado Pesquisa" width="100%"/>
   <br>
-  <img src="./frontend/docs/prints/img2.png" alt="Comparação" width="45%"/>
-  <img src="./frontend/docs/prints/img9.png" alt="Resultado Comparação" width="45%"/>
+  <img src="./frontend/docs/prints/img3.png" alt="Comparação" width="100%"/>
+  <img src="./frontend/docs/prints/img4.png" alt="Resultado Comparação" width="100%"/>
 </div>
 
 ---
