@@ -53,7 +53,7 @@ class GroqService:
         modelo: str,
         versao: str,
         ano: int,
-        limite_caracteres: Optional[int] = None,
+        limite_caracteres: Optional[int] = 4000,
     ) -> Dict[str, str]:
         """
         Extrai atributos técnicos de um único texto utilizando a IA.
