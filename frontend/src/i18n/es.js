@@ -66,6 +66,9 @@ export default {
     indisponivel: 'No disponible',
     nao_disponivel: 'No disponible',
     destaque: '🏆 {{marca}} {{modelo}} se destaca en {{count}} atributos',
+    ficha_tecnica: 'Ficha Técnica',
+    de_encontrados: 'de encontrados',
+    fonte_pipeline: 'Fuente: scrapy + IA (consenso ponderado entre fuentes)',
   },
   historico: {
     titulo: 'Historial de Búsquedas',

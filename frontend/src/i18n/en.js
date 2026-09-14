@@ -66,6 +66,9 @@ export default {
     indisponivel: 'Unavailable',
     nao_disponivel: 'Not available',
     destaque: '🏆 {{marca}} {{modelo}} stands out in {{count}} attributes',
+    ficha_tecnica: 'Spec Sheet',
+    de_encontrados: 'found',
+    fonte_pipeline: 'Source: scrapy + AI (weighted consensus across sources)',
   },
   historico: {
     titulo: 'Search History',
