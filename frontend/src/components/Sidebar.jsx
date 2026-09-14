@@ -39,10 +39,10 @@ export default function Sidebar() {
             <button
               key={path}
               onClick={() => navigate(path)}
-              className={`flex items-center gap-[11px] px-[14px] py-[13px] rounded-[13px] transition-all text-left
-                ${ativo ? 'bg-[rgba(30,107,255,.16)] text-white' : 'text-[#7e90ac] hover:text-white'}`}
+              className={`flex items-center gap-[11px] px-[14px] py-[13px] rounded-[13px] transition-all duration-300 ease-out text-left active:scale-[0.97]
+                ${ativo ? 'bg-[rgba(30,107,255,.16)] text-white' : 'text-[#7e90ac] hover:text-white hover:bg-[rgba(30,107,255,.07)] hover:translate-x-[2px]'}`}
             >
-              <span className={`w-[3px] rounded-full transition-all ${ativo ? 'h-[18px] bg-[#1e6bff]' : 'h-[10px] bg-[rgba(120,160,220,.3)]'}`} />
+              <span className={`w-[3px] rounded-full transition-all duration-300 ease-out ${ativo ? 'h-[18px] bg-[#1e6bff]' : 'h-[10px] bg-[rgba(120,160,220,.3)]'}`} />
               <span className="font-sans font-semibold text-[13.5px]">{t(labelKey)}</span>
               <span className="ml-auto font-mono text-[10px] opacity-[.55]">{meta}</span>
             </button>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { GRUPOS_ATRIBUTOS, PRESETS, PRESET_IDS, ATRIBUTOS } from '../data/attributesData'
+import { traduzirAtributo } from '../data/attributeLabels'
 import { buscarEspecificacoesReais } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
@@ -14,7 +15,7 @@ const SLOTS = [
 
 export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
   const { token } = useAuth()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [v1, setV1] = useState({
     marca: itemHistorico?.veiculo1?.marca || '',
     modelo: itemHistorico?.veiculo1?.modelo || '',
@@ -35,6 +36,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
   const [resultado, setResultado] = useState(itemHistorico || null)
   const [loading, setLoading] = useState(false)
   const [pulando, setPulando] = useState(false)
+  const [concluido, setConcluido] = useState(false)
   const [erro, setErro] = useState('')
 
   function toggle(atributo) {
@@ -78,6 +80,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
     }
 
     setPulando(false)
+    setConcluido(false)
     setLoading(true)
     try {
       const [specs1, specs2] = await Promise.all([
@@ -93,6 +96,8 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
       }
 
       aoSalvar(pesquisa)
+      setConcluido(true)
+      await new Promise(r => setTimeout(r, 700))
       setResultado(pesquisa)
     } catch (err) {
       setErro(err.response?.data?.detail || 'Falha ao realizar a comparação com a IA. Tente novamente.')
@@ -124,6 +129,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
         versao=""
         ano=""
         totalAtributos={selecionados.length}
+        concluido={concluido}
         onPular={() => setPulando(true)}
       />
     )
@@ -143,7 +149,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
         <p className="font-sans text-[#7e90ac] text-sm mt-2.5">{t('duelo.subtitulo')}</p>
       </div>
 
-      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[1fr_44px_1fr] lg:gap-0 lg:items-stretch">
+      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[1fr_44px_1fr] lg:gap-6 lg:items-stretch">
         <div
           className="rounded-[22px] p-6"
           style={{ background: 'linear-gradient(180deg,rgba(16,27,46,.95),rgba(9,16,29,.95))', border: '1px solid rgba(120,160,220,.14)', borderTop: `3px solid ${estados[0].slot.cor}` }}
@@ -227,7 +233,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
                     }`}
                   >
                     <span className="font-bold text-sm">{t(`presets.${id}`)}</span>
-                    <span className="font-mono text-[10px] opacity-70">{PRESETS[id].length} ATRIB.</span>
+                    <span className="font-mono text-[10px] opacity-70">{PRESETS[id].length} {t('pesquisa.atrib_abbrev')}</span>
                   </button>
                 )
               })}
@@ -256,7 +262,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
                               ativo ? 'border-[#1e6bff] bg-[#1e6bff]/15 text-white' : 'border-[rgba(120,160,220,.16)] bg-[#080e1a] text-[#7e90ac]'
                             }`}
                           >
-                            {atributo}
+                            {traduzirAtributo(atributo, i18n.language)}
                           </button>
                         )
                       })}

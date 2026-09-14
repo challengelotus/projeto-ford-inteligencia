@@ -1,8 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { calcularVantagem } from '../utils/duelo'
+import { traduzirAtributo } from '../data/attributeLabels'
 
 export default function ResultadoComparacao({ resultado, onNova }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { veiculo1, veiculo2, atributos } = resultado
 
   const vantagens1 = atributos.filter(a => calcularVantagem(a, veiculo1.specs[a], veiculo2.specs[a]).vencedor === 1).length
@@ -13,7 +14,7 @@ export default function ResultadoComparacao({ resultado, onNova }) {
       ['', `${veiculo1.marca} ${veiculo1.modelo} ${veiculo1.versao} ${veiculo1.ano}`, `${veiculo2.marca} ${veiculo2.modelo} ${veiculo2.versao} ${veiculo2.ano}`],
       [''],
       ['Atributo', `${veiculo1.marca} ${veiculo1.modelo}`, `${veiculo2.marca} ${veiculo2.modelo}`],
-      ...atributos.map(a => [a, veiculo1.specs[a] || 'Não disponível', veiculo2.specs[a] || 'Não disponível'])
+      ...atributos.map(a => [traduzirAtributo(a, i18n.language), veiculo1.specs[a] || 'Não disponível', veiculo2.specs[a] || 'Não disponível'])
     ]
 
     const csv = linhas.map(l => l.map(c => `"${c}"`).join(',')).join('\n')
@@ -83,7 +84,7 @@ export default function ResultadoComparacao({ resultado, onNova }) {
                 )}
               </div>
               <div className="font-mono text-[9.5px] md:text-[10px] tracking-[.08em] text-[#6f8099] uppercase text-center px-1 min-w-[90px] md:min-w-[130px]">
-                {atributo}
+                {traduzirAtributo(atributo, i18n.language)}
               </div>
               <div className="text-left min-w-0">
                 <div className={`font-sans font-bold text-sm md:text-base truncate ${comp.vencedor === 2 ? 'text-[#f5a524]' : val2 === 'Não disponível' ? 'text-[#5d6b82]' : 'text-[#e8eef8]'}`}>

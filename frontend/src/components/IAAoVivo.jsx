@@ -6,27 +6,29 @@ const AMBAR = '#f5a524'
 const MUTED = '#7e90ac'
 const STAGE_META = ['3 FONTES', 'SCRAPY', 'CONSENSO', 'GROQ', 'POSTGRES']
 
-export default function IAAoVivo({ marca, modelo, versao, ano, totalAtributos, onPular }) {
+export default function IAAoVivo({ marca, modelo, versao, ano, totalAtributos, concluido, onPular }) {
   const { t } = useTranslation()
   const [stage, setStage] = useState(1)
   const [elapsed, setElapsed] = useState(0)
   const [logs, setLogs] = useState([])
   const timersRef = useRef([])
+  const seqRef = useRef([])
 
   useEffect(() => {
     const seq = [
-      { st: 1, at: 300, cor: MUTED, txt: `→ POST /api/especificacoes  marca=${marca} modelo=${modelo} versao=${versao} ano=${ano}` },
-      { st: 1, at: 700, cor: '#4c5a70', txt: '  enfileirando fontes (scrapy)' },
-      { st: 2, at: 1200, cor: MUTED, txt: '  scrapy · crawl iniciado · automaistv, caranddriver, motor1' },
-      { st: 2, at: 1750, cor: '#3ed598', txt: '  ✓ fontes coletadas' },
-      { st: 2, at: 2200, cor: '#3ed598', txt: '  ✓ artigos extraídos' },
-      { st: 3, at: 2700, cor: MUTED, txt: '  consensus_service · votação ponderada entre as fontes' },
-      { st: 3, at: 3200, cor: '#3ed598', txt: '  ✓ divergências resolvidas por peso de fonte' },
-      { st: 4, at: 3700, cor: '#8fb6ff', txt: '  groq api · gpt-oss-20b · extraindo JSON estruturado' },
-      { st: 4, at: 4400, cor: '#3ed598', txt: `  ✓ ${totalAtributos}/${totalAtributos} campos técnicos preenchidos` },
-      { st: 5, at: 4900, cor: MUTED, txt: '  validando unidades e faixas plausíveis' },
-      { st: 5, at: 5400, cor: AMBAR, txt: '  ✓ gravado no banco · fonte=scrapy_ia_consenso' },
+      { st: 1, at: 300, cor: MUTED, txt: t('ia.log_requisicao', { marca, modelo, versao, ano }) },
+      { st: 1, at: 700, cor: '#4c5a70', txt: t('ia.log_fila') },
+      { st: 2, at: 1200, cor: MUTED, txt: t('ia.log_crawl') },
+      { st: 2, at: 1750, cor: '#3ed598', txt: t('ia.log_fontes_ok') },
+      { st: 2, at: 2200, cor: '#3ed598', txt: t('ia.log_artigos_ok') },
+      { st: 3, at: 2700, cor: MUTED, txt: t('ia.log_consenso') },
+      { st: 3, at: 3200, cor: '#3ed598', txt: t('ia.log_divergencias') },
+      { st: 4, at: 3700, cor: '#8fb6ff', txt: t('ia.log_groq') },
+      { st: 4, at: 4400, cor: '#3ed598', txt: t('ia.log_campos', { n: totalAtributos }) },
+      { st: 5, at: 4900, cor: MUTED, txt: t('ia.log_validando') },
+      { st: 5, at: 5400, cor: AMBAR, txt: t('ia.log_gravado') },
     ]
+    seqRef.current = seq
 
     const iv = setInterval(() => setElapsed(e => +(e + 0.1).toFixed(1)), 100)
     const timers = seq.map(s =>
@@ -40,9 +42,23 @@ export default function IAAoVivo({ marca, modelo, versao, ano, totalAtributos, o
     return () => {
       timersRef.current.forEach(id => { clearTimeout(id); clearInterval(id) })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marca, modelo, versao, ano, totalAtributos])
 
-  const pct = Math.round((stage / 5) * 100)
+  // Quando a resposta real da API chega, encerra a dramatização: completa
+  // qualquer log que ainda não tinha aparecido e só então vai pra 100% de verdade.
+  useEffect(() => {
+    if (!concluido) return
+    timersRef.current.forEach(id => { clearTimeout(id); clearInterval(id) })
+    setStage(5)
+    setLogs(prev => {
+      const jaMostrados = new Set(prev.map(l => l.t))
+      const faltando = seqRef.current.filter(s => !jaMostrados.has(s.txt))
+      return [...faltando.map(s => ({ t: s.txt, cor: s.cor })).reverse(), ...prev]
+    })
+  }, [concluido])
+
+  const pct = concluido ? 100 : stage >= 5 ? 96 : Math.round((stage / 5) * 100)
   const etapas = [t('ia.etapa_fontes'), t('ia.etapa_paginas'), t('ia.etapa_consenso'), t('ia.etapa_ia'), t('ia.etapa_validando')]
 
   return (
@@ -82,14 +98,17 @@ export default function IAAoVivo({ marca, modelo, versao, ano, totalAtributos, o
               style={{ background: 'linear-gradient(90deg,#0a2a6b,#1e6bff)', width: `${pct}%` }}
             />
           </div>
+          {stage >= 5 && !concluido && (
+            <p className="font-mono text-[10px] text-[#5d6b82] mt-2 animate-pulse">{t('ia.ainda_validando')}</p>
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-8">
         {etapas.map((label, i) => {
           const n = i + 1
-          const feito = stage > n
-          const ativo = stage === n
+          const feito = stage > n || (concluido && stage >= n)
+          const ativo = stage === n && !feito
           return (
             <div
               key={label}

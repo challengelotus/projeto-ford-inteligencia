@@ -1,7 +1,12 @@
 import { useTranslation } from 'react-i18next'
+import { traduzirAtributo } from '../data/attributeLabels'
 
 const PRIORIDADE_HERO = ['Potência', 'Torque', 'Aceleração 0-100 km/h']
-const UNIDADES = { 'Potência': 'cv', 'Torque': 'Nm', 'Aceleração 0-100 km/h': 's' }
+const UNIDADES = {
+  'Potência': { pt: 'cv', en: 'hp', es: 'cv' },
+  'Torque': { pt: 'Nm', en: 'Nm', es: 'Nm' },
+  'Aceleração 0-100 km/h': { pt: 's', en: 's', es: 's' },
+}
 
 function extrairNumero(valor) {
   const m = String(valor).match(/[\d.,]+/)
@@ -9,7 +14,7 @@ function extrairNumero(valor) {
 }
 
 export default function ResultadoIndividual({ resultado, onNova }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { marca, modelo, versao, ano, specs } = resultado
 
   const total = Object.keys(specs).length
@@ -19,9 +24,9 @@ export default function ResultadoIndividual({ resultado, onNova }) {
     .filter(attr => specs[attr] && specs[attr] !== 'Não disponível')
     .slice(0, 3)
     .map(attr => ({
-      k: attr === 'Aceleração 0-100 km/h' ? '0-100' : attr,
+      k: attr === 'Aceleração 0-100 km/h' ? '0-100' : traduzirAtributo(attr, i18n.language),
       v: extrairNumero(specs[attr]),
-      u: UNIDADES[attr],
+      u: UNIDADES[attr]?.[i18n.language] || UNIDADES[attr]?.pt,
     }))
 
   const watermark = heroStats[0]?.v
@@ -32,7 +37,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
       [''],
       [t('resultado.atributo'), t('resultado.especificacao'), t('resultado.status')],
       ...Object.entries(specs).map(([atributo, valor]) => [
-        atributo,
+        traduzirAtributo(atributo, i18n.language),
         valor,
         valor !== 'Não disponível' ? t('resultado.encontrado') : t('resultado.nao_disponivel')
       ])
@@ -118,7 +123,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
               key={atributo}
               className="bg-[rgba(10,17,30,.9)] border border-[rgba(120,160,220,.12)] hover:border-[rgba(30,107,255,.4)] rounded-2xl p-5 transition"
             >
-              <span className="font-mono font-semibold text-[11px] tracking-[.1em] text-[#6f8099] uppercase">{atributo}</span>
+              <span className="font-mono font-semibold text-[11px] tracking-[.1em] text-[#6f8099] uppercase">{traduzirAtributo(atributo, i18n.language)}</span>
               <div className="font-sans font-bold text-[17px] leading-[1.35] text-[#e8eef8] mt-3 min-h-[46px]">{valor}</div>
               <div className="flex items-center gap-2.5 mt-3.5">
                 <div className="flex-1 h-[3px] rounded-full bg-[rgba(120,160,220,.12)] overflow-hidden">

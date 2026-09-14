@@ -11,7 +11,7 @@ export default function Pesquisa() {
 
   return (
     <AppLayout>
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-10 lg:py-16">
         <PesquisaIndividual aoSalvar={salvarNoHistorico} itemHistorico={itemHistorico} />
       </div>
     </AppLayout>

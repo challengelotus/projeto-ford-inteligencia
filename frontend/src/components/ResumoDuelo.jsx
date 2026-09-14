@@ -43,7 +43,7 @@ export default function ResumoDuelo({ v1, v2, selecionados, onComparar, disabled
           className="font-mono font-bold text-[11px] px-[9px] py-1.5 rounded-[7px]"
           style={{ background: disabled ? 'rgba(120,160,220,.12)' : 'rgba(255,255,255,.16)' }}
         >
-          {selecionados.length} ATRIB
+          {selecionados.length} {t('pesquisa.atrib_abbrev')}
         </span>
       </button>
 
