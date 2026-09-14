@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import Navbar from '../components/Navbar'
+import AppLayout from '../components/AppLayout'
 import PesquisaIndividual from '../components/PesquisaIndividual'
 import { salvarNoHistorico } from '../utils/historico'
 
@@ -10,11 +10,10 @@ export default function Pesquisa() {
     : null
 
   return (
-    <div className="min-h-screen bg-[#0a1628]">
-      <Navbar />
-      <div className="max-w-5xl mx-auto px-6 py-8">
+    <AppLayout>
+      <div className="max-w-6xl mx-auto px-6 py-8">
         <PesquisaIndividual aoSalvar={salvarNoHistorico} itemHistorico={itemHistorico} />
       </div>
-    </div>
+    </AppLayout>
   )
 }
