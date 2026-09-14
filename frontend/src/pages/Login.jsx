@@ -69,9 +69,9 @@ export default function Login() {
         </div>
 
         <div>
-          <div className="font-sans font-extrabold text-white text-[100px] leading-[.84] tracking-[-.05em]" style={{ fontStretch: '118%' }}>FORD</div>
-          <div className="flex items-end gap-5">
-            <div className="font-sans font-extrabold text-[#1e6bff] text-[100px] leading-[.84] tracking-[-.05em]" style={{ fontStretch: '118%' }}>CI</div>
+          <div className="font-sans font-extrabold text-white text-[128px] leading-[.84] tracking-[-.05em]" style={{ fontStretch: '118%' }}>FORD</div>
+          <div className="flex items-end gap-[22px]">
+            <div className="font-sans font-extrabold text-[#1e6bff] text-[128px] leading-[.84] tracking-[-.05em]" style={{ fontStretch: '118%' }}>CI</div>
             <div className="font-mono text-[#7e90ac] text-sm pb-4">
               <div>{t('login.tagline_l1')}</div>
               <div>{t('login.tagline_l2', { count: ATRIBUTOS.length })}</div>
@@ -123,7 +123,7 @@ export default function Login() {
                 placeholder={t('login.placeholder_email')}
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="bg-[rgba(12,22,42,.75)] border border-[rgba(120,160,220,.18)] border-b-2 border-b-[rgba(30,107,255,.55)] rounded-xl px-4 py-[15px] text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-medium"
+                className="bg-[rgba(12,22,42,.75)] border border-[rgba(120,160,220,.18)] border-b-2 border-b-[rgba(30,107,255,.55)] rounded-xl px-4 py-[15px] text-[15px] text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-medium"
               />
             </div>
 
@@ -134,7 +134,7 @@ export default function Login() {
                 placeholder={t('login.placeholder_senha')}
                 value={senha}
                 onChange={e => setSenha(e.target.value)}
-                className="bg-[rgba(12,22,42,.75)] border border-[rgba(120,160,220,.18)] border-b-2 border-b-[rgba(30,107,255,.55)] rounded-xl px-4 py-[15px] text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-medium"
+                className="bg-[rgba(12,22,42,.75)] border border-[rgba(120,160,220,.18)] border-b-2 border-b-[rgba(30,107,255,.55)] rounded-xl px-4 py-[15px] text-[15px] text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-medium"
               />
             </div>
 
@@ -148,7 +148,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-1.5 bg-[#1e6bff] hover:bg-[#3d84ff] text-white font-bold h-14 px-[22px] rounded-[13px] flex items-center justify-between transition disabled:opacity-60"
+              className="mt-1.5 bg-[#1e6bff] hover:bg-[#3d84ff] text-white font-bold text-[15px] h-14 px-[22px] rounded-[13px] flex items-center justify-between transition disabled:opacity-60"
               style={{ boxShadow: '0 12px 30px -12px rgba(30,107,255,.9)' }}
             >
               <span>{loading ? t('login.entrando') : t('login.btn_entrar')}</span>
