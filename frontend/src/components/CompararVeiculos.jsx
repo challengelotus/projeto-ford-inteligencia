@@ -172,7 +172,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
           </div>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center items-center">
           <div className="w-11 h-11 rounded-full flex items-center justify-center font-mono font-extrabold text-[15px]" style={{ background: 'rgba(245,165,36,.12)', border: '1px solid rgba(245,165,36,.3)', color: '#f5a524' }}>
             VS
           </div>
