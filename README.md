@@ -34,7 +34,7 @@ O **Ford Commercial Intelligence (Ford CI)** é uma plataforma centralizada que 
 - **Cache Inteligente:** Uma vez pesquisado, o veículo fica salvo (SQLite) e a ficha técnica é entregue instantaneamente na próxima busca.
 - **Interface SPA Rápida:** Um dashboard React intuitivo para buscar e comparar veículos concorrentes lado a lado.
 
-*Reduzimos o tempo de mapeamento da concorrência de 1 hora para menos de 10 segundos.*
+*Reduzimos o tempo de mapeamento da concorrência de 1 hora para segundos.*
 
 ---
 
