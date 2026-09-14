@@ -41,7 +41,7 @@ export default {
     ano: 'Año',
     placeholder_marca: 'ej: Toyota',
     placeholder_modelo: 'ej: Hilux',
-    placeholder_versao: 'ej: SR 2025',
+    placeholder_versao: 'ej: SR ',
     placeholder_ano: 'ej: 2025',
     especificacoes_tecnicas: 'Especificaciones Técnicas',
     experiencia: 'Experiencia y Sensaciones',

@@ -1,6 +1,54 @@
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { calcularVantagem } from '../utils/duelo'
 import { traduzirAtributo } from '../data/attributeLabels'
+
+function LinhaAtributo({ atributo, val1, val2, index, idioma }) {
+  const [pronto, setPronto] = useState(false)
+  const comp = calcularVantagem(atributo, val1, val2)
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setPronto(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
+  return (
+    <div
+      style={{ animation: 'fcd-rise .4s ease both', animationDelay: `${Math.min(index * 35, 400)}ms` }}
+      className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 md:gap-4 py-4 px-2 border-b border-[rgba(120,160,220,.1)] last:border-0"
+    >
+      <div className="text-right min-w-0">
+        <div className={`font-sans font-bold text-sm md:text-base truncate ${comp.vencedor === 1 ? 'text-[#f5a524]' : val1 === 'Não disponível' ? 'text-[#5d6b82]' : 'text-[#e8eef8]'}`}>
+          {val1}
+        </div>
+        {comp.comparavel && (
+          <div className="h-[3px] rounded-full bg-[rgba(120,160,220,.12)] mt-2 overflow-hidden">
+            <div
+              className="h-full ml-auto rounded-full transition-all duration-700 ease-out"
+              style={{ width: pronto ? `${comp.p1}%` : '0%', background: comp.vencedor === 1 ? '#f5a524' : '#3d4a5e' }}
+            />
+          </div>
+        )}
+      </div>
+      <div className="font-mono text-[9.5px] md:text-[10px] tracking-[.08em] text-[#6f8099] uppercase text-center px-1 min-w-[90px] md:min-w-[130px]">
+        {traduzirAtributo(atributo, idioma)}
+      </div>
+      <div className="text-left min-w-0">
+        <div className={`font-sans font-bold text-sm md:text-base truncate ${comp.vencedor === 2 ? 'text-[#f5a524]' : val2 === 'Não disponível' ? 'text-[#5d6b82]' : 'text-[#e8eef8]'}`}>
+          {val2}
+        </div>
+        {comp.comparavel && (
+          <div className="h-[3px] rounded-full bg-[rgba(120,160,220,.12)] mt-2 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-700 ease-out"
+              style={{ width: pronto ? `${comp.p2}%` : '0%', background: comp.vencedor === 2 ? '#f5a524' : '#3d4a5e' }}
+            />
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function ResultadoComparacao({ resultado, onNova }) {
   const { t, i18n } = useTranslation()
@@ -66,39 +114,16 @@ export default function ResultadoComparacao({ resultado, onNova }) {
       </div>
 
       <div className="rounded-2xl mt-4 p-2 md:p-4" style={{ background: 'rgba(9,16,29,.9)', border: '1px solid rgba(120,160,220,.14)' }}>
-        {atributos.map(atributo => {
-          const val1 = veiculo1.specs[atributo]
-          const val2 = veiculo2.specs[atributo]
-          const comp = calcularVantagem(atributo, val1, val2)
-
-          return (
-            <div key={atributo} className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 md:gap-4 py-4 px-2 border-b border-[rgba(120,160,220,.1)] last:border-0">
-              <div className="text-right min-w-0">
-                <div className={`font-sans font-bold text-sm md:text-base truncate ${comp.vencedor === 1 ? 'text-[#f5a524]' : val1 === 'Não disponível' ? 'text-[#5d6b82]' : 'text-[#e8eef8]'}`}>
-                  {val1}
-                </div>
-                {comp.comparavel && (
-                  <div className="h-[3px] rounded-full bg-[rgba(120,160,220,.12)] mt-2 overflow-hidden">
-                    <div className="h-full ml-auto rounded-full transition-all" style={{ width: `${comp.p1}%`, background: comp.vencedor === 1 ? '#f5a524' : '#3d4a5e' }} />
-                  </div>
-                )}
-              </div>
-              <div className="font-mono text-[9.5px] md:text-[10px] tracking-[.08em] text-[#6f8099] uppercase text-center px-1 min-w-[90px] md:min-w-[130px]">
-                {traduzirAtributo(atributo, i18n.language)}
-              </div>
-              <div className="text-left min-w-0">
-                <div className={`font-sans font-bold text-sm md:text-base truncate ${comp.vencedor === 2 ? 'text-[#f5a524]' : val2 === 'Não disponível' ? 'text-[#5d6b82]' : 'text-[#e8eef8]'}`}>
-                  {val2}
-                </div>
-                {comp.comparavel && (
-                  <div className="h-[3px] rounded-full bg-[rgba(120,160,220,.12)] mt-2 overflow-hidden">
-                    <div className="h-full rounded-full transition-all" style={{ width: `${comp.p2}%`, background: comp.vencedor === 2 ? '#f5a524' : '#3d4a5e' }} />
-                  </div>
-                )}
-              </div>
-            </div>
-          )
-        })}
+        {atributos.map((atributo, index) => (
+          <LinhaAtributo
+            key={atributo}
+            atributo={atributo}
+            val1={veiculo1.specs[atributo]}
+            val2={veiculo2.specs[atributo]}
+            index={index}
+            idioma={i18n.language}
+          />
+        ))}
       </div>
     </div>
   )

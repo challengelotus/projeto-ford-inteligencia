@@ -83,16 +83,22 @@ export default function Historico() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-7">
-            {historico.map(item => {
-              const cor = item.tipo === 'comparacao' ? '#f5a524' : '#8fb6ff'
-              const bg = item.tipo === 'comparacao' ? 'rgba(245,165,36,.12)' : 'rgba(30,107,255,.14)'
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => abrir(item)}
-                  className="relative rounded-[20px] p-[22px] cursor-pointer transition hover:border-[rgba(30,107,255,.5)]"
-                  style={{ background: 'rgba(10,17,30,.9)', border: '1px solid rgba(120,160,220,.12)', borderTop: `3px solid ${cor}` }}
-                >
+{historico.map((item, index) => {
+  const cor = item.tipo === 'comparacao' ? '#f5a524' : '#8fb6ff'
+  const bg = item.tipo === 'comparacao' ? 'rgba(245,165,36,.12)' : 'rgba(30,107,255,.14)'
+  return (
+    <div
+      key={item.id}
+      onClick={() => abrir(item)}
+      className="relative rounded-[20px] p-[22px] cursor-pointer transition-all duration-300 hover:border-[rgba(30,107,255,.5)] hover:-translate-y-[2px]"
+      style={{
+        background: 'rgba(10,17,30,.9)',
+        border: '1px solid rgba(120,160,220,.12)',
+        borderTop: `3px solid ${cor}`,
+        animation: 'fcd-rise .4s ease both',
+        animationDelay: `${Math.min(index * 50, 400)}ms`,
+      }}
+    >
                   <button
                     onClick={e => { e.stopPropagation(); remover(item.id) }}
                     className="absolute top-4 right-4 text-[#5d6b82] hover:text-[#ff9a9a] transition"

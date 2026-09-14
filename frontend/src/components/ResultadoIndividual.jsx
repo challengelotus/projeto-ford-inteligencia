@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { traduzirAtributo } from '../data/attributeLabels'
 
@@ -13,6 +14,71 @@ function extrairNumero(valor) {
   return m ? m[0] : valor
 }
 
+function StatCard({ label, valor, unidade }) {
+  const [exibido, setExibido] = useState(0)
+
+  useEffect(() => {
+    const alvo = parseFloat(String(valor).replace(',', '.'))
+    if (Number.isNaN(alvo)) { setExibido(valor); return }
+    const decimais = (String(valor).split(/[.,]/)[1] || '').length
+    const duracao = 900
+    const inicio = performance.now()
+    let frame
+    function passo(agora) {
+      const p = Math.min((agora - inicio) / duracao, 1)
+      const facilitado = 1 - Math.pow(1 - p, 3)
+      setExibido((alvo * facilitado).toFixed(decimais))
+      if (p < 1) frame = requestAnimationFrame(passo)
+    }
+    frame = requestAnimationFrame(passo)
+    return () => cancelAnimationFrame(frame)
+  }, [valor])
+
+  return (
+    <div className="w-[calc(50%-6px)] sm:w-[150px] bg-[rgba(4,7,14,.5)] border border-[rgba(120,160,220,.14)] rounded-2xl px-[18px] py-4">
+      <div className="font-mono text-[9px] tracking-[.1em] text-[#7e90ac] uppercase">{label}</div>
+      <div className="font-sans font-extrabold text-white text-[30px] leading-none mt-2.5">
+        {exibido}<span className="font-mono font-semibold text-xs text-[#8fb6ff] ml-1">{unidade}</span>
+      </div>
+    </div>
+  )
+}
+
+function SpecCard({ atributo, valor, index, idioma }) {
+  const { t } = useTranslation()
+  const [pronto, setPronto] = useState(false)
+  const encontrado = valor !== 'Não disponível'
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setPronto(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
+  return (
+    <div
+      style={{ animation: 'fcd-rise .4s ease both', animationDelay: `${Math.min(index * 40, 400)}ms` }}
+      className="bg-[rgba(10,17,30,.9)] border border-[rgba(120,160,220,.12)] hover:border-[rgba(30,107,255,.4)] hover:-translate-y-[2px] rounded-2xl p-5 transition-all duration-300"
+    >
+      <span className="font-mono font-semibold text-[11px] tracking-[.1em] text-[#6f8099] uppercase">{traduzirAtributo(atributo, idioma)}</span>
+      <div className="font-sans font-bold text-[17px] leading-[1.35] text-[#e8eef8] mt-3 min-h-[46px]">{valor}</div>
+      <div className="flex items-center gap-2.5 mt-3.5">
+        <div className="flex-1 h-[3px] rounded-full bg-[rgba(120,160,220,.12)] overflow-hidden">
+          <div
+            className="h-full rounded-full transition-all duration-700 ease-out"
+            style={{ width: pronto ? (encontrado ? '100%' : '8%') : '0%', background: encontrado ? '#3ed598' : '#5d6b82' }}
+          />
+        </div>
+        <span
+          className="font-mono font-semibold text-[9.5px] uppercase whitespace-nowrap"
+          style={{ color: encontrado ? '#3ed598' : '#5d6b82' }}
+        >
+          {encontrado ? t('resultado.encontrado') : t('resultado.indisponivel')}
+        </span>
+      </div>
+    </div>
+  )
+}
+
 export default function ResultadoIndividual({ resultado, onNova }) {
   const { t, i18n } = useTranslation()
   const { marca, modelo, versao, ano, specs } = resultado
@@ -24,12 +90,13 @@ export default function ResultadoIndividual({ resultado, onNova }) {
     .filter(attr => specs[attr] && specs[attr] !== 'Não disponível')
     .slice(0, 3)
     .map(attr => ({
-      k: attr === 'Aceleração 0-100 km/h' ? '0-100' : traduzirAtributo(attr, i18n.language),
-      v: extrairNumero(specs[attr]),
-      u: UNIDADES[attr]?.[i18n.language] || UNIDADES[attr]?.pt,
+      key: attr,
+      label: attr === 'Aceleração 0-100 km/h' ? '0-100' : traduzirAtributo(attr, i18n.language),
+      valor: extrairNumero(specs[attr]),
+      unidade: UNIDADES[attr]?.[i18n.language] || UNIDADES[attr]?.pt,
     }))
 
-  const watermark = heroStats[0]?.v
+  const watermark = heroStats[0]?.valor
 
   function exportarCSV() {
     const linhas = [
@@ -86,13 +153,8 @@ export default function ResultadoIndividual({ resultado, onNova }) {
           </div>
           {heroStats.length > 0 && (
             <div className="flex gap-3 flex-wrap">
-              {heroStats.map(({ k, v, u }) => (
-                <div key={k} className="w-[calc(50%-6px)] sm:w-[150px] bg-[rgba(4,7,14,.5)] border border-[rgba(120,160,220,.14)] rounded-2xl px-[18px] py-4">
-                  <div className="font-mono text-[9px] tracking-[.1em] text-[#7e90ac] uppercase">{k}</div>
-                  <div className="font-sans font-extrabold text-white text-[30px] leading-none mt-2.5">
-                    {v}<span className="font-mono font-semibold text-xs text-[#8fb6ff] ml-1">{u}</span>
-                  </div>
-                </div>
+              {heroStats.map(({ key, label, valor, unidade }) => (
+                <StatCard key={key} label={label} valor={valor} unidade={unidade} />
               ))}
             </div>
           )}
@@ -116,32 +178,9 @@ export default function ResultadoIndividual({ resultado, onNova }) {
       <p className="font-mono text-[10px] text-[#4c5a70] mb-4">{t('resultado.fonte_pipeline')}</p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {Object.entries(specs).map(([atributo, valor]) => {
-          const encontrado = valor !== 'Não disponível'
-          return (
-            <div
-              key={atributo}
-              className="bg-[rgba(10,17,30,.9)] border border-[rgba(120,160,220,.12)] hover:border-[rgba(30,107,255,.4)] rounded-2xl p-5 transition"
-            >
-              <span className="font-mono font-semibold text-[11px] tracking-[.1em] text-[#6f8099] uppercase">{traduzirAtributo(atributo, i18n.language)}</span>
-              <div className="font-sans font-bold text-[17px] leading-[1.35] text-[#e8eef8] mt-3 min-h-[46px]">{valor}</div>
-              <div className="flex items-center gap-2.5 mt-3.5">
-                <div className="flex-1 h-[3px] rounded-full bg-[rgba(120,160,220,.12)] overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{ width: encontrado ? '100%' : '8%', background: encontrado ? '#3ed598' : '#5d6b82' }}
-                  />
-                </div>
-                <span
-                  className="font-mono font-semibold text-[9.5px] uppercase whitespace-nowrap"
-                  style={{ color: encontrado ? '#3ed598' : '#5d6b82' }}
-                >
-                  {encontrado ? t('resultado.encontrado') : t('resultado.indisponivel')}
-                </span>
-              </div>
-            </div>
-          )
-        })}
+        {Object.entries(specs).map(([atributo, valor], index) => (
+          <SpecCard key={atributo} atributo={atributo} valor={valor} index={index} idioma={i18n.language} />
+        ))}
       </div>
     </div>
   )
