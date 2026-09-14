@@ -1,14 +1,16 @@
+import { useTranslation } from 'react-i18next'
 import { ATRIBUTOS, COMPARAVEIS_DUELO } from '../data/attributesData'
 
 export default function ResumoDuelo({ v1, v2, selecionados, onComparar, disabled }) {
+  const { t } = useTranslation()
   const titulo = `${[v1.marca, v1.modelo].filter(Boolean).join(' ') || '—'}  vs  ${[v2.marca, v2.modelo].filter(Boolean).join(' ') || '—'}`
   const comparaveis = selecionados.filter(a => COMPARAVEIS_DUELO[a]).length
   const qualitativos = selecionados.length - comparaveis
 
   const linhas = [
-    { k: 'ATRIBUTOS', v: `${selecionados.length} / ${ATRIBUTOS.length}` },
-    { k: 'COMPARÁVEIS', v: `${comparaveis} numéricos` },
-    { k: 'QUALITATIVOS', v: qualitativos },
+    { k: t('duelo.resumo_atributos'), v: `${selecionados.length} / ${ATRIBUTOS.length}` },
+    { k: t('duelo.resumo_comparaveis'), v: t('duelo.resumo_comparaveis_valor', { n: comparaveis }) },
+    { k: t('duelo.resumo_qualitativos'), v: qualitativos },
   ]
 
   return (
@@ -16,7 +18,7 @@ export default function ResumoDuelo({ v1, v2, selecionados, onComparar, disabled
       className="rounded-[22px] p-6 lg:sticky lg:top-6 h-fit"
       style={{ background: 'linear-gradient(180deg,rgba(10,42,107,.5),rgba(9,16,29,.95))', border: '1px solid rgba(30,107,255,.24)' }}
     >
-      <div className="font-mono font-semibold text-[10px] tracking-[.14em] text-[#8fb6ff] uppercase">Resumo do Duelo</div>
+      <div className="font-mono font-semibold text-[10px] tracking-[.14em] text-[#8fb6ff] uppercase">{t('duelo.resumo_titulo')}</div>
       <div className="font-sans font-extrabold text-white text-[22px] leading-[1.2] tracking-[-.02em] mt-3.5">{titulo}</div>
 
       <div className="flex flex-col gap-[11px] mt-5 pt-[18px] border-t border-[rgba(120,160,220,.14)]">
@@ -36,7 +38,7 @@ export default function ResumoDuelo({ v1, v2, selecionados, onComparar, disabled
           ? { background: 'rgba(120,160,220,.1)', color: '#5d6b82' }
           : { background: '#1e6bff', color: '#fff', boxShadow: '0 14px 34px -14px rgba(30,107,255,.95)' }}
       >
-        <span>Comparar veículos</span>
+        <span>{t('duelo.comparar_veiculos')}</span>
         <span
           className="font-mono font-bold text-[11px] px-[9px] py-1.5 rounded-[7px]"
           style={{ background: disabled ? 'rgba(120,160,220,.12)' : 'rgba(255,255,255,.16)' }}
@@ -46,7 +48,7 @@ export default function ResumoDuelo({ v1, v2, selecionados, onComparar, disabled
       </button>
 
       {disabled && (
-        <p className="text-center font-mono text-[11px] text-[#7e90ac] mt-2.5">Selecione ao menos um atributo para continuar.</p>
+        <p className="text-center font-mono text-[11px] text-[#7e90ac] mt-2.5">{t('resumo.aviso')}</p>
       )}
     </div>
   )

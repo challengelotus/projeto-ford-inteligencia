@@ -6,16 +6,16 @@ import { Trash2, X } from 'lucide-react'
 import { obterHistorico, removerDoHistorico, limparHistorico } from '../utils/historico'
 import { calcularVantagem } from '../utils/duelo'
 
-function metaItem(item) {
+function metaItem(item, t) {
   if (item.tipo === 'individual') {
     const total = Object.keys(item.specs).length
     const encontrados = Object.values(item.specs).filter(v => v !== 'Não disponível').length
-    return `${total} atributos · ${encontrados} encontrados`
+    return t('historico.meta_individual', { total, encontrados })
   }
   const total = item.atributos.length
   const v1 = item.atributos.filter(a => calcularVantagem(a, item.veiculo1.specs[a], item.veiculo2.specs[a]).vencedor === 1).length
   const v2 = item.atributos.filter(a => calcularVantagem(a, item.veiculo1.specs[a], item.veiculo2.specs[a]).vencedor === 2).length
-  return `${total} atributos · ${v1}×${v2} vantagens`
+  return t('historico.meta_comparacao', { total, v1, v2 })
 }
 
 function tituloItem(item) {
@@ -111,7 +111,7 @@ export default function Historico() {
                   </div>
 
                   <div className="font-sans font-bold text-[17px] leading-[1.3] text-white mt-4">{tituloItem(item)}</div>
-                  <div className="font-mono text-[11px] text-[#6f8099] mt-3">{metaItem(item)}</div>
+                  <div className="font-mono text-[11px] text-[#6f8099] mt-3">{metaItem(item, t)}</div>
                 </div>
               )
             })}

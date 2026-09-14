@@ -1,6 +1,8 @@
+import { useTranslation } from 'react-i18next'
 import { calcularVantagem } from '../utils/duelo'
 
 export default function ResultadoComparacao({ resultado, onNova }) {
+  const { t } = useTranslation()
   const { veiculo1, veiculo2, atributos } = resultado
 
   const vantagens1 = atributos.filter(a => calcularVantagem(a, veiculo1.specs[a], veiculo2.specs[a]).vencedor === 1).length
@@ -31,13 +33,13 @@ export default function ResultadoComparacao({ resultado, onNova }) {
           onClick={onNova}
           className="bg-transparent border-none text-[#7e90ac] hover:text-white font-mono font-semibold text-[11px] flex items-center gap-2 transition"
         >
-          <span className="text-base">←</span> Ajustar Duelo
+          <span className="text-base">←</span> {t('duelo.ajustar_duelo')}
         </button>
         <button
           onClick={exportarCSV}
           className="border border-[rgba(30,107,255,.4)] bg-[rgba(30,107,255,.16)] hover:bg-[rgba(30,107,255,.3)] hover:text-white rounded-[11px] px-4 py-[11px] text-[#8fb6ff] font-sans font-semibold text-xs transition"
         >
-          Exportar CSV
+          {t('resultado.exportar')}
         </button>
       </div>
 
@@ -52,8 +54,8 @@ export default function ResultadoComparacao({ resultado, onNova }) {
             style={{ background: 'linear-gradient(180deg,rgba(16,27,46,.95),rgba(9,16,29,.95))', border: '1px solid rgba(120,160,220,.14)', borderTop: `3px solid ${cor}` }}
           >
             <div className="flex items-center justify-between">
-              <span className="font-mono font-extrabold text-[11px] tracking-[.14em]" style={{ color: cor }}>VEÍCULO {i + 1}</span>
-              <span className="font-mono font-bold text-[11px]" style={{ color: cor }}>{vantagens} vantagens</span>
+              <span className="font-mono font-extrabold text-[11px] tracking-[.14em]" style={{ color: cor }}>{t('duelo.veiculo_num', { n: i + 1 })}</span>
+              <span className="font-mono font-bold text-[11px]" style={{ color: cor }}>{t('duelo.vantagens_contagem', { n: vantagens })}</span>
             </div>
             <div className="font-sans font-extrabold text-white text-xl mt-2.5">
               {v.marca} {v.modelo} <span style={{ color: cor }}>{v.versao}</span> · {v.ano}

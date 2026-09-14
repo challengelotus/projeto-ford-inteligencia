@@ -8,8 +8,8 @@ import ResumoDuelo from './ResumoDuelo'
 import IAAoVivo from './IAAoVivo'
 
 const SLOTS = [
-  { tag: 'VEÍCULO 01', cor: '#8fb6ff' },
-  { tag: 'VEÍCULO 02', cor: '#f5a524' },
+  { tagKey: 'duelo.veiculo_01', cor: '#8fb6ff' },
+  { tagKey: 'duelo.veiculo_02', cor: '#f5a524' },
 ]
 
 export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
@@ -138,9 +138,9 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
     <div className="flex flex-col gap-4">
       <div>
         <h2 className="font-sans font-extrabold text-white text-[28px] md:text-[36px] leading-none tracking-[-.03em]" style={{ fontStretch: '112%' }}>
-          Duelo
+          {t('duelo.titulo')}
         </h2>
-        <p className="font-sans text-[#7e90ac] text-sm mt-2.5">Dois veículos, atributo por atributo, com vantagem calculada.</p>
+        <p className="font-sans text-[#7e90ac] text-sm mt-2.5">{t('duelo.subtitulo')}</p>
       </div>
 
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[1fr_44px_1fr] lg:gap-0 lg:items-stretch">
@@ -149,8 +149,8 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
           style={{ background: 'linear-gradient(180deg,rgba(16,27,46,.95),rgba(9,16,29,.95))', border: '1px solid rgba(120,160,220,.14)', borderTop: `3px solid ${estados[0].slot.cor}` }}
         >
           <div className="flex items-center justify-between mb-[18px]">
-            <span className="font-mono font-extrabold text-[11px] tracking-[.14em]" style={{ color: estados[0].slot.cor }}>{estados[0].slot.tag}</span>
-            <span className="font-mono text-[10px] text-[#5d6b82]">{estados[0].state.marca ? 'PRONTO' : 'VAZIO'}</span>
+            <span className="font-mono font-extrabold text-[11px] tracking-[.14em]" style={{ color: estados[0].slot.cor }}>{t(estados[0].slot.tagKey)}</span>
+            <span className="font-mono text-[10px] text-[#5d6b82]">{estados[0].state.marca ? t('duelo.pronto') : t('duelo.vazio')}</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             {[
@@ -183,8 +183,8 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
           style={{ background: 'linear-gradient(180deg,rgba(16,27,46,.95),rgba(9,16,29,.95))', border: '1px solid rgba(120,160,220,.14)', borderTop: `3px solid ${estados[1].slot.cor}` }}
         >
           <div className="flex items-center justify-between mb-[18px]">
-            <span className="font-mono font-extrabold text-[11px] tracking-[.14em]" style={{ color: estados[1].slot.cor }}>{estados[1].slot.tag}</span>
-            <span className="font-mono text-[10px] text-[#5d6b82]">{estados[1].state.marca ? 'PRONTO' : 'VAZIO'}</span>
+            <span className="font-mono font-extrabold text-[11px] tracking-[.14em]" style={{ color: estados[1].slot.cor }}>{t(estados[1].slot.tagKey)}</span>
+            <span className="font-mono text-[10px] text-[#5d6b82]">{estados[1].state.marca ? t('duelo.pronto') : t('duelo.vazio')}</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
             {[
@@ -211,7 +211,7 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
         <div className="flex flex-col gap-4">
           <div className="rounded-2xl p-6" style={{ background: 'rgba(9,16,29,.9)', border: '1px solid rgba(120,160,220,.14)' }}>
             <div className="flex items-center justify-between mb-4">
-              <span className="font-mono text-[10px] tracking-[.14em] text-[#6f8099] uppercase">Atributos do Duelo</span>
+              <span className="font-mono text-[10px] tracking-[.14em] text-[#6f8099] uppercase">{t('duelo.atributos_titulo')}</span>
               <span className="font-mono text-xs font-bold text-[#f5a524]">{selecionados.length}/{ATRIBUTOS.length}</span>
             </div>
 
