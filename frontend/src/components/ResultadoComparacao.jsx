@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { calcularVantagem } from '../utils/duelo'
 import { traduzirAtributo } from '../data/attributeLabels'
+import { capitalizarPalavras } from '../utils/texto'
 
 function LinhaAtributo({ atributo, val1, val2, index, idioma }) {
   const [pronto, setPronto] = useState(false)
@@ -59,9 +60,9 @@ export default function ResultadoComparacao({ resultado, onNova }) {
 
   function exportarCSV() {
     const linhas = [
-      ['', `${veiculo1.marca} ${veiculo1.modelo} ${veiculo1.versao} ${veiculo1.ano}`, `${veiculo2.marca} ${veiculo2.modelo} ${veiculo2.versao} ${veiculo2.ano}`],
-      [''],
-      ['Atributo', `${veiculo1.marca} ${veiculo1.modelo}`, `${veiculo2.marca} ${veiculo2.modelo}`],
+      ['', `${capitalizarPalavras(veiculo1.marca)} ${capitalizarPalavras(veiculo1.modelo)} ${capitalizarPalavras(veiculo1.versao)} ${veiculo1.ano}`, `${capitalizarPalavras(veiculo2.marca)} ${capitalizarPalavras(veiculo2.modelo)} ${capitalizarPalavras(veiculo2.versao)} ${veiculo2.ano}`],
+    [''],
+    ['Atributo', `${capitalizarPalavras(veiculo1.marca)} ${capitalizarPalavras(veiculo1.modelo)}`, `${capitalizarPalavras(veiculo2.marca)} ${capitalizarPalavras(veiculo2.modelo)}`],
       ...atributos.map(a => [traduzirAtributo(a, i18n.language), veiculo1.specs[a] || 'Não disponível', veiculo2.specs[a] || 'Não disponível'])
     ]
 
@@ -107,7 +108,7 @@ export default function ResultadoComparacao({ resultado, onNova }) {
               <span className="font-mono font-bold text-[11px]" style={{ color: cor }}>{t('duelo.vantagens_contagem', { n: vantagens })}</span>
             </div>
             <div className="font-sans font-extrabold text-white text-xl mt-2.5">
-              {v.marca} {v.modelo} <span style={{ color: cor }}>{v.versao}</span> · {v.ano}
+               {capitalizarPalavras(v.marca)} {capitalizarPalavras(v.modelo)} <span style={{ color: cor }}>{capitalizarPalavras(v.versao)}</span> · {v.ano}
             </div>
           </div>
         ))}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { GRUPOS_ATRIBUTOS, PRESETS, PRESET_IDS, ATRIBUTOS } from '../data/attributesData'
 import { traduzirAtributo } from '../data/attributeLabels'
 import { buscarEspecificacoesReais } from '../api'
@@ -25,6 +25,18 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
   const [pulando, setPulando] = useState(false)
   const [concluido, setConcluido] = useState(false)
   const [erro, setErro] = useState('')
+  const camposRef = useRef([])
+
+  function handleEnterCampo(e, index) {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    const proximo = camposRef.current[index + 1]
+    if (proximo) {
+      proximo.focus()
+    } else {
+      handleBuscar()
+    }
+  }
 
   function toggle(atributo) {
     setPreset('custom')
@@ -116,13 +128,15 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
                 { label: t('pesquisa.modelo'), value: modelo, set: setModelo, placeholder: t('pesquisa.placeholder_modelo') },
                 { label: t('pesquisa.versao'), value: versao, set: setVersao, placeholder: t('pesquisa.placeholder_versao') },
                 { label: t('pesquisa.ano'), value: ano, set: setAno, placeholder: t('pesquisa.placeholder_ano') },
-              ].map(({ label, value, set, placeholder }) => (
+              ].map(({ label, value, set, placeholder }, index) => (
                 <div key={label} className="flex flex-col gap-2">
                   <label className="font-mono text-[9.5px] tracking-[.14em] text-[#6f8099] uppercase">{label}</label>
                   <input
+                    ref={el => (camposRef.current[index] = el)}
                     placeholder={placeholder}
                     value={value}
                     onChange={e => set(e.target.value)}
+                    onKeyDown={e => handleEnterCampo(e, index)}
                     className="bg-[#080e1a] border border-[rgba(120,160,220,.16)] rounded-xl px-4 py-3.5 text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-semibold"
                   />
                 </div>

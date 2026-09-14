@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { traduzirAtributo } from '../data/attributeLabels'
+import { capitalizarPalavras } from '../utils/texto'
 
 const PRIORIDADE_HERO = ['Potência', 'Torque', 'Aceleração 0-100 km/h']
 const UNIDADES = {
@@ -100,7 +101,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
 
   function exportarCSV() {
     const linhas = [
-      ['Veículo', `${marca} ${modelo} ${versao} ${ano}`],
+      ['Veículo', `${capitalizarPalavras(marca)} ${capitalizarPalavras(modelo)} ${capitalizarPalavras(versao)} ${ano}`],
       [''],
       [t('resultado.atributo'), t('resultado.especificacao'), t('resultado.status')],
       ...Object.entries(specs).map(([atributo, valor]) => [
@@ -148,7 +149,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
               className="font-sans font-extrabold text-white leading-none tracking-[-.04em] mt-3.5 text-[32px] md:text-[56px]"
               style={{ fontStretch: '110%' }}
             >
-              {modelo} {versao}
+              {capitalizarPalavras(modelo)} {capitalizarPalavras(versao)}
             </div>
           </div>
           {heroStats.length > 0 && (

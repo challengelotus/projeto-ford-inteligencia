@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { GRUPOS_ATRIBUTOS, PRESETS, PRESET_IDS, ATRIBUTOS } from '../data/attributesData'
 import { traduzirAtributo } from '../data/attributeLabels'
 import { buscarEspecificacoesReais } from '../api'
@@ -38,6 +38,18 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
   const [pulando, setPulando] = useState(false)
   const [concluido, setConcluido] = useState(false)
   const [erro, setErro] = useState('')
+  const camposRef = useRef([])
+
+  function handleEnterCampo(e, index) {
+    if (e.key !== 'Enter') return
+    e.preventDefault()
+    const proximo = camposRef.current[index + 1]
+    if (proximo) {
+      proximo.focus()
+    } else {
+      handleComparar()
+    }
+  }
 
   function toggle(atributo) {
     setPreset('custom')
@@ -164,12 +176,14 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
               { field: 'modelo', label: t('pesquisa.modelo'), placeholder: 'ex: Ranger' },
               { field: 'versao', label: t('pesquisa.versao'), placeholder: 'ex: Raptor' },
               { field: 'ano', label: t('pesquisa.ano'), placeholder: 'ex: 2025' },
-            ].map(({ field, label, placeholder }) => (
+            ].map(({ field, label, placeholder }, i) => (
               <label key={field} className="flex flex-col gap-2">
                 <span className="font-mono text-[9.5px] tracking-[.14em] text-[#6f8099] uppercase">{label}</span>
                 <input
+                  ref={el => (camposRef.current[i] = el)}
                   value={estados[0].state[field]}
                   onChange={e => estados[0].setState(prev => ({ ...prev, [field]: e.target.value }))}
+                  onKeyDown={e => handleEnterCampo(e, i)}
                   placeholder={placeholder}
                   className="bg-[#080e1a] border border-[rgba(120,160,220,.16)] rounded-xl px-3 py-3 text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-semibold text-sm"
                 />
@@ -198,12 +212,14 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
               { field: 'modelo', label: t('pesquisa.modelo'), placeholder: 'ex: Hilux' },
               { field: 'versao', label: t('pesquisa.versao'), placeholder: 'ex: SR' },
               { field: 'ano', label: t('pesquisa.ano'), placeholder: 'ex: 2025' },
-            ].map(({ field, label, placeholder }) => (
+            ].map(({ field, label, placeholder }, i) => (
               <label key={field} className="flex flex-col gap-2">
                 <span className="font-mono text-[9.5px] tracking-[.14em] text-[#6f8099] uppercase">{label}</span>
                 <input
+                  ref={el => (camposRef.current[4 + i] = el)}
                   value={estados[1].state[field]}
                   onChange={e => estados[1].setState(prev => ({ ...prev, [field]: e.target.value }))}
+                  onKeyDown={e => handleEnterCampo(e, 4 + i)}
                   placeholder={placeholder}
                   className="bg-[#080e1a] border border-[rgba(120,160,220,.16)] rounded-xl px-3 py-3 text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-semibold text-sm"
                 />

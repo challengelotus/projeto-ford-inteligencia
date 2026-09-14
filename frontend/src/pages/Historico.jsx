@@ -5,6 +5,7 @@ import AppLayout from '../components/AppLayout'
 import { Trash2, X } from 'lucide-react'
 import { obterHistorico, removerDoHistorico, limparHistorico } from '../utils/historico'
 import { calcularVantagem } from '../utils/duelo'
+import { capitalizarPalavras } from '../utils/texto'
 
 function metaItem(item, t) {
   if (item.tipo === 'individual') {
@@ -20,9 +21,11 @@ function metaItem(item, t) {
 
 function tituloItem(item) {
   if (item.tipo === 'individual') {
-    return `${item.marca} ${item.modelo} ${item.versao}`
+    return capitalizarPalavras(`${item.marca} ${item.modelo} ${item.versao}`)
   }
-  return `${item.veiculo1.marca} ${item.veiculo1.modelo} vs ${item.veiculo2.marca} ${item.veiculo2.modelo}`
+  const nome1 = capitalizarPalavras(`${item.veiculo1.marca} ${item.veiculo1.modelo}`)
+  const nome2 = capitalizarPalavras(`${item.veiculo2.marca} ${item.veiculo2.modelo}`)
+  return `${nome1} vs ${nome2}`
 }
 
 export default function Historico() {
