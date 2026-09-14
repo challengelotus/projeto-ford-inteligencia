@@ -262,31 +262,40 @@ export default function CompararVeiculos({ aoSalvar, itemHistorico }) {
               {ajusteFino ? t('presets.fechar_ajuste') : t('presets.ajuste_fino')}
             </button>
 
-            {ajusteFino && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-                {Object.entries(GRUPOS_ATRIBUTOS).map(([grupoId, itens]) => (
-                  <div key={grupoId}>
-                    <div className="font-mono text-[9.5px] tracking-[.14em] text-[#5d6b82] uppercase mb-2.5">{t(`grupos.${grupoId}`)}</div>
-                    <div className="flex flex-wrap gap-2">
-                      {itens.map(atributo => {
-                        const ativo = selecionados.includes(atributo)
-                        return (
-                          <button
-                            key={atributo}
-                            onClick={() => toggle(atributo)}
-                            className={`px-3 py-2 rounded-full border text-sm transition ${
-                              ativo ? 'border-[#1e6bff] bg-[#1e6bff]/15 text-white' : 'border-[rgba(120,160,220,.16)] bg-[#080e1a] text-[#7e90ac]'
-                            }`}
-                          >
-                            {traduzirAtributo(atributo, i18n.language)}
-                          </button>
-                        )
-                      })}
+            <div
+              className="grid transition-[grid-template-rows] duration-300 ease-in-out"
+              style={{ gridTemplateRows: ajusteFino ? '1fr' : '0fr' }}
+            >
+              <div className="overflow-hidden min-h-0">
+                <div
+                  className={`grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 transition-opacity duration-300 ${
+                    ajusteFino ? 'opacity-100 delay-100' : 'opacity-0'
+                  }`}
+                >
+                  {Object.entries(GRUPOS_ATRIBUTOS).map(([grupoId, itens]) => (
+                    <div key={grupoId}>
+                      <div className="font-mono text-[9.5px] tracking-[.14em] text-[#5d6b82] uppercase mb-2.5">{t(`grupos.${grupoId}`)}</div>
+                      <div className="flex flex-wrap gap-2">
+                        {itens.map(atributo => {
+                          const ativo = selecionados.includes(atributo)
+                          return (
+                            <button
+                              key={atributo}
+                              onClick={() => toggle(atributo)}
+                              className={`px-3 py-2 rounded-full border text-sm transition ${
+                                ativo ? 'border-[#1e6bff] bg-[#1e6bff]/15 text-white' : 'border-[rgba(120,160,220,.16)] bg-[#080e1a] text-[#7e90ac]'
+                              }`}
+                            >
+                              {traduzirAtributo(atributo, i18n.language)}
+                            </button>
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            )}
+            </div>
           </div>
 
           {erro && (

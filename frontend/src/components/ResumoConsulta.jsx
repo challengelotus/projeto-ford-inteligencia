@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { ATRIBUTOS } from '../data/attributesData'
+import { capitalizarPalavras } from '../utils/texto'
 
 export default function ResumoConsulta({ marca, modelo, versao, ano, selecionados, onExtrair, disabled }) {
   const { t } = useTranslation()
 
-  const titulo = [marca, modelo, versao].filter(Boolean).join(' ') || t('resumo.sem_nome')
+  const titulo = capitalizarPalavras([marca, modelo, versao].filter(Boolean).join(' ')) || t('resumo.sem_nome')
 
   const linhas = [
     { k: t('resumo.ano'), v: ano || '—' },
@@ -30,14 +31,14 @@ export default function ResumoConsulta({ marca, modelo, versao, ano, selecionado
         ))}
       </div>
 
-<button
-  onClick={onExtrair}
-  disabled={disabled}
-  className="w-full mt-[22px] rounded-2xl h-14 px-5 font-bold text-[15px] flex items-center justify-between transition disabled:cursor-not-allowed"
-  style={disabled
-    ? { background: 'rgba(120,160,220,.1)', color: '#5d6b82' }
-    : { background: '#1e6bff', color: '#fff', animation: 'fcd-glow 2.4s ease-in-out infinite' }}
->
+      <button
+        onClick={onExtrair}
+        disabled={disabled}
+        className="w-full mt-[22px] rounded-2xl h-14 px-5 font-bold text-[15px] flex items-center justify-between transition disabled:cursor-not-allowed"
+        style={disabled
+          ? { background: 'rgba(120,160,220,.1)', color: '#5d6b82' }
+          : { background: '#1e6bff', color: '#fff', animation: 'fcd-glow 2.4s ease-in-out infinite' }}
+      >
         <span>{t('resumo.extrair')}</span>
         <span
           className="font-mono font-bold text-[11px] px-[9px] py-1.5 rounded-[7px]"

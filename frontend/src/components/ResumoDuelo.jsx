@@ -1,9 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { ATRIBUTOS, COMPARAVEIS_DUELO } from '../data/attributesData'
+import { capitalizarPalavras } from '../utils/texto'
 
 export default function ResumoDuelo({ v1, v2, selecionados, onComparar, disabled }) {
   const { t } = useTranslation()
-  const titulo = `${[v1.marca, v1.modelo].filter(Boolean).join(' ') || '—'}  vs  ${[v2.marca, v2.modelo].filter(Boolean).join(' ') || '—'}`
+  const nome1 = capitalizarPalavras([v1.marca, v1.modelo].filter(Boolean).join(' ')) || '—'
+  const nome2 = capitalizarPalavras([v2.marca, v2.modelo].filter(Boolean).join(' ')) || '—'
+  const titulo = `${nome1}  vs  ${nome2}`
   const comparaveis = selecionados.filter(a => COMPARAVEIS_DUELO[a]).length
   const qualitativos = selecionados.length - comparaveis
 
@@ -29,14 +32,15 @@ export default function ResumoDuelo({ v1, v2, selecionados, onComparar, disabled
           </div>
         ))}
       </div>
-<button
-  onClick={onComparar}
-  disabled={disabled}
-  className="w-full mt-[22px] rounded-2xl h-14 px-5 font-bold text-[15px] flex items-center justify-between transition disabled:cursor-not-allowed"
-  style={disabled
-    ? { background: 'rgba(120,160,220,.1)', color: '#5d6b82' }
-    : { background: '#1e6bff', color: '#fff', animation: 'fcd-glow 2.4s ease-in-out infinite' }}
->
+
+      <button
+        onClick={onComparar}
+        disabled={disabled}
+        className="w-full mt-[22px] rounded-2xl h-14 px-5 font-bold text-[15px] flex items-center justify-between transition disabled:cursor-not-allowed"
+        style={disabled
+          ? { background: 'rgba(120,160,220,.1)', color: '#5d6b82' }
+          : { background: '#1e6bff', color: '#fff', animation: 'fcd-glow 2.4s ease-in-out infinite' }}
+      >
         <span>{t('duelo.comparar_veiculos')}</span>
         <span
           className="font-mono font-bold text-[11px] px-[9px] py-1.5 rounded-[7px]"
