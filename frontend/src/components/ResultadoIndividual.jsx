@@ -5,11 +5,25 @@ import { capitalizarPalavras } from '../utils/texto'
 
 const PRIORIDADE_HERO = ['Potência', 'Torque', 'Aceleração 0-100 km/h']
 
+const ABREVIACOES_UNIDADE = {
+  segundos: 's', segundo: 's', seg: 's', s: 's',
+  cavalos: 'cv', cv: 'cv',
+  'kgf.m': 'kgfm', 'kgf·m': 'kgfm', kgfm: 'kgfm',
+  'n.m': 'Nm', nm: 'Nm', Nm: 'Nm',
+  rpm: 'rpm',
+}
+
+function abreviarUnidade(unidade) {
+  if (!unidade) return unidade
+  const chave = unidade.toLowerCase().replace(/\s+/g, '')
+  return ABREVIACOES_UNIDADE[chave] || unidade
+}
+
 function extrairNumeroEUnidade(valor) {
   const texto = String(valor)
   const m = texto.match(/^([\d.,]+)\s*([^\s\d]*)/)
   if (!m) return { numero: texto, unidade: '' }
-  return { numero: m[1], unidade: m[2] || '' }
+  return { numero: m[1], unidade: abreviarUnidade(m[2]) }
 }
 
 function StatCard({ label, valor, unidade }) {
@@ -33,10 +47,11 @@ function StatCard({ label, valor, unidade }) {
   }, [valor])
 
   return (
-    <div className="flex-1 min-w-0 bg-[rgba(4,7,14,.5)] border border-[rgba(120,160,220,.14)] rounded-2xl px-3 sm:px-[18px] py-3 sm:py-4">
+    <div className="flex-1 min-w-0 overflow-hidden bg-[rgba(4,7,14,.5)] border border-[rgba(120,160,220,.14)] rounded-2xl px-3 sm:px-[18px] py-3 sm:py-4">
       <div className="font-mono text-[8.5px] sm:text-[9px] tracking-[.1em] text-[#7e90ac] uppercase truncate">{label}</div>
-      <div className="font-sans font-extrabold text-white text-[22px] sm:text-[30px] leading-none mt-2 sm:mt-2.5">
-        {exibido}<span className="font-mono font-semibold text-[10px] sm:text-xs text-[#8fb6ff] ml-1">{unidade}</span>
+      <div className="flex items-baseline flex-wrap gap-x-1 mt-2 sm:mt-2.5">
+        <span className="font-sans font-extrabold text-white text-[20px] sm:text-[30px] leading-none">{exibido}</span>
+        <span className="font-mono font-semibold text-[9px] sm:text-xs text-[#8fb6ff] leading-none">{unidade}</span>
       </div>
     </div>
   )
