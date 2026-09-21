@@ -1,23 +1,30 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import AppLayout from './components/AppLayout'
 import Login from './pages/Login'
 import Pesquisa from './pages/Pesquisa'
 import Duelo from './pages/Duelo'
 import Historico from './pages/Historico'
 
-function RotaProtegida({ children }) {
+function RotaProtegida() {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" />
-  return children
+  return (
+    <AppLayout>
+      <Outlet />
+    </AppLayout>
+  )
 }
 
 function Rotas() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<RotaProtegida><Pesquisa /></RotaProtegida>} />
-      <Route path="/duelo" element={<RotaProtegida><Duelo /></RotaProtegida>} />
-      <Route path="/historico" element={<RotaProtegida><Historico /></RotaProtegida>} />
+      <Route element={<RotaProtegida />}>
+        <Route path="/" element={<Pesquisa />} />
+        <Route path="/duelo" element={<Duelo />} />
+        <Route path="/historico" element={<Historico />} />
+      </Route>
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )

@@ -31,3 +31,7 @@
 .no-scrollbar {
   -ms-overflow-style: none;
 }
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}

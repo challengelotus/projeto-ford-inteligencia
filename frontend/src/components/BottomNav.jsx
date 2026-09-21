@@ -29,12 +29,21 @@ export default function BottomNav() {
           <button
             key={path}
             onClick={() => navigate(path)}
-            className="flex flex-col items-center gap-[7px] py-[11px] px-[18px] rounded-full transition-all duration-200"
-            style={{ background: ativo ? 'rgba(30,107,255,.16)' : 'transparent', color: ativo ? '#fff' : '#5d6b82' }}
+            className="flex flex-col items-center gap-[7px] py-[11px] px-[18px] rounded-full"
+            style={{
+              background: ativo ? 'rgba(30,107,255,.16)' : 'transparent',
+              color: ativo ? '#fff' : '#5d6b82',
+              transition: 'background 250ms ease, color 250ms ease',
+            }}
           >
             <span
-              className="h-[3px] rounded-full transition-all duration-300"
-              style={{ width: ativo ? 18 : 6, background: ativo ? '#1e6bff' : 'rgba(120,160,220,.3)' }}
+              className="rounded-full"
+              style={{
+                width: ativo ? 22 : 6,
+                height: 3,
+                background: ativo ? '#1e6bff' : 'rgba(120,160,220,.3)',
+                transition: 'width 450ms cubic-bezier(.34,1.56,.64,1), background 300ms ease',
+              }}
             />
             <span className="font-mono font-semibold text-[10.5px] tracking-[.06em]">{t(labelKey)}</span>
           </button>
