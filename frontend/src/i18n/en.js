@@ -72,6 +72,7 @@ export default {
     ficha_tecnica: 'Spec Sheet',
     de_encontrados: 'found',
     fonte_pipeline: 'Source: scrapy + AI (weighted consensus across sources)',
+    contagem: '{{encontrados}} of {{total}} found',
   },
   historico: {
     titulo: 'Search History',

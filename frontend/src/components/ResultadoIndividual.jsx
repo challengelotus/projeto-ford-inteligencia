@@ -4,15 +4,12 @@ import { traduzirAtributo } from '../data/attributeLabels'
 import { capitalizarPalavras } from '../utils/texto'
 
 const PRIORIDADE_HERO = ['Potência', 'Torque', 'Aceleração 0-100 km/h']
-const UNIDADES = {
-  'Potência': { pt: 'cv', en: 'hp', es: 'cv' },
-  'Torque': { pt: 'Nm', en: 'Nm', es: 'Nm' },
-  'Aceleração 0-100 km/h': { pt: 's', en: 's', es: 's' },
-}
 
-function extrairNumero(valor) {
-  const m = String(valor).match(/[\d.,]+/)
-  return m ? m[0] : valor
+function extrairNumeroEUnidade(valor) {
+  const texto = String(valor)
+  const m = texto.match(/^([\d.,]+)\s*([^\s\d]*)/)
+  if (!m) return { numero: texto, unidade: '' }
+  return { numero: m[1], unidade: m[2] || '' }
 }
 
 function StatCard({ label, valor, unidade }) {
@@ -36,10 +33,10 @@ function StatCard({ label, valor, unidade }) {
   }, [valor])
 
   return (
-    <div className="flex-1 min-w-[100px] bg-[rgba(4,7,14,.5)] border border-[rgba(120,160,220,.14)] rounded-2xl px-[14px] sm:px-[18px] py-4">
-      <div className="font-mono text-[9px] tracking-[.1em] text-[#7e90ac] uppercase">{label}</div>
-      <div className="font-sans font-extrabold text-white text-[30px] leading-none mt-2.5">
-        {exibido}<span className="font-mono font-semibold text-xs text-[#8fb6ff] ml-1">{unidade}</span>
+    <div className="flex-1 min-w-0 bg-[rgba(4,7,14,.5)] border border-[rgba(120,160,220,.14)] rounded-2xl px-3 sm:px-[18px] py-3 sm:py-4">
+      <div className="font-mono text-[8.5px] sm:text-[9px] tracking-[.1em] text-[#7e90ac] uppercase truncate">{label}</div>
+      <div className="font-sans font-extrabold text-white text-[22px] sm:text-[30px] leading-none mt-2 sm:mt-2.5">
+        {exibido}<span className="font-mono font-semibold text-[10px] sm:text-xs text-[#8fb6ff] ml-1">{unidade}</span>
       </div>
     </div>
   )
@@ -90,12 +87,15 @@ export default function ResultadoIndividual({ resultado, onNova }) {
   const heroStats = PRIORIDADE_HERO
     .filter(attr => specs[attr] && specs[attr] !== 'Não disponível')
     .slice(0, 3)
-    .map(attr => ({
-      key: attr,
-      label: attr === 'Aceleração 0-100 km/h' ? '0-100' : traduzirAtributo(attr, i18n.language),
-      valor: extrairNumero(specs[attr]),
-      unidade: UNIDADES[attr]?.[i18n.language] || UNIDADES[attr]?.pt,
-    }))
+    .map(attr => {
+      const { numero, unidade } = extrairNumeroEUnidade(specs[attr])
+      return {
+        key: attr,
+        label: attr === 'Aceleração 0-100 km/h' ? '0-100' : traduzirAtributo(attr, i18n.language),
+        valor: numero,
+        unidade,
+      }
+    })
 
   const watermark = heroStats[0]?.valor
 
@@ -123,12 +123,20 @@ export default function ResultadoIndividual({ resultado, onNova }) {
 
   return (
     <div>
-      <button
-        onClick={onNova}
-        className="bg-transparent border-none text-[#7e90ac] hover:text-white font-mono font-semibold text-[11px] flex items-center gap-2 transition"
-      >
-        <span className="text-base">←</span> {t('resultado.nova_pesquisa')}
-      </button>
+      <div className="flex items-center justify-between">
+        <button
+          onClick={onNova}
+          className="bg-transparent border-none text-[#7e90ac] hover:text-white font-mono font-semibold text-[11px] flex items-center gap-2 transition"
+        >
+          <span className="text-base">←</span> {t('resultado.nova_pesquisa')}
+        </button>
+        <button
+          onClick={exportarCSV}
+          className="border border-[rgba(30,107,255,.4)] bg-[rgba(30,107,255,.16)] hover:bg-[rgba(30,107,255,.3)] hover:text-white rounded-[11px] px-4 py-[11px] text-[#8fb6ff] font-sans font-semibold text-xs transition"
+        >
+          {t('resultado.exportar')}
+        </button>
+      </div>
 
       <div
         className="relative mt-4 rounded-[26px] overflow-hidden border border-[rgba(120,160,220,.16)]"
@@ -142,7 +150,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
             {watermark}
           </div>
         )}
-        <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-10">
+        <div className="relative p-5 sm:p-6 md:p-8 flex flex-col md:flex-row md:items-end justify-between gap-5 md:gap-10">
           <div>
             <div className="font-mono text-[11px] tracking-[.16em] text-[#8fb6ff] uppercase">{marca} · {ano}</div>
             <div
@@ -153,7 +161,7 @@ export default function ResultadoIndividual({ resultado, onNova }) {
             </div>
           </div>
           {heroStats.length > 0 && (
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-2 sm:gap-3">
               {heroStats.map(({ key, label, valor, unidade }) => (
                 <StatCard key={key} label={label} valor={valor} unidade={unidade} />
               ))}
@@ -162,19 +170,10 @@ export default function ResultadoIndividual({ resultado, onNova }) {
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-8 mb-1">
+      <div className="mt-8 mb-1">
         <span className="font-mono font-semibold text-[10px] tracking-[.14em] text-[#6f8099] uppercase">
-          {t('resultado.ficha_tecnica')} · {total} {t('resultado.atributo')}
+          {t('resultado.ficha_tecnica')} · <span style={{ color: '#3ed598' }}>{t('resultado.contagem', { encontrados: encontradosCount, total })}</span>
         </span>
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-[11px] text-[#3ed598]">● {encontradosCount} {t('resultado.de_encontrados')}</span>
-          <button
-            onClick={exportarCSV}
-            className="border border-[rgba(30,107,255,.4)] bg-[rgba(30,107,255,.16)] hover:bg-[rgba(30,107,255,.3)] hover:text-white rounded-[11px] px-4 py-[11px] text-[#8fb6ff] font-sans font-semibold text-xs transition"
-          >
-            {t('resultado.exportar')}
-          </button>
-        </div>
       </div>
       <p className="font-mono text-[10px] text-[#4c5a70] mb-4">{t('resultado.fonte_pipeline')}</p>
 

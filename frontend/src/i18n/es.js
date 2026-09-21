@@ -72,6 +72,7 @@ export default {
     ficha_tecnica: 'Ficha Técnica',
     de_encontrados: 'de encontrados',
     fonte_pipeline: 'Fuente: scrapy + IA (consenso ponderado entre fuentes)',
+    contagem: '{{encontrados}} de {{total}} encontrados',
   },
   historico: {
     titulo: 'Historial de Búsquedas',
