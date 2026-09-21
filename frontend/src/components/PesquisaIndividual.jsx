@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useMemo } from 'react'
 import { GRUPOS_ATRIBUTOS, PRESETS, PRESET_IDS, ATRIBUTOS } from '../data/attributesData'
 import { traduzirAtributo } from '../data/attributeLabels'
 import { buscarEspecificacoesReais } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { obterHistorico } from '../utils/historico'
 import ResultadoIndividual from './ResultadoIndividual'
 import ResumoConsulta from './ResumoConsulta'
 import IAAoVivo from './IAAoVivo'
@@ -27,6 +28,20 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
   const [erro, setErro] = useState('')
   const camposRef = useRef([])
 
+  const sugestoes = useMemo(() => {
+    const vistos = new Set()
+    const lista = []
+    for (const item of obterHistorico()) {
+      if (item.tipo !== 'individual') continue
+      const chave = `${item.marca}|${item.modelo}|${item.versao}|${item.ano}`
+      if (vistos.has(chave)) continue
+      vistos.add(chave)
+      lista.push(item)
+      if (lista.length >= 5) break
+    }
+    return lista
+  }, [])
+
   function handleEnterCampo(e, index) {
     if (e.key !== 'Enter') return
     e.preventDefault()
@@ -36,6 +51,13 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
     } else {
       handleBuscar()
     }
+  }
+
+  function aplicarSugestao(item) {
+    setMarca(item.marca)
+    setModelo(item.modelo)
+    setVersao(item.versao)
+    setAno(item.ano)
   }
 
   function toggle(atributo) {
@@ -122,25 +144,43 @@ export default function PesquisaIndividual({ aoSalvar, itemHistorico }) {
         <div className="flex flex-col gap-4">
           <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(180deg,rgba(16,27,46,.95),rgba(9,16,29,.95))', border: '1px solid rgba(120,160,220,.14)' }}>
             <div className="font-mono text-[10px] tracking-[.14em] text-[#6f8099] uppercase mb-4">{t('pesquisa.identificacao_veiculo')}</div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
-              {[
-                { label: t('pesquisa.marca'), value: marca, set: setMarca, placeholder: t('pesquisa.placeholder_marca') },
-                { label: t('pesquisa.modelo'), value: modelo, set: setModelo, placeholder: t('pesquisa.placeholder_modelo') },
-                { label: t('pesquisa.versao'), value: versao, set: setVersao, placeholder: t('pesquisa.placeholder_versao') },
-                { label: t('pesquisa.ano'), value: ano, set: setAno, placeholder: t('pesquisa.placeholder_ano') },
-              ].map(({ label, value, set, placeholder }, index) => (
-                <div key={label} className="flex flex-col gap-2">
-                  <label className="font-mono text-[9.5px] tracking-[.14em] text-[#6f8099] uppercase">{label}</label>
-                  <input
-                    ref={el => (camposRef.current[index] = el)}
-                    placeholder={placeholder}
-                    value={value}
-                    onChange={e => set(e.target.value)}
-                    onKeyDown={e => handleEnterCampo(e, index)}
-                    className="bg-[#080e1a] border border-[rgba(120,160,220,.16)] rounded-xl px-4 py-3.5 text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-semibold"
-                  />
+
+            <div className="mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                {[
+                  { label: t('pesquisa.marca'), value: marca, set: setMarca, placeholder: t('pesquisa.placeholder_marca') },
+                  { label: t('pesquisa.modelo'), value: modelo, set: setModelo, placeholder: t('pesquisa.placeholder_modelo') },
+                  { label: t('pesquisa.versao'), value: versao, set: setVersao, placeholder: t('pesquisa.placeholder_versao') },
+                  { label: t('pesquisa.ano'), value: ano, set: setAno, placeholder: t('pesquisa.placeholder_ano') },
+                ].map(({ label, value, set, placeholder }, index) => (
+                  <div key={label} className="flex flex-col gap-2">
+                    <label className="font-mono text-[9.5px] tracking-[.14em] text-[#6f8099] uppercase">{label}</label>
+                    <input
+                      ref={el => (camposRef.current[index] = el)}
+                      placeholder={placeholder}
+                      value={value}
+                      onChange={e => set(e.target.value)}
+                      onKeyDown={e => handleEnterCampo(e, index)}
+                      className="bg-[#080e1a] border border-[rgba(120,160,220,.16)] rounded-xl px-4 py-3.5 text-white placeholder-[#4c5a70] outline-none focus:border-[#1e6bff] transition font-semibold"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {sugestoes.length > 0 && (
+                <div className="flex flex-wrap gap-[7px] mt-3">
+                  {sugestoes.map((s, i) => (
+                    <button
+                      key={i}
+                      onClick={() => aplicarSugestao(s)}
+                      className="rounded-full px-3 py-[7px] font-mono text-[11.5px] transition"
+                      style={{ background: 'rgba(30,107,255,.1)', border: '1px solid rgba(30,107,255,.28)', color: '#8fb6ff' }}
+                    >
+                      {s.modelo} {s.versao} {String(s.ano).slice(-2)}
+                    </button>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
 
             <div className="flex items-center justify-between mb-4">

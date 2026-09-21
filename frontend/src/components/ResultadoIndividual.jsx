@@ -36,7 +36,7 @@ function StatCard({ label, valor, unidade }) {
   }, [valor])
 
   return (
-    <div className="w-[calc(50%-6px)] sm:w-[150px] bg-[rgba(4,7,14,.5)] border border-[rgba(120,160,220,.14)] rounded-2xl px-[18px] py-4">
+    <div className="flex-1 min-w-[100px] bg-[rgba(4,7,14,.5)] border border-[rgba(120,160,220,.14)] rounded-2xl px-[14px] sm:px-[18px] py-4">
       <div className="font-mono text-[9px] tracking-[.1em] text-[#7e90ac] uppercase">{label}</div>
       <div className="font-sans font-extrabold text-white text-[30px] leading-none mt-2.5">
         {exibido}<span className="font-mono font-semibold text-xs text-[#8fb6ff] ml-1">{unidade}</span>

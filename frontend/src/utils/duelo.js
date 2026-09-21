@@ -21,3 +21,13 @@ export function calcularVantagem(atributo, valor1, valor2) {
   const p1 = Math.round((base1 / soma) * 100)
   return { comparavel: true, empate: false, vencedor, p1, p2: 100 - p1 }
 }
+
+// Diferença percentual bruta de "este" valor em relação ao "outro" — usada no
+// card mobile (ex: "+95%" / "-49%"). É a diferença numérica real, não uma
+// indicação de quem "venceu" (isso já vem de calcularVantagem).
+export function calcularDeltaPercentual(valorEste, valorOutro) {
+  const nEste = extrairNumero(valorEste)
+  const nOutro = extrairNumero(valorOutro)
+  if (nEste == null || nOutro == null || nOutro === 0) return null
+  return Math.round(((nEste - nOutro) / Math.abs(nOutro)) * 100)
+}

@@ -144,6 +144,9 @@ export default {
     atras: 'Atrás',
     sem_vantagem: 'Sem vantagem',
     atributo_por_atributo: 'Atributo por atributo',
+    qualitativo: 'Qualitativo',
+    outro: 'Outro',
+    arraste: 'Arraste',
   },
   resumo: {
     titulo: 'Resumo da Consulta',

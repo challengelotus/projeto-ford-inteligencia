@@ -24,3 +24,10 @@
   0%, 100% { box-shadow: 0 14px 34px -14px rgba(30,107,255,.95); }
   50% { box-shadow: 0 16px 42px -10px rgba(30,107,255,1); }
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+}

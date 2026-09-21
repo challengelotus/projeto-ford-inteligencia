@@ -144,6 +144,9 @@ export default {
     atras: 'Behind',
     sem_vantagem: 'No advantage',
     atributo_por_atributo: 'Attribute by attribute',
+    qualitativo: 'Qualitative',
+outro: 'Other',
+arraste: 'Drag',
   },
   resumo: {
     titulo: 'Query Summary',

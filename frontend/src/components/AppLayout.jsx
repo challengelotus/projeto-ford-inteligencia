@@ -1,5 +1,6 @@
 import Sidebar from './Sidebar'
-import Navbar from './Navbar'
+import BottomNav from './BottomNav'
+import MobileHeader from './MobileHeader'
 import GlobalBackground from './GlobalBackground'
 
 export default function AppLayout({ children }) {
@@ -10,12 +11,16 @@ export default function AppLayout({ children }) {
       <div className="hidden lg:flex relative z-10">
         <Sidebar />
       </div>
-      <div className="lg:hidden relative z-10">
-        <Navbar />
+      <div className="lg:hidden">
+        <MobileHeader />
       </div>
 
-      <div className="flex-1 min-w-0 relative z-10">
+      <div className="flex-1 min-w-0 relative z-10 pb-28 lg:pb-0">
         {children}
+      </div>
+
+      <div className="lg:hidden">
+        <BottomNav />
       </div>
     </div>
   )
