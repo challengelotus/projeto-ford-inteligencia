@@ -3,7 +3,7 @@ def test_usuario_atenticado_acessa_proprio_perfil(client, usuario):
         "/auth/token",
         data={
             "username": "teste@teste.com",
-            "password": "123456",
+            "password": "12345678",
         },
     )
 

@@ -3,7 +3,7 @@ def test_login_sucesso(client, usuario):
         "/auth/token",
         data={
             "username": "teste@teste.com",
-            "password": "123456",
+            "password": "12345678",
         },
     )
     
@@ -34,7 +34,7 @@ def test_login_usuario_inexistente(client):
         "/auth/token",
         data={
             "username": "naoexiste@teste.com",
-            "password": "123456",
+            "password": "12345678",
         },
     )
 

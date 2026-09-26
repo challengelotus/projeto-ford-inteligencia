@@ -17,6 +17,7 @@ from app.services.vehicle_service import (
 from app.utils.helpers import limiter, logger
 
 router = APIRouter(prefix="/veiculos", tags=["Veículos"])
+ai_service = VehicleService()
 
 
 def _obter_ou_processar_veiculo(
@@ -52,8 +53,6 @@ def _obter_ou_processar_veiculo(
             )
 
         # 2. IA e Consenso
-        ai_service = VehicleService()
-        
         especs = ai_service.processar_veiculo_com_ia(
             marca=marca,
             modelo=modelo,

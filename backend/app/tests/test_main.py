@@ -12,4 +12,8 @@ def test_openapi(client):
     assert "openapi" in response.json()
 
 def test_banco_de_testes(client, db):
-    assert db is not None
+    from app.models.user_model import User
+
+    usuarios = db.query(User).all()
+
+    assert usuarios == []
