@@ -229,10 +229,30 @@ def test_buscar_veiculo_retorna_cache(
     usuario,
 ):
     especificacoes = {
-        "motor": "3.0 V6",
-        "potencia": "397 cv",
-        "torque": "583 Nm",
-    }
+            "motor": "3.0 V6",
+            "potencia": "397 cv",
+            "torque": "583 Nm",
+            "cambio": "Automático",
+            "numero_de_marchas": "10",
+            "tracao": "4x4",
+            "propulsao": "Combustão",
+            "suspensao": "Independente",
+            "freios": "Discos",
+            "rodas_e_pneus": "17 polegadas",
+            "farois": "LED",
+            "modos_de_conducao": "Normal, Sport, Off-road",
+            "comprimento": "5,36 m",
+            "largura": "2,03 m",
+            "altura": "1,93 m",
+            "capacidade_do_tanque": "80 L",
+            "peso": "2.510 kg",
+            "aceleracao_0_100": "5,8 s",
+            "velocidade_maxima": "180 km/h",
+            "consumo_urbano": "6 km/l",
+            "consumo_rodoviario": "8 km/l",
+            "preco": "R$ 500.000",
+            "tipo_combustivel": "Gasolina",
+        }
 
     veiculo = create_veiculo(
         db=db,
