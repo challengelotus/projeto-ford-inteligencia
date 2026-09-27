@@ -129,3 +129,25 @@ def usuario(db):
     db.refresh(usuario)
 
     return usuario
+
+# ============================================================
+# ADMIN DE TESTE
+# ============================================================
+
+@pytest.fixture
+def admin(db):
+    """
+    Cria um usuário administrador exclusivamente no banco de testes.
+    """
+    admin = User(
+        nome="Administrador Teste",
+        email="admin@teste.com",
+        senha_hash=get_password_hash("12345678"),
+        role="admin",
+    )
+
+    db.add(admin)
+    db.commit()
+    db.refresh(admin)
+
+    return admin

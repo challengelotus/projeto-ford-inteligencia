@@ -158,4 +158,4 @@ async def comparar_veiculos(
         bypass_cache,
     )
 
-    return VeiculoCompareResponse(veiculo_1=veiculo_1, veiculo_2=veiculo_2)
+    return VeiculoCompareResponse(veiculo1=veiculo_1, veiculo2=veiculo_2)

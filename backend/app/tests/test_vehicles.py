@@ -1,4 +1,5 @@
 from unittest.mock import MagicMock, patch
+from datetime import datetime
 
 from app.services.vehicle_service import gerar_hash_busca
 from app.services.vehicle_service import create_veiculo
@@ -292,3 +293,115 @@ def test_buscar_veiculo_retorna_cache(
 
         mock_scrapy.assert_not_called()
         mock_vehicle_service.assert_not_called()
+        
+@patch(
+    "app.routes.vehicle_routes._obter_ou_processar_veiculo"
+)
+def test_comparar_veiculos_sucesso(
+    mock_obter,
+    client,
+    usuario,
+):
+    from app.models.vehicle_model import Veiculo
+
+    especificacoes = {
+        chave: "não disponível"
+        for chave in (
+            "motor",
+            "potencia",
+            "torque",
+            "cambio",
+            "numero_de_marchas",
+            "tracao",
+            "propulsao",
+            "suspensao",
+            "freios",
+            "rodas_e_pneus",
+            "farois",
+            "modos_de_conducao",
+            "comprimento",
+            "largura",
+            "altura",
+            "capacidade_do_tanque",
+            "peso",
+            "aceleracao_0_100",
+            "velocidade_maxima",
+            "consumo_urbano",
+            "consumo_rodoviario",
+            "preco",
+            "tipo_combustivel",
+        )
+    }
+
+    veiculo1 = Veiculo(
+        id=1,
+        marca="Ford",
+        modelo="Ranger",
+        versao="Raptor",
+        ano=2025,
+        fonte="teste",
+        hash_busca="hash-1",
+        criado_em=datetime.now(),
+        **especificacoes,
+    )
+
+    veiculo2 = Veiculo(
+        id=2,
+        marca="Ford",
+        modelo="Mustang",
+        versao="GT",
+        ano=2025,
+        fonte="teste",
+        hash_busca="hash-2",
+        criado_em=datetime.now(),
+        **especificacoes,
+    )
+
+    mock_obter.side_effect = [
+        veiculo1,
+        veiculo2,
+    ]
+
+    response = client.get(
+        "/veiculos/comparar",
+        params={
+            "marca1": "Ford",
+            "modelo1": "Ranger",
+            "versao1": "Raptor",
+            "ano1": 2025,
+            "marca2": "Ford",
+            "modelo2": "Mustang",
+            "versao2": "GT",
+            "ano2": 2025,
+        },
+        headers={
+            "Authorization": (
+                "Bearer "
+                + headers_autenticacao(client)[
+                    "Authorization"
+                ].replace("Bearer ", "")
+            )
+        },
+    )
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["veiculo1"]["modelo"] == "Ranger"
+    assert data["veiculo2"]["modelo"] == "Mustang"
+
+    assert mock_obter.call_count == 2
+    
+def test_buscar_veiculo_sem_autenticacao(client):
+    response = client.get(
+        "/veiculos/busca",
+        params={
+            "marca": "Ford",
+            "modelo": "Ranger",
+            "versao": "Raptor",
+            "ano": 2025,
+        },
+    )
+
+    assert response.status_code == 401
