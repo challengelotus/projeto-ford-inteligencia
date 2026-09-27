@@ -13,6 +13,9 @@
   <p>
     <b>Desafio Ford FIAP 2026</b> | Desenvolvido por ☁️ <b>Nimbus</b>
   </p>
+  <p>
+    <a href="https://ford-ci.vercel.app"><img src="https://img.shields.io/badge/Acessar_Demo-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Demo ao vivo"/></a>
+  </p>
 </div>
 
 ## 📌 O Problema
@@ -146,6 +149,14 @@ Abaixo, os endpoints centrais do sistema:
 | POST | `/historico/` | Sim | User/Admin | 201 / 400 / 401 / 422 |
 | GET | `/historico/` | Sim | User/Admin | 200 / 401 |
 | DELETE | `/historico/limpeza-antigos` | Sim | **Admin** | 200 / 401 / 403 |
+
+---
+
+## 🔮 Próximos Passos
+
+- [ ] **Hospedar o backend em produção** — hoje ele roda apenas localmente; publicá-lo (Render, Railway ou similar) fecha o ciclo com o frontend já hospedado na Vercel.
+- [ ] **Cache e filas assíncronas** — melhorar o tratamento de buscas simultâneas sem travar o pipeline de scraping/IA.
+- [ ] **Dashboard de analytics** — relatório dos veículos mais buscados/comparados, útil para o time de marketing.
 
 ---
 
