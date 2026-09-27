@@ -4,11 +4,14 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from app.core.database import Base, SessionLocal, engine
 from app.core.security import get_password_hash
 from app.models.user_model import User
 from app.routes import auth_routes, history_routes, user_routes, vehicle_routes
+from app.utils.helpers import limiter
 
 load_dotenv()
 
@@ -40,6 +43,10 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Ford Commercial Intelligence", lifespan=lifespan)
+
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS
 app.add_middleware(

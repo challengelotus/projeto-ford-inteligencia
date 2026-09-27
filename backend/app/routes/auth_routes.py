@@ -1,7 +1,7 @@
 # app/routes/auth_routes.py
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -11,12 +11,15 @@ from app.core.security import create_access_token, create_refresh_token
 from app.dependencies.auth_dependencies import get_current_user
 from app.schemas.auth_schema import Token
 from app.services.auth_service import authenticate_user
+from app.utils.helpers import limiter
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/token", response_model=Token)
+@limiter.limit("5/minute")
 async def login_for_access_token(
+    request: Request,   # noqa: ARG001 (usado internamente pelo slowapi)
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db),
 ):
