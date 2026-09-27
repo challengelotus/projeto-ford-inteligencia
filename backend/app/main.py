@@ -41,10 +41,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Ford Commercial Intelligence", lifespan=lifespan)
 
+origins = [
+    "http://localhost:5173",
+    "https://ford-ci.vercel.app",
+]
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["GET", "POST"],
     allow_headers=["*"],
