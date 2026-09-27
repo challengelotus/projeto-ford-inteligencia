@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Trash2, X } from 'lucide-react'
@@ -29,12 +29,8 @@ function tituloItem(item) {
 
 export default function Historico() {
   const { t } = useTranslation()
-  const [historico, setHistorico] = useState([])
+  const [historico, setHistorico] = useState(() => obterHistorico())
   const navigate = useNavigate()
-
-  useEffect(() => {
-    setHistorico(obterHistorico())
-  }, [])
 
   function remover(id) {
     setHistorico(removerDoHistorico(id))
