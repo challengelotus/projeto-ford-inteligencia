@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 import { useTranslation } from 'react-i18next'
 import { ATRIBUTOS } from '../data/attributesData'
 import GlobalBackground from '../components/GlobalBackground'
@@ -50,7 +50,7 @@ export default function Login() {
       } else {
         setErro(t('login.erro_credenciais'))
       }
-    } catch (error) {
+    } catch {
       setErro(t('login.erro_credenciais'))
     } finally {
       setLoading(false)
