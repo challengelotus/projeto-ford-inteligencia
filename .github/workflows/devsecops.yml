@@ -6,8 +6,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Princípio do menor privilégio para o GITHUB_TOKEN.
-# O workflow só precisa ler o repositório.
 permissions:
   contents: read
 
@@ -17,8 +15,9 @@ concurrency:
 
 jobs:
   backend-quality:
-    name: Backend - validação Python
+    name: Build · Backend Python
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -39,8 +38,9 @@ jobs:
         run: python -m compileall -q backend/app
 
   frontend-quality:
-    name: Frontend - lint e build
+    name: Build · Frontend (Lint & Build)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -53,9 +53,6 @@ jobs:
           cache-dependency-path: frontend/package.json
           package-manager-cache: true
 
-      # O projeto enviado não contém package-lock.json.
-      # Criamos um lock durante o CI para permitir npm ci/npm audit.
-      # Depois da primeira execução, recomenda-se versionar o package-lock.json.
       - name: Gerar lockfile do frontend
         working-directory: frontend
         run: npm install --package-lock-only --ignore-scripts
@@ -73,8 +70,9 @@ jobs:
         run: npm run build
 
   sast:
-    name: SAST - Semgrep
+    name: Security · SAST (Semgrep)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -99,8 +97,9 @@ jobs:
             .
 
   sca-python:
-    name: SCA - Python (pip-audit)
+    name: Security · SCA — Python Dependencies (pip-audit)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -120,8 +119,9 @@ jobs:
         run: pip-audit -r backend/requirements.txt
 
   sca-frontend:
-    name: SCA - Frontend (npm audit)
+    name: Security · SCA — Frontend Dependencies (npm audit)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -146,9 +146,24 @@ jobs:
         working-directory: frontend
         run: npm audit --audit-level=high
 
-  secret-scanning:
-    name: Secret Scanning - Gitleaks
+  dependency-review:
+    name: Security · Dependency Review (PR Diff)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Revisar dependências novas na PR
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: high
+
+  secret-scanning:
+    name: Security · Secret Scanning (Gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout completo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -157,7 +172,7 @@ jobs:
           persist-credentials: false
 
       - name: Executar Gitleaks
-        uses: gitleaks/gitleaks-action@v3
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_COMMENTS: 'false'
@@ -165,8 +180,9 @@ jobs:
           GITLEAKS_ENABLE_SUMMARY: 'true'
 
   security-gate:
-    name: Gate de Segurança
+    name: Security Gate
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs:
       - backend-quality
       - frontend-quality
@@ -179,8 +195,9 @@ jobs:
         run: echo '✅ DevSecOps Gate aprovado. O sistema está apto para a etapa de deploy.'
 
   deploy-simulated:
-    name: Deploy - simulação acadêmica
+    name: Deploy · Simulated
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     needs: security-gate
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     steps:
@@ -189,7 +206,3 @@ jobs:
           echo '🚀 DEPLOY SIMULADO'
           echo 'As validações de qualidade e segurança foram aprovadas.'
           echo 'Neste projeto acadêmico não há infraestrutura de produção conectada ao workflow.'
-
-# Segurança de container: não incluída neste workflow porque a estrutura atual do projeto
-# não possui Dockerfile/container. Se um container for criado no futuro, adicionar Trivy
-# nesta etapa antes do deploy.
