@@ -120,20 +120,32 @@ O Dashboard estará disponível em: `http://localhost:5173`
 
 ---
 
+## 📋 Como Rodar os Testes Automatizados
+
+Dentro de `backend/` rode:
+
+```bash
+pytest -v
+```
+
+---
+
 ## 📖 Contrato da API (Resumo)
 
 A documentação interativa completa, com todos os schemas e testes executáveis, é gerada automaticamente pelo FastAPI e pode ser acessada em **`http://localhost:8000/docs`** ao rodar o projeto.
 
 Abaixo, os endpoints centrais do sistema:
 
-| Método | Endpoint | Descrição | Requer Auth (JWT) |
-| --- | --- | --- | --- |
-| `POST` | `/auth/token` | Recebe `username` (e-mail) e `password` e retorna o Token JWT. | ❌ |
-| `POST` | `/auth/refresh` | Renova o tempo de vida do Token. | ✅ |
-| `GET` | `/users/me/` | Retorna o perfil do usuário logado atual. | ✅ |
-| `POST` | `/veiculos/busca` | Pipeline de IA: Faz scraping, consenso e extrai especificações do veículo. | ✅ |
-| `GET` | `/historico/` | Retorna todas as consultas e comparações salvas pelo usuário. | ✅ |
-| `POST` | `/historico/` | Salva uma nova busca (individual ou comparação) no histórico. | ✅ |
+| Método | Endpoint | Autenticação | Perfil | Validação/resultado |
+|---|---|---|---|---|
+| POST | `/auth/token` | Não | Todos | 200 / 401 / 422 |
+| POST | `/auth/refresh` | Sim | User/Admin | 200 / 401 |
+| GET | `/users/me/` | Sim | User/Admin | 200 / 401 |
+| GET | `/veiculos/busca` | Sim | User/Admin | 200 / 401 / 404 / 503 / 422 |
+| GET | `/veiculos/comparar` | Sim | User/Admin | 200 / 401 / 422 |
+| POST | `/historico/` | Sim | User/Admin | 201 / 400 / 401 / 422 |
+| GET | `/historico/` | Sim | User/Admin | 200 / 401 |
+| DELETE | `/historico/limpeza-antigos` | Sim | **Admin** | 200 / 401 / 403 |
 
 ---
 
